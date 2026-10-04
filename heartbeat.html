@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heartbeat — Bambi Li</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --night:#13101A;
+  --night2:#1C1625;
+  --night3:#221B2E;
+  --rose:#FF769B;
+  --rose-dim:rgba(255,118,155,0.12);
+  --rose-glow:rgba(255,118,155,0.06);
+  --wine:#823F54;
+  --wine-mid:#A0566A;
+  --amber:#FF9737;
+  --cream:#F0EBE3;
+  --muted:rgba(240,235,227,0.48);
+  --muted2:rgba(240,235,227,0.22);
+  --rule:rgba(255,118,155,0.1);
+  --rule2:rgba(255,118,155,0.22);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--night);
+  color:var(--cream);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CURSOR ── */
+#cursor{
+  position:fixed;width:8px;height:8px;
+  background:var(--rose);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+}
+#cursor-ring{
+  position:fixed;width:26px;height:26px;
+  border:1px solid rgba(255,118,155,0.38);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:width .2s,height .2s,border-color .2s;
+}
+
+/* ── PROGRESS ── */
+#progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--wine),var(--rose),var(--amber));
+  z-index:200;width:0%;transition:width .08s linear;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(19,16,26,0.92) 0%,transparent 100%);
+  backdrop-filter:blur(12px);
+}
+.nav-left{display:flex;align-items:center;gap:14px}
+.nav-back{
+  font-size:12px;letter-spacing:.08em;color:var(--muted);
+  text-decoration:none;display:flex;align-items:center;gap:6px;
+  transition:color .2s;
+}
+.nav-back:hover{color:var(--rose)}
+.nav-dot{width:3px;height:3px;border-radius:50%;background:var(--muted2)}
+.nav-project{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.nav-links{display:flex;gap:28px}
+.nav-links a{
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color .2s;
+}
+.nav-links a:hover{color:var(--rose)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:120px 56px 80px;
+  position:relative;overflow:hidden;
+}
+/* ambient glow */
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 55% at 75% 50%, rgba(130,63,84,0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 45% at 20% 30%, rgba(255,118,155,0.05) 0%, transparent 60%);
+  pointer-events:none;
+}
+/* ECG canvas sits low, behind text */
+#hero-ecg{
+  position:absolute;bottom:0;left:0;right:0;height:140px;
+  pointer-events:none;z-index:0;
+}
+.hero-content{position:relative;z-index:1;max-width:760px}
+.hero-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:28px;
+  display:flex;align-items:center;gap:12px;
+}
+.hero-eyebrow::before{
+  content:'';display:block;width:20px;height:1px;background:var(--rose);
+}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(60px,9vw,120px);
+  font-weight:300;line-height:.95;letter-spacing:-.02em;
+  color:var(--cream);margin-bottom:36px;
+}
+.hero-title em{font-style:italic;color:var(--rose)}
+.hero-question{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(18px,2.2vw,26px);
+  font-weight:300;font-style:italic;
+  color:var(--muted);line-height:1.55;max-width:520px;
+  margin-bottom:56px;
+  border-left:1px solid var(--wine);padding-left:20px;
+}
+.hero-meta{display:flex;gap:48px;flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;gap:5px}
+.meta-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2)}
+.meta-val{font-size:13px;color:var(--cream)}
+
+/* ── SECTION BASE ── */
+.section{
+  padding:88px 56px;
+  position:relative;
+}
+.section+.section{border-top:1px solid var(--rule)}
+
+/* chapter tag */
+.ch{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.ch::before{content:'';display:block;width:18px;height:1px;background:var(--rose)}
+
+.s-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(34px,4.5vw,60px);
+  font-weight:300;line-height:1.08;color:var(--cream);margin-bottom:14px;
+}
+.s-title em{font-style:italic;color:var(--rose)}
+.s-sub{
+  font-size:clamp(14px,1.5vw,17px);font-weight:300;
+  color:var(--muted);line-height:1.65;max-width:580px;
+}
+
+/* ECG section divider */
+.ecg-div{
+  width:100%;height:48px;overflow:hidden;
+  border-top:none;border-bottom:none;
+}
+
+/* ── PLACEHOLDER ── */
+.placeholder{
+  width:100%;background:var(--night2);
+  border:1px solid var(--rule);border-radius:6px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;color:var(--muted2);
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+}
+.placeholder svg{opacity:.3}
+
+/* ── ABOUT ── */
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:64px;margin-top:52px;align-items:start;
+}
+.about-quote{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(18px,2vw,24px);font-weight:300;font-style:italic;
+  color:var(--cream);line-height:1.65;
+}
+.about-right{display:flex;flex-direction:column;gap:28px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:5px 12px;border:1px solid var(--rule2);
+  border-radius:2px;color:var(--muted);
+}
+.proto-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:13px 24px;
+  background:var(--rose-dim);border:1px solid var(--rule2);
+  color:var(--rose);font-size:12px;letter-spacing:.08em;
+  text-decoration:none;border-radius:2px;width:fit-content;
+  transition:background .2s,border-color .2s;
+}
+.proto-btn:hover{background:rgba(255,118,155,0.2);border-color:var(--rose)}
+
+/* ── PROBLEMS ── */
+.problems-layout{
+  display:grid;grid-template-columns:240px 1fr;gap:56px;
+  margin-top:52px;align-items:center;
+}
+.phone-ph{
+  aspect-ratio:9/19;width:200px;
+  background:var(--night2);border:1px solid var(--rule);
+  border-radius:28px;display:flex;align-items:center;
+  justify-content:center;color:var(--muted2);
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+}
+.prob-list{display:flex;flex-direction:column;gap:16px}
+.prob-item{
+  display:flex;gap:16px;padding:18px 20px;
+  background:var(--rose-glow);
+  border:1px solid var(--rule);border-radius:3px;
+  transition:border-color .2s,background .2s;
+}
+.prob-item:hover{border-color:var(--rule2);background:var(--rose-dim)}
+.prob-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:300;font-style:italic;
+  color:var(--wine-mid);line-height:1;flex-shrink:0;min-width:24px;
+}
+.prob-t{font-size:14px;font-weight:300;color:var(--muted);line-height:1.6;padding-top:4px}
+
+/* ── INTERVIEW FLIP CARDS ── */
+.iq-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  margin-top:48px;
+}
+.iq-card{
+  position:relative;height:164px;
+  perspective:900px;cursor:pointer;
+}
+.iq-front,.iq-back{
+  position:absolute;inset:0;
+  padding:18px 20px;
+  border:1px solid var(--rule);border-radius:4px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transition:transform .52s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.iq-front{
+  background:var(--rose-glow);
+  border-left:2px solid var(--wine);
+  transform:rotateY(0deg);
+}
+.iq-back{
+  background:rgba(130,63,84,0.15);
+  border-left:2px solid var(--rose);
+  transform:rotateY(180deg);
+}
+.iq-card.flipped .iq-front{transform:rotateY(-180deg)}
+.iq-card.flipped .iq-back{transform:rotateY(0deg)}
+.iq-num{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--wine-mid);
+}
+.iq-card.flipped .iq-num{color:rgba(255,118,155,0.6)}
+.iq-q{font-size:13px;font-weight:300;color:var(--muted);line-height:1.55;flex:1;padding:8px 0}
+.iq-a{font-size:13px;font-weight:300;color:var(--cream);line-height:1.55;flex:1;padding:8px 0;font-style:italic}
+.iq-hint{font-size:10px;letter-spacing:.06em;color:var(--muted2)}
+
+/* ── FLOW / JOURNEY SVG WRAPPERS ── */
+.flow-svg-wrap,.journey-svg-wrap{
+  margin-top:48px;
+  background:var(--night2);
+  border:1px solid var(--rule);border-radius:6px;
+  padding:28px;overflow-x:auto;
+}
+
+/* ── PERSONA GRID ── */
+.persona-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  margin-top:48px;
+}
+.persona-card{
+  border-radius:6px;overflow:hidden;
+  border:1px solid var(--rule);
+  transition:transform .2s,box-shadow .2s;
+}
+.persona-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 40px rgba(130,63,84,0.3);
+}
+
+/* ── SOLUTIONS ── */
+.sol-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  margin-top:48px;
+}
+.sol-card{
+  padding:28px;background:var(--night2);
+  border:1px solid var(--rule);border-radius:3px;
+  transition:transform .2s,border-color .2s;
+}
+.sol-card:hover{transform:translateY(-3px);border-color:var(--rule2)}
+.sol-icon{
+  font-size:20px;margin-bottom:16px;
+  width:36px;height:36px;
+  background:var(--rose-dim);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.sol-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:300;color:var(--cream);margin-bottom:10px;
+}
+.sol-text{font-size:13px;font-weight:300;color:var(--muted);line-height:1.65}
+
+/* ── HIFI / SCREENS ── */
+.hifi-header{
+  display:grid;grid-template-columns:1fr 1fr;gap:56px;
+  margin-top:52px;margin-bottom:48px;align-items:start;
+}
+.hifi-quote{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(17px,1.9vw,23px);font-weight:300;font-style:italic;
+  color:var(--cream);line-height:1.65;
+}
+
+/* 5 screen placeholders */
+.screens-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:14px;
+}
+.screen-ph{
+  aspect-ratio:9/19;background:var(--night2);
+  border:1px solid var(--rule);border-radius:18px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;padding:14px;
+  position:relative;overflow:hidden;
+  transition:transform .25s,box-shadow .25s;
+}
+.screen-ph:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 40px rgba(130,63,84,0.35);
+}
+/* rose tint gradient inside phone */
+.screen-ph::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(130,63,84,0.18) 0%,transparent 60%);
+}
+.screen-ph-label{
+  position:relative;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted2);text-align:center;
+}
+/* tiny phone chrome at top */
+.screen-notch{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:40px;height:6px;background:var(--night3);border-radius:3px;
+}
+/* faint screen content lines */
+.screen-lines{
+  position:absolute;top:28px;left:12px;right:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.screen-line{
+  height:5px;border-radius:2px;
+  background:rgba(240,235,227,0.07);
+}
+.screen-line.wide{width:70%}
+.screen-line.med{width:45%}
+.screen-line.short{width:28%}
+/* colored accent inside screen */
+.screen-accent{
+  position:absolute;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--rose);opacity:.35;
+}
+
+/* ── DEMO ── */
+.demo-wrap{
+  margin-top:48px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--rule);aspect-ratio:16/9;
+  background:var(--night2);position:relative;
+}
+.demo-wrap iframe{width:100%;height:100%;border:none}
+.demo-ov{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(19,16,26,0.35) 100%);
+  pointer-events:none;
+}
+
+/* ── PROCESS BREAK ── */
+.process-break{
+  padding:32px 56px;
+  border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:16px;
+}
+.process-break-line{flex:1;height:1px;background:var(--rule)}
+.process-break-label{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);
+  white-space:nowrap;
+}
+
+/* ── WIREFRAME & HIFI PHONES ── */
+.wf-label-row{
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted2);margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;
+}
+.wf-label-row::after{content:'';flex:1;height:1px;background:var(--rule)}
+.hifi-phones-row{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:14px;
+  margin-bottom:8px;
+}
+.wf-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+}
+.wf-cell{
+  aspect-ratio:9/19.5;
+  background:var(--night2);
+  border:1px solid var(--rule);border-radius:20px;
+  position:relative;overflow:hidden;
+  padding:14px 11px 38px;
+}
+.wf-bar{height:5px;border-radius:2px;background:rgba(240,235,227,0.1);margin-bottom:6px}
+.wf-bar.w100{width:100%}.wf-bar.w70{width:70%}.wf-bar.w50{width:50%}.wf-bar.w35{width:35%}
+.wf-rect{border-radius:4px;background:rgba(240,235,227,0.08);margin-bottom:6px}
+.wf-row{display:flex;gap:5px;margin-bottom:6px}
+.wf-sq{border-radius:4px;background:rgba(240,235,227,0.09);flex:1;aspect-ratio:1}
+.wf-circle{border-radius:50%;background:rgba(240,235,227,0.1)}
+.wf-notch{
+  width:28px;height:4px;background:var(--night3);
+  border-radius:2px;margin:0 auto 10px;
+}
+.wf-tabs{
+  position:absolute;bottom:7px;left:9px;right:9px;
+  height:22px;background:rgba(240,235,227,0.05);
+  border-radius:6px;display:flex;align-items:center;
+  justify-content:space-around;padding:0 6px;
+}
+.wf-tab{width:12px;height:12px;border-radius:50%;background:rgba(240,235,227,0.08)}
+.wf-tab.active{background:rgba(255,118,155,0.38)}
+.wf-name{
+  position:absolute;bottom:32px;left:0;right:0;
+  text-align:center;font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted2);
+}
+
+/* ── USER FLOW ── */
+.flow-ph{
+  margin-top:48px;
+  aspect-ratio:4/3;
+  background:var(--night2);border:1px solid var(--rule);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted2);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  flex-direction:column;gap:12px;
+}
+
+/* ── PERSONAS ── */
+.personas-ph{
+  margin-top:48px;
+  aspect-ratio:16/9;
+  background:var(--night2);border:1px solid var(--rule);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted2);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  flex-direction:column;gap:12px;
+}
+
+/* ── JOURNEY ── */
+.journey-ph{
+  margin-top:48px;
+  aspect-ratio:21/9;
+  background:var(--night2);border:1px solid var(--rule);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted2);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  flex-direction:column;gap:12px;
+}
+
+/* ── STYLE GUIDE ── */
+.sg-layout{
+  margin-top:52px;
+  display:flex;flex-direction:column;gap:0;
+}
+/* top row: type + logo */
+.sg-top{
+  display:grid;grid-template-columns:2fr 1fr;
+  gap:0;border:1px solid var(--rule);border-radius:4px 4px 0 0;overflow:hidden;
+}
+.sg-type{
+  padding:36px 40px;
+  border-right:1px solid var(--rule);
+}
+.sg-type-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);margin-bottom:20px}
+.sg-type-name{
+  font-size:clamp(32px,4vw,52px);
+  color:var(--cream);line-height:1;margin-bottom:12px;
+}
+.sg-type-weights{
+  display:flex;gap:20px;margin-top:8px;
+}
+.sg-type-w{font-size:14px;color:var(--muted)}
+.sg-logo-cell{
+  padding:36px 32px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:var(--night2);
+}
+.sg-logo-circle{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--rose);
+  display:flex;align-items:center;justify-content:center;
+}
+.sg-logo-name{
+  font-size:18px;color:var(--rose);letter-spacing:.02em;
+}
+
+/* color row */
+.sg-colors{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  border:1px solid var(--rule);border-top:none;
+  border-radius:0 0 4px 4px;overflow:hidden;
+}
+.sg-color-cell{
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--rule);
+}
+.sg-color-cell:last-child{border-right:none}
+.sg-color-swatch{height:80px;transition:height .2s}
+.sg-color-swatch:hover{height:96px}
+.sg-color-info{padding:14px 16px}
+.sg-color-hex{font-size:12px;font-family:monospace;color:var(--cream);margin-bottom:2px}
+.sg-color-role{font-size:10px;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase}
+
+/* ── ALL SCREENS ── */
+.all-ph{
+  margin-top:48px;
+  aspect-ratio:3/4;
+  background:var(--night2);border:1px solid var(--rule);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted2);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  flex-direction:column;gap:12px;
+}
+
+/* ── THANK YOU ── */
+.thanks{
+  padding:80px 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--rule);
+  gap:32px;flex-wrap:wrap;
+}
+.thanks-left{display:flex;flex-direction:column;gap:8px}
+.thanks-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2)}
+.thanks-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,4vw,52px);
+  font-weight:300;font-style:italic;color:var(--cream);line-height:1;
+}
+.thanks-sub{font-size:14px;color:var(--muted);font-weight:300}
+.thanks-right{display:flex;gap:16px;flex-wrap:wrap}
+.thanks-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;
+  background:var(--rose-dim);border:1px solid var(--rule2);
+  color:var(--rose);font-size:12px;letter-spacing:.08em;
+  text-decoration:none;border-radius:2px;
+  transition:background .2s,border-color .2s;
+  white-space:nowrap;
+}
+.thanks-btn:hover{background:rgba(255,118,155,0.2);border-color:var(--rose)}
+.thanks-btn.ghost{
+  background:transparent;border-color:var(--rule);color:var(--muted);
+}
+.thanks-btn.ghost:hover{border-color:var(--muted);color:var(--cream)}
+
+/* ── FOOTER ── */
+footer{
+  padding:24px 56px;
+  border-top:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:center;
+}
+footer span{font-size:11px;color:var(--muted2)}
+
+/* ── REVEAL ── */
+.reveal{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .65s ease,transform .65s ease;
+}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  nav{padding:16px 20px}
+  .hero,.section{padding-left:20px;padding-right:20px}
+  .about-grid,.problems-layout,.hifi-header,
+  .sol-grid,.research-grid{grid-template-columns:1fr;gap:28px}
+  .screens-row{grid-template-columns:repeat(3,1fr)}
+  .wf-grid{grid-template-columns:repeat(2,1fr)}
+  .sg-top{grid-template-columns:1fr}
+  .sg-type{border-right:none;border-bottom:1px solid var(--rule)}
+  .sg-colors{grid-template-columns:repeat(3,1fr)}
+  .thanks{flex-direction:column;align-items:flex-start}
+  footer{padding:20px;flex-direction:column;gap:8px}
+  .process-break{padding:24px 20px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a class="nav-back" href="index.html">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M8 2L3.5 6.5 8 11"/>
+      </svg>
+      Back
+    </a>
+    <div class="nav-dot"></div>
+    <span class="nav-project">Heartbeat</span>
+  </div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#design">Design</a>
+    <a href="#process">Process</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="hero-ecg"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Human · Mobile · Social</div>
+    <h1 class="hero-title">Heart<em>beat</em></h1>
+    <p class="hero-question">
+      What if who you are is defined<br>by what you listen to —<br>not what you look like?
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Role</span>
+        <span class="meta-val">UX / UI Designer</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Type</span>
+        <span class="meta-val">Mobile App</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Year</span>
+        <span class="meta-val">2023</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Tools</span>
+        <span class="meta-val">Figma · Protopie</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 01 ABOUT -->
+<section class="section reveal" id="about">
+  <div class="ch">01 — About the Project</div>
+  <h2 class="s-title">Music as <em>identity</em></h2>
+  <p class="s-sub">A social app that lets you find people nearby based on what you're listening to — not how you look.</p>
+  <div class="about-grid">
+    <p class="about-quote">"Heartbeat connects music enthusiasts nearby who share your taste. The emphasis is on music, not appearance — helping those who struggle with traditional photo-based social platforms find their people."</p>
+    <div class="about-right">
+      <div>
+        <div class="ch" style="margin-bottom:10px">Tags</div>
+        <div class="tags">
+          <span class="tag">Social Design</span>
+          <span class="tag">Mobile UX</span>
+          <span class="tag">Community</span>
+          <span class="tag">Music</span>
+          <span class="tag">Matching</span>
+          <span class="tag">Privacy</span>
+        </div>
+      </div>
+      <div>
+        <div class="ch" style="margin-bottom:10px">Prototype</div>
+        <a class="proto-btn" href="https://figmashort.link/JdiCSr" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="7.5" cy="7.5" r="6"/>
+            <polygon points="6,4.5 11,7.5 6,10.5" fill="currentColor" stroke="none"/>
+          </svg>
+          Try the Figma Prototype
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PROBLEMS -->
+<section class="section reveal" id="problems">
+  <div class="ch">02 — Problems</div>
+  <h2 class="s-title">Photo-first <em>isn't for everyone</em></h2>
+  <p class="s-sub">The current social landscape is built around appearance. That excludes a lot of people.</p>
+  <div class="problems-layout">
+    <div class="phone-ph">App Screen Placeholder</div>
+    <div class="prob-list">
+      <div class="prob-item">
+        <span class="prob-n">1</span>
+        <p class="prob-t">Social media primarily revolves around photo-sharing, making identity visual by default.</p>
+      </div>
+      <div class="prob-item">
+        <span class="prob-n">2</span>
+        <p class="prob-t">Individuals lacking confidence in their appearance may feel excluded or uncomfortable.</p>
+      </div>
+      <div class="prob-item">
+        <span class="prob-n">3</span>
+        <p class="prob-t">Users who prefer not to share photos find mainstream platforms less appealing or safe.</p>
+      </div>
+      <div class="prob-item">
+        <span class="prob-n">4</span>
+        <p class="prob-t">Privacy concerns around photo theft and identity remain unaddressed on most platforms.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 USER INTERVIEW -->
+<section class="section reveal" id="research">
+  <div class="ch">03 — Research · User Interview</div>
+  <h2 class="s-title">Listening to <em>listeners</em></h2>
+  <p class="s-sub">Six questions that shaped the design direction. Click any card to reveal what we heard.</p>
+  <div class="iq-grid">
+    <div class="iq-card" data-q="Q1" data-a="Most interviewees listen alone daily — music is a deeply private ritual, rarely shared in real time.">
+      <div class="iq-front">
+        <span class="iq-num">Q1</span>
+        <p class="iq-q">How often do you find yourself listening to music alone?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A1</span>
+        <p class="iq-a">Most interviewees listen alone daily — music is a deeply private ritual, rarely shared in real time.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+    <div class="iq-card" data-q="Q2" data-a="Tastes are wildly varied but people feel strongly about them — genre is identity, not just preference.">
+      <div class="iq-front">
+        <span class="iq-num">Q2</span>
+        <p class="iq-q">What genres or types of music do you enjoy most?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A2</span>
+        <p class="iq-a">Tastes are wildly varied but people feel strongly about them — genre is identity, not just preference.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+    <div class="iq-card" data-q="Q3" data-a="Yes — fear of judgment was common. Many don't share music publicly because taste feels too personal to expose.">
+      <div class="iq-front">
+        <span class="iq-num">Q3</span>
+        <p class="iq-q">Have you ever hesitated to share musical interests on social media?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A3</span>
+        <p class="iq-a">Yes — fear of judgment was common. Many don't share music publicly because taste feels too personal to expose.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+    <div class="iq-card" data-q="Q4" data-a="Most find it hard to start conversations cold. A shared song feels like a much lower-stakes opener.">
+      <div class="iq-front">
+        <span class="iq-num">Q4</span>
+        <p class="iq-q">Are you comfortable initiating conversations with new people?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A4</span>
+        <p class="iq-a">Most find it hard to start conversations cold. A shared song feels like a much lower-stakes opener.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+    <div class="iq-card" data-q="Q5" data-a="Almost universally yes — people imagine it but assumed it wasn't possible without being creepy.">
+      <div class="iq-front">
+        <span class="iq-num">Q5</span>
+        <p class="iq-q">Have you ever wished you could discover people who share your musical tastes?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A5</span>
+        <p class="iq-a">Almost universally yes — people imagine it but assumed it wasn't possible without being creepy.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+    <div class="iq-card" data-q="Q6" data-a="High interest, with one condition: it must feel safe and music-first, not like another dating app.">
+      <div class="iq-front">
+        <span class="iq-num">Q6</span>
+        <p class="iq-q">Are you interested in a social app connecting you with nearby music enthusiasts?</p>
+        <span class="iq-hint">tap to reveal insight →</span>
+      </div>
+      <div class="iq-back">
+        <span class="iq-num">A6</span>
+        <p class="iq-a">High interest, with one condition: it must feel safe and music-first, not like another dating app.</p>
+        <span class="iq-hint">← tap to close</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 SOLUTIONS -->
+<section class="section reveal" id="solutions">
+  <div class="ch">04 — Solutions</div>
+  <h2 class="s-title">Connect through <em>sound</em></h2>
+  <p class="s-sub">Four design principles that shift the focus from looks to listening.</p>
+  <div class="sol-grid">
+    <div class="sol-card">
+      <div class="sol-icon">♪</div>
+      <h3 class="sol-title">Music-first matching</h3>
+      <p class="sol-text">Connect with nearby users based on shared musical preferences. The emphasis is on music, not appearance.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">◎</div>
+      <h3 class="sol-title">Genre-based discovery</h3>
+      <p class="sol-text">Discover like-minded individuals through musical genres and compositions, fostering friendships through shared taste.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">✦</div>
+      <h3 class="sol-title">Low-barrier conversation</h3>
+      <p class="sol-text">Assist those who struggle with verbal expression by giving them music as the opening line of any conversation.</p>
+    </div>
+    <div class="sol-card">
+      <div class="sol-icon">◇</div>
+      <h3 class="sol-title">Appearance-free identity</h3>
+      <p class="sol-text">Shift the focus away from physical appearances — encouraging users to appreciate each other for musical interests.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ECG DIVIDER -->
+<div class="ecg-div">
+  <svg id="ecg-mid" viewBox="0 0 1440 48" preserveAspectRatio="none" fill="none" width="100%" height="48">
+    <path id="ecg-mid-path"
+      d="M0,24 L200,24 L218,24 L226,6 L234,42 L242,6 L250,42 L258,24 L276,24 L500,24 L518,24 L526,6 L534,42 L542,6 L550,42 L558,24 L576,24 L800,24 L818,24 L826,6 L834,42 L842,6 L850,42 L858,24 L876,24 L1100,24 L1118,24 L1126,6 L1134,42 L1142,6 L1150,42 L1158,24 L1176,24 L1440,24"
+      stroke="#FF769B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2000" stroke-dashoffset="2000"/>
+  </svg>
+</div>
+
+<!-- 05 HIFI DESIGN -->
+<section class="section reveal" id="design">
+  <div class="ch">05 — High Fidelity Design</div>
+  <h2 class="s-title">Deep blue, <em>rose light</em></h2>
+  <div class="hifi-header">
+    <p class="hifi-quote">"To evoke an air of mystery, I opted for deep blue and pink — providing users with a distinctive and unique visual experience."</p>
+    <p class="s-sub">Five screens, one coherent world. Each surface of Heartbeat is designed to feel intimate — like putting on headphones in a crowd.</p>
+  </div>
+
+</section>
+
+<!-- 06 DEMO -->
+<section class="section reveal" id="demo">
+  <div class="ch">06 — Demo Reel</div>
+  <h2 class="s-title">See it <em>move</em></h2>
+  <p class="s-sub">A walkthrough of the full app experience — from matching to music to conversation.</p>
+  <div class="demo-wrap">
+    <iframe src="https://www.youtube.com/embed/4oGgocBoOc8" allowfullscreen title="Heartbeat App Demo"></iframe>
+    <div class="demo-ov"></div>
+  </div>
+</section>
+
+<!-- PROCESS BREAK -->
+<div class="process-break">
+  <div class="process-break-line"></div>
+  <span class="process-break-label">Process & Thinking</span>
+  <div class="process-break-line"></div>
+</div>
+
+<!-- 07 WIREFRAME -->
+<section class="section reveal" id="process" style="border-top:none;padding-top:52px">
+  <div class="ch">07 — Wireframes</div>
+  <h2 class="s-title">Before the <em>colour</em></h2>
+  <p class="s-sub">From hifi screens to grayscale foundations — five final screens above, eight wireframe screens below.</p>
+
+  <!-- 5 HIFI PHONES -->
+  <div class="wf-label-row">Hifi Design</div>
+  <div class="hifi-phones-row">
+    <!-- Home -->
+    <div class="wf-cell">
+      <div class="wf-notch"></div>
+      <div class="wf-bar w70" style="margin-top:2px;background:rgba(255,118,155,0.2)"></div>
+      <div class="wf-row"><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.4)"></div><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.4)"></div><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.4)"></div></div>
+      <div class="wf-bar w50" style="background:rgba(255,118,155,0.15)"></div>
+      <div class="wf-row"><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.35)"></div><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.35)"></div><div class="wf-sq" style="border-radius:6px;background:rgba(130,63,84,0.35)"></div></div>
+      <div class="wf-bar w35" style="background:rgba(255,118,155,0.12)"></div>
+      <div class="wf-bar w100" style="height:20px;border-radius:4px;background:rgba(130,63,84,0.3)"></div>
+      <div class="wf-bar w100" style="height:20px;border-radius:4px;background:rgba(130,63,84,0.25)"></div>
+      <div class="wf-name">Home</div>
+      <div class="wf-tabs"><div class="wf-tab active" style="background:rgba(255,118,155,0.5)"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div></div>
+    </div>
+    <!-- Explore -->
+    <div class="wf-cell">
+      <div class="wf-notch"></div>
+      <div style="display:flex;gap:6px;margin-bottom:5px">
+        <div class="wf-bar" style="width:44px;height:14px;border-radius:2px;background:rgba(240,235,227,0.12)"></div>
+        <div class="wf-bar" style="width:36px;height:14px;border-radius:2px;background:rgba(255,118,155,0.3)"></div>
+      </div>
+      <div class="wf-bar w100" style="height:64px;border-radius:5px;background:rgba(130,63,84,0.3)"></div>
+      <div style="height:4px"></div>
+      <div class="wf-row" style="align-items:center">
+        <div class="wf-circle" style="width:20px;height:20px;flex-shrink:0;background:rgba(255,118,155,0.2)"></div>
+        <div style="flex:1"><div class="wf-bar w70" style="background:rgba(240,235,227,0.1)"></div><div class="wf-bar" style="width:40%;background:rgba(240,235,227,0.07)"></div></div>
+      </div>
+      <div class="wf-row" style="align-items:center">
+        <div class="wf-circle" style="width:20px;height:20px;flex-shrink:0;background:rgba(255,118,155,0.2)"></div>
+        <div style="flex:1"><div class="wf-bar w70" style="background:rgba(240,235,227,0.1)"></div><div class="wf-bar" style="width:40%;background:rgba(240,235,227,0.07)"></div></div>
+      </div>
+      <div class="wf-name">Explore</div>
+      <div class="wf-tabs"><div class="wf-tab"></div><div class="wf-tab active" style="background:rgba(255,118,155,0.5)"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div></div>
+    </div>
+    <!-- Matching -->
+    <div class="wf-cell">
+      <div class="wf-notch"></div>
+      <div class="wf-bar w50" style="margin:0 auto 8px;background:rgba(255,118,155,0.15)"></div>
+      <div style="position:relative;height:72px">
+        <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,118,155,0.3);top:12px;left:15%"></div>
+        <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(130,63,84,0.5);top:40px;left:70%"></div>
+        <div style="position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(255,118,155,0.25);top:55px;left:30%"></div>
+        <div style="position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(130,63,84,0.4);top:8px;left:80%"></div>
+        <div style="position:absolute;width:9px;height:9px;border-radius:50%;background:rgba(255,118,155,0.8);top:32px;left:46%;box-shadow:0 0 10px rgba(255,118,155,0.5)"></div>
+      </div>
+      <div class="wf-bar w100" style="height:28px;border-radius:6px;background:rgba(130,63,84,0.35)"></div>
+      <div class="wf-name">Matching</div>
+      <div class="wf-tabs"><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab active" style="background:rgba(255,118,155,0.6)"></div><div class="wf-tab"></div><div class="wf-tab"></div></div>
+    </div>
+    <!-- Chat -->
+    <div class="wf-cell">
+      <div class="wf-notch"></div>
+      <div class="wf-bar w50" style="margin:0 auto 6px;background:rgba(255,118,155,0.12)"></div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <div style="background:rgba(130,63,84,0.45);border-radius:8px 8px 8px 2px;padding:5px 7px;width:68%"><div class="wf-bar w100" style="height:3px;margin-bottom:2px;background:rgba(240,235,227,0.15)"></div><div class="wf-bar w70" style="height:3px;background:rgba(240,235,227,0.1)"></div></div>
+        <div style="background:rgba(255,118,155,0.25);border-radius:8px 8px 2px 8px;padding:5px 7px;width:55%;margin-left:auto"><div class="wf-bar w100" style="height:3px;background:rgba(240,235,227,0.2)"></div></div>
+        <div style="background:rgba(130,63,84,0.4);border-radius:8px 8px 8px 2px;padding:5px 7px;width:72%"><div class="wf-bar w100" style="height:3px;margin-bottom:2px;background:rgba(240,235,227,0.15)"></div><div class="wf-bar w50" style="height:3px;background:rgba(240,235,227,0.1)"></div></div>
+      </div>
+      <div style="height:5px"></div>
+      <div class="wf-bar w100" style="height:20px;border-radius:14px;background:rgba(130,63,84,0.3)"></div>
+      <div class="wf-name">Chat</div>
+      <div class="wf-tabs"><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab active" style="background:rgba(255,118,155,0.5)"></div><div class="wf-tab"></div></div>
+    </div>
+    <!-- Profile -->
+    <div class="wf-cell">
+      <div class="wf-notch"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:6px">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,118,155,0.25);border:1px solid rgba(255,118,155,0.3)"></div>
+        <div class="wf-bar w50" style="margin:0 auto;background:rgba(255,118,155,0.15)"></div>
+        <div class="wf-row" style="gap:10px;margin:0">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="wf-bar" style="width:18px;height:5px;background:rgba(240,235,227,0.15)"></div><div class="wf-bar" style="width:18px;height:3px;background:rgba(240,235,227,0.07)"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="wf-bar" style="width:18px;height:5px;background:rgba(240,235,227,0.15)"></div><div class="wf-bar" style="width:18px;height:3px;background:rgba(240,235,227,0.07)"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="wf-bar" style="width:18px;height:5px;background:rgba(240,235,227,0.15)"></div><div class="wf-bar" style="width:18px;height:3px;background:rgba(240,235,227,0.07)"></div></div>
+        </div>
+      </div>
+      <div class="wf-row"><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.35)"></div><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.3)"></div><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.25)"></div></div>
+      <div class="wf-row"><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.2)"></div><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.2)"></div><div class="wf-sq" style="border-radius:5px;background:rgba(130,63,84,0.2)"></div></div>
+      <div class="wf-name">Profile</div>
+      <div class="wf-tabs"><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab"></div><div class="wf-tab active" style="background:rgba(255,118,155,0.5)"></div></div>
+    </div>
+  </div>
+
+  <!-- 8 WIREFRAME PHONES -->
+  </div>
+</section>
+
+<!-- 08 USER FLOW -->
+<section class="section reveal">
+  <div class="ch">08 — User Flow</div>
+  <h2 class="s-title">Five paths, <em>one heartbeat</em></h2>
+  <p class="s-sub">Music · Explore · Matching · Chat · Profile — each tab is its own universe, connected by the always-present playing bar.</p>
+  <div class="flow-svg-wrap">
+    <svg viewBox="0 0 1060 672" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;max-width:1000px;margin:0 auto">
+      <defs>
+        <marker id="flarr" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,1 L5,3.5 L0,6" fill="none" stroke="rgba(240,235,227,0.28)" stroke-width="1.2"/>
+        </marker>
+        <marker id="flarr-a" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,1 L5,3.5 L0,6" fill="none" stroke="rgba(255,151,55,0.5)" stroke-width="1.2"/>
+        </marker>
+      </defs>
+
+      <!-- ── LAYOUT CONSTANTS ──
+           Tab Y:  Music=75  Explore=205  Matching=335  Chat=465  Profile=595
+           Gap between tabs: 130px (equal throughout)
+           START midpoint: (75+595)/2 = 335  (same as Matching)
+           Columns: trunk x=130, tab x=258..354, L2-trunk x=386, L2-nodes x=444, L3 x=580, leaf x=716
+      -->
+
+      <!-- START -->
+      <rect x="16" y="320" width="76" height="30" rx="5" fill="#823F54"/>
+      <text x="54" y="339" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="white" font-weight="500">Start</text>
+      <line x1="92" y1="335" x2="128" y2="335" stroke="rgba(240,235,227,0.28)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <!-- vertical trunk -->
+      <line x1="130" y1="75" x2="130" y2="595" stroke="rgba(240,235,227,0.1)" stroke-width="1.2"/>
+
+      <!-- ══ MUSIC y=75 ══ children centered: 49 / 75 / 101 -->
+      <line x1="130" y1="75" x2="256" y2="75" stroke="rgba(240,235,227,0.22)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <rect x="256" y="60" width="96" height="30" rx="5" fill="rgba(255,118,155,0.18)" stroke="rgba(255,118,155,0.5)" stroke-width="1.2"/>
+      <text x="304" y="79" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#FF769B">Music</text>
+      <!-- L2 trunk -->
+      <line x1="352" y1="75" x2="384" y2="75" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <line x1="386" y1="37" x2="386" y2="113" stroke="rgba(240,235,227,0.07)" stroke-width="1"/>
+      <!-- Recently y=49 -->
+      <line x1="386" y1="37" x2="442" y2="37" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="24" width="110" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="497" y="41" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Recently</text>
+      <!-- Recommendation y=75 -->
+      <rect x="442" y="62" width="132" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="508" y="79" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Recommendation</text>
+      <!-- Nearby Listening y=101 -->
+      <line x1="386" y1="113" x2="442" y2="113" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="100" width="130" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="507" y="117" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Nearby Listening</text>
+      <!-- Play Music leaf -->
+      <line x1="552" y1="37" x2="614" y2="37" stroke="rgba(240,235,227,0.09)" stroke-width="1" marker-end="url(#flarr-a)"/>
+      <rect x="614" y="24" width="88" height="26" rx="4" fill="rgba(255,151,55,0.1)" stroke="rgba(255,151,55,0.28)" stroke-width="1"/>
+      <text x="658" y="41" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,151,55,0.72)">Play Music</text>
+      <!-- Chat leaf -->
+      <line x1="572" y1="113" x2="614" y2="113" stroke="rgba(240,235,227,0.09)" stroke-width="1" marker-end="url(#flarr-a)"/>
+      <rect x="614" y="100" width="72" height="26" rx="4" fill="rgba(255,151,55,0.1)" stroke="rgba(255,151,55,0.28)" stroke-width="1"/>
+      <text x="650" y="117" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,151,55,0.72)">Chat</text>
+
+      <!-- ══ EXPLORE y=205 ══ children: 179 / 205 / 231 -->
+      <line x1="130" y1="205" x2="256" y2="205" stroke="rgba(240,235,227,0.22)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <rect x="256" y="190" width="96" height="30" rx="5" fill="rgba(255,118,155,0.18)" stroke="rgba(255,118,155,0.5)" stroke-width="1.2"/>
+      <text x="304" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#FF769B">Explore</text>
+      <line x1="352" y1="205" x2="384" y2="205" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <line x1="386" y1="167" x2="386" y2="243" stroke="rgba(240,235,227,0.07)" stroke-width="1"/>
+      <!-- Following y=179 -->
+      <line x1="386" y1="167" x2="442" y2="167" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="154" width="96" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="490" y="171" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Following</text>
+      <!-- Recent y=205 -->
+      <rect x="442" y="192" width="80" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="482" y="209" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Recent</text>
+      <!-- Add Your Post y=231 -->
+      <line x1="386" y1="243" x2="442" y2="243" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="230" width="110" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="497" y="247" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Add Your Post</text>
+
+      <!-- ══ MATCHING y=335 ══ children: 298 / 335 / 372 -->
+      <line x1="130" y1="335" x2="256" y2="335" stroke="rgba(240,235,227,0.22)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <rect x="256" y="320" width="96" height="30" rx="5" fill="rgba(130,63,84,0.6)" stroke="rgba(255,118,155,0.65)" stroke-width="1.5"/>
+      <text x="304" y="339" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#FF769B" font-weight="500">Matching</text>
+      <line x1="352" y1="335" x2="384" y2="335" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <line x1="386" y1="298" x2="386" y2="372" stroke="rgba(240,235,227,0.07)" stroke-width="1"/>
+      <!-- Filter y=298 -->
+      <line x1="386" y1="298" x2="442" y2="298" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="285" width="76" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="480" y="302" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Filter</text>
+      <!-- Filter L3: Location·Gender y=282, MBTI·TAG y=308 -->
+      <line x1="518" y1="297" x2="576" y2="281" stroke="rgba(240,235,227,0.07)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="576" y="268" width="122" height="26" rx="4" fill="rgba(240,235,227,0.04)" stroke="rgba(240,235,227,0.1)" stroke-width="1"/>
+      <text x="637" y="285" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.35)">Location · Gender</text>
+      <line x1="518" y1="297" x2="576" y2="313" stroke="rgba(240,235,227,0.07)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="576" y="300" width="100" height="26" rx="4" fill="rgba(240,235,227,0.04)" stroke="rgba(240,235,227,0.1)" stroke-width="1"/>
+      <text x="626" y="317" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.35)">MBTI · TAG</text>
+      <!-- Save Filter -->
+      <line x1="676" y1="299" x2="742" y2="299" stroke="rgba(240,235,227,0.06)" stroke-width="1" marker-end="url(#flarr-a)"/>
+      <rect x="742" y="286" width="90" height="26" rx="4" fill="rgba(255,151,55,0.1)" stroke="rgba(255,151,55,0.26)" stroke-width="1"/>
+      <text x="787" y="303" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,151,55,0.65)">Save Filter</text>
+      <!-- Matching Result y=335 -->
+      <rect x="442" y="322" width="122" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="503" y="339" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Matching Result</text>
+      <!-- Playing Bar y=372 -->
+      <line x1="386" y1="372" x2="442" y2="372" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="359" width="92" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="488" y="376" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Playing Bar</text>
+
+      <!-- ══ CHAT y=465 ══ children: 439 / 465 / 491 -->
+      <line x1="130" y1="465" x2="256" y2="465" stroke="rgba(240,235,227,0.22)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <rect x="256" y="450" width="96" height="30" rx="5" fill="rgba(255,118,155,0.18)" stroke="rgba(255,118,155,0.5)" stroke-width="1.2"/>
+      <text x="304" y="469" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#FF769B">Chat</text>
+      <line x1="352" y1="465" x2="384" y2="465" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <line x1="386" y1="427" x2="386" y2="503" stroke="rgba(240,235,227,0.07)" stroke-width="1"/>
+      <!-- Message List y=439 -->
+      <line x1="386" y1="427" x2="442" y2="427" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="414" width="104" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="494" y="431" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Message List</text>
+      <!-- Music y=465 -->
+      <rect x="442" y="452" width="76" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="480" y="469" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Music</text>
+      <!-- DM to a friend y=491 -->
+      <line x1="386" y1="503" x2="442" y2="503" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="490" width="118" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="501" y="507" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">DM to a friend</text>
+      <!-- DM leaves: Profile y=478, Add Music y=504 -->
+      <line x1="560" y1="503" x2="614" y2="490" stroke="rgba(240,235,227,0.08)" stroke-width="1" marker-end="url(#flarr-a)"/>
+      <rect x="614" y="477" width="76" height="26" rx="4" fill="rgba(255,151,55,0.1)" stroke="rgba(255,151,55,0.26)" stroke-width="1"/>
+      <text x="652" y="494" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,151,55,0.7)">Profile</text>
+      <line x1="560" y1="503" x2="614" y2="516" stroke="rgba(240,235,227,0.08)" stroke-width="1" marker-end="url(#flarr-a)"/>
+      <rect x="614" y="503" width="92" height="26" rx="4" fill="rgba(255,151,55,0.1)" stroke="rgba(255,151,55,0.26)" stroke-width="1"/>
+      <text x="660" y="520" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(255,151,55,0.7)">Add Music</text>
+
+      <!-- ══ PROFILE y=595 ══ children: 569 / 595 / 621 -->
+      <line x1="130" y1="595" x2="256" y2="595" stroke="rgba(240,235,227,0.22)" stroke-width="1.5" marker-end="url(#flarr)"/>
+      <rect x="256" y="580" width="96" height="30" rx="5" fill="rgba(255,118,155,0.18)" stroke="rgba(255,118,155,0.5)" stroke-width="1.2"/>
+      <text x="304" y="599" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" fill="#FF769B">Profile</text>
+      <line x1="352" y1="595" x2="384" y2="595" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <line x1="386" y1="557" x2="386" y2="633" stroke="rgba(240,235,227,0.07)" stroke-width="1"/>
+      <!-- Profile Info y=569 -->
+      <line x1="386" y1="557" x2="442" y2="557" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="544" width="98" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="491" y="561" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Profile Info</text>
+      <!-- All Posts y=595 -->
+      <rect x="442" y="582" width="82" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="483" y="599" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">All Posts</text>
+      <!-- Chat y=621 -->
+      <line x1="386" y1="633" x2="442" y2="633" stroke="rgba(240,235,227,0.14)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="442" y="620" width="66" height="26" rx="4" fill="rgba(240,235,227,0.05)" stroke="rgba(240,235,227,0.13)" stroke-width="1"/>
+      <text x="475" y="637" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.55)">Chat</text>
+      <!-- All Posts L3 leaves: Follower / Photo / Name -->
+      <line x1="524" y1="557" x2="578" y2="544" stroke="rgba(240,235,227,0.07)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="578" y="531" width="76" height="26" rx="4" fill="rgba(240,235,227,0.04)" stroke="rgba(240,235,227,0.1)" stroke-width="1"/>
+      <text x="616" y="548" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.35)">Follower</text>
+      <line x1="524" y1="595" x2="578" y2="582" stroke="rgba(240,235,227,0.07)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="578" y="569" width="66" height="26" rx="4" fill="rgba(240,235,227,0.04)" stroke="rgba(240,235,227,0.1)" stroke-width="1"/>
+      <text x="611" y="586" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.35)">Photo</text>
+      <line x1="524" y1="620" x2="578" y2="620" stroke="rgba(240,235,227,0.07)" stroke-width="1" marker-end="url(#flarr)"/>
+      <rect x="578" y="607" width="66" height="26" rx="4" fill="rgba(240,235,227,0.04)" stroke="rgba(240,235,227,0.1)" stroke-width="1"/>
+      <text x="611" y="624" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.35)">Name</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 09 PERSONAS -->
+<section class="section reveal">
+  <div class="ch">09 — User Personas</div>
+  <h2 class="s-title">Two people, <em>same longing</em></h2>
+  <p class="s-sub">Stephen, a solo music producer in Copenhagen. Victoria, a college student in Queens. Both looking for connection through music.</p>
+  <div class="persona-grid">
+    <!-- Stephen -->
+    <div class="persona-card">
+      <svg viewBox="0 0 400 340" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <!-- bg -->
+        <rect width="400" height="340" rx="6" fill="#1C1625"/>
+        <rect width="400" height="340" rx="6" fill="url(#sg1)" opacity="0.4"/>
+        <defs>
+          <linearGradient id="sg1" x1="0" y1="0" x2="400" y2="340" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#823F54" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#13101A" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- accent bar top -->
+        <rect width="4" height="340" fill="#823F54" opacity="0.7"/>
+        <!-- avatar circle -->
+        <circle cx="52" cy="60" r="32" fill="rgba(130,63,84,0.3)" stroke="rgba(255,118,155,0.3)" stroke-width="1.5"/>
+        <text x="52" y="67" text-anchor="middle" font-size="22" fill="rgba(240,235,227,0.5)">♂</text>
+        <!-- name + role -->
+        <text x="100" y="48" font-family="Cormorant Garamond, serif" font-size="22" fill="#F0EBE3" font-style="italic">Stephen Warren</text>
+        <text x="100" y="66" font-family="DM Sans, sans-serif" font-size="11" fill="rgba(255,118,155,0.8)" letter-spacing="1">MUSIC PRODUCER</text>
+        <!-- meta pills -->
+        <rect x="100" y="76" width="60" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="130" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Age 25</text>
+        <rect x="168" y="76" width="90" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="213" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Copenhagen, DK</text>
+        <rect x="266" y="76" width="68" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="300" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Lives alone</text>
+        <!-- divider -->
+        <line x1="20" y1="112" x2="380" y2="112" stroke="rgba(255,118,155,0.12)" stroke-width="1"/>
+        <!-- Needs section -->
+        <text x="20" y="132" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,118,155,0.7)" letter-spacing="1.5">NEEDS</text>
+        <circle cx="27" cy="151" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="155" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">Find people with similar music taste</text>
+        <circle cx="27" cy="171" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="175" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">Low-effort ways to meet new people</text>
+        <circle cx="27" cy="191" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="195" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">A way to share music without Instagram</text>
+        <!-- divider -->
+        <line x1="20" y1="212" x2="380" y2="212" stroke="rgba(255,118,155,0.08)" stroke-width="1"/>
+        <!-- Pain points -->
+        <text x="20" y="232" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,151,55,0.7)" letter-spacing="1.5">PAIN POINTS</text>
+        <text x="27" y="252" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· Doesn't have much time to network</text>
+        <text x="27" y="271" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· Can't find local friends with shared taste</text>
+        <text x="27" y="290" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· Aloof personality — hard to approach people</text>
+        <!-- tech usage bars -->
+        <line x1="20" y1="308" x2="380" y2="308" stroke="rgba(255,118,155,0.08)" stroke-width="1"/>
+        <text x="20" y="325" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.3)" letter-spacing="1">TECH</text>
+        <rect x="70" y="316" width="200" height="5" rx="2.5" fill="rgba(240,235,227,0.06)"/>
+        <rect x="70" y="316" width="180" height="5" rx="2.5" fill="rgba(255,118,155,0.35)"/>
+        <text x="280" y="323" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(240,235,227,0.25)">Music App ●●●●○</text>
+      </svg>
+    </div>
+    <!-- Victoria -->
+    <div class="persona-card">
+      <svg viewBox="0 0 400 340" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <rect width="400" height="340" rx="6" fill="#1C1625"/>
+        <rect width="400" height="340" rx="6" fill="url(#sg2)" opacity="0.4"/>
+        <defs>
+          <linearGradient id="sg2" x1="400" y1="0" x2="0" y2="340" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FF769B" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#13101A" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect x="396" width="4" height="340" fill="#FF769B" opacity="0.5"/>
+        <circle cx="52" cy="60" r="32" fill="rgba(255,118,155,0.15)" stroke="rgba(255,118,155,0.3)" stroke-width="1.5"/>
+        <text x="52" y="67" text-anchor="middle" font-size="22" fill="rgba(240,235,227,0.5)">♀</text>
+        <text x="100" y="48" font-family="Cormorant Garamond, serif" font-size="22" fill="#F0EBE3" font-style="italic">Victoria Watson</text>
+        <text x="100" y="66" font-family="DM Sans, sans-serif" font-size="11" fill="rgba(255,118,155,0.8)" letter-spacing="1">COLLEGE STUDENT</text>
+        <rect x="100" y="76" width="60" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="130" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Age 19</text>
+        <rect x="168" y="76" width="100" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="218" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Queens, New York</text>
+        <rect x="276" y="76" width="82" height="18" rx="9" fill="rgba(255,118,155,0.1)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+        <text x="317" y="89" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.5)">Lives w/ family</text>
+        <line x1="20" y1="112" x2="380" y2="112" stroke="rgba(255,118,155,0.12)" stroke-width="1"/>
+        <text x="20" y="132" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,118,155,0.7)" letter-spacing="1.5">NEEDS</text>
+        <circle cx="27" cy="151" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="155" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">Make more friends who share her taste</text>
+        <circle cx="27" cy="171" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="175" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">Find people who also love Arianna Savall</text>
+        <circle cx="27" cy="191" r="2.5" fill="rgba(255,118,155,0.5)"/>
+        <text x="38" y="195" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.6)">A social space beyond Instagram & dating apps</text>
+        <line x1="20" y1="212" x2="380" y2="212" stroke="rgba(255,118,155,0.08)" stroke-width="1"/>
+        <text x="20" y="232" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,151,55,0.7)" letter-spacing="1.5">PAIN POINTS</text>
+        <text x="27" y="252" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· Met many on dating apps, never became friends</text>
+        <text x="27" y="271" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· No Arianna Savall fans in her city</text>
+        <text x="27" y="290" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(240,235,227,0.45)">· Photo-based social feels superficial</text>
+        <line x1="20" y1="308" x2="380" y2="308" stroke="rgba(255,118,155,0.08)" stroke-width="1"/>
+        <text x="20" y="325" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.3)" letter-spacing="1">TECH</text>
+        <rect x="70" y="316" width="200" height="5" rx="2.5" fill="rgba(240,235,227,0.06)"/>
+        <rect x="70" y="316" width="160" height="5" rx="2.5" fill="rgba(255,118,155,0.35)"/>
+        <text x="280" y="323" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(240,235,227,0.25)">Social Media ●●●●○</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 10 USER JOURNEY -->
+<section class="section reveal">
+  <div class="ch">10 — User Journey</div>
+  <h2 class="s-title">From <em>awareness</em> to loyalty</h2>
+  <p class="s-sub">Mapping the emotional arc — and the touchpoints where Heartbeat turns a curious stranger into a loyal listener-friend.</p>
+  <div class="journey-svg-wrap">
+    <svg viewBox="0 0 1030 345" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+      <!-- Column widths: label 144px, each stage 148px x 6 = 888 total -->
+      <!-- Col centers: label=72, stg1=220, stg2=368, stg3=516, stg4=664, stg5=812, stg6=960 -->
+
+      <!-- Header bg -->
+      <rect x="0" y="0" width="1030" height="38" rx="4" fill="rgba(130,63,84,0.28)"/>
+
+      <!-- Stage headers -->
+      <text x="72"  y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.3)" letter-spacing="1.5">STAGE</text>
+      <text x="220" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">AWARENESS</text>
+      <text x="368" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">CONSIDERATION</text>
+      <text x="516" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">DECISION</text>
+      <text x="664" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">USE</text>
+      <text x="812" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">USE+</text>
+      <text x="960" y="23" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.85)" letter-spacing="1.5">LOYALTY</text>
+
+      <!-- Vertical separators -->
+      <line x1="144" y1="0" x2="144" y2="345" stroke="rgba(255,118,155,0.1)" stroke-width="1"/>
+      <line x1="292" y1="38" x2="292" y2="345" stroke="rgba(255,118,155,0.06)" stroke-width="1"/>
+      <line x1="440" y1="38" x2="440" y2="345" stroke="rgba(255,118,155,0.06)" stroke-width="1"/>
+      <line x1="588" y1="38" x2="588" y2="345" stroke="rgba(255,118,155,0.06)" stroke-width="1"/>
+      <line x1="736" y1="38" x2="736" y2="345" stroke="rgba(255,118,155,0.06)" stroke-width="1"/>
+      <line x1="884" y1="38" x2="884" y2="345" stroke="rgba(255,118,155,0.06)" stroke-width="1"/>
+
+      <!-- ── EMOTION ROW y=38..105 height=67 ── -->
+      <rect x="0" y="38" width="1030" height="67" fill="rgba(240,235,227,0.015)"/>
+      <line x1="0" y1="38" x2="1030" y2="38" stroke="rgba(255,118,155,0.08)" stroke-width="1"/>
+      <!-- row label -->
+      <text x="72" y="75" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.38)">Emotion</text>
+      <!-- happy/neutral labels at left -->
+      <text x="148" y="56" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(240,235,227,0.22)">Happy</text>
+      <text x="148" y="72" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(240,235,227,0.22)">Neutral</text>
+      <text x="148" y="88" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(240,235,227,0.16)">Unhappy</text>
+      <!-- Emotion line: neutral(68)→neutral(68)→happy(55)→neutral(68)→happy(55)→happy(55) -->
+      <polyline points="220,72 368,72 516,55 664,72 812,55 960,55"
+        stroke="rgba(255,118,155,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="220" cy="72" r="5" fill="#823F54" stroke="rgba(255,118,155,0.6)" stroke-width="1.5"/>
+      <circle cx="368" cy="72" r="5" fill="#823F54" stroke="rgba(255,118,155,0.6)" stroke-width="1.5"/>
+      <circle cx="516" cy="55" r="6" fill="#FF769B" stroke="rgba(255,118,155,0.85)" stroke-width="1.5"/>
+      <circle cx="664" cy="72" r="5" fill="#823F54" stroke="rgba(255,118,155,0.6)" stroke-width="1.5"/>
+      <circle cx="812" cy="55" r="6" fill="#FF769B" stroke="rgba(255,118,155,0.85)" stroke-width="1.5"/>
+      <circle cx="960" cy="55" r="6" fill="#FF769B" stroke="rgba(255,118,155,0.85)" stroke-width="1.5"/>
+
+      <!-- ── ACTIVITIES ROW y=105..165 height=60 ── -->
+      <line x1="0" y1="105" x2="1030" y2="105" stroke="rgba(255,118,155,0.07)" stroke-width="1"/>
+      <rect x="0" y="105" width="1030" height="60" fill="rgba(130,63,84,0.06)"/>
+      <text x="72" y="137" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.38)">Activities</text>
+      <text x="220" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Hear from friends,</text>
+      <text x="220" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">see online ad</text>
+      <text x="368" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Consider</text>
+      <text x="368" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">downloading</text>
+      <text x="516" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Download &amp;</text>
+      <text x="516" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">register</text>
+      <text x="664" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Listen &amp;</text>
+      <text x="664" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">match people</text>
+      <text x="812" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Chat, post,</text>
+      <text x="812" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">follow people</text>
+      <text x="960" y="128" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">Start matching</text>
+      <text x="960" y="142" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.42)">again &amp; share</text>
+
+      <!-- ── GOALS ROW y=165..225 height=60 ── -->
+      <line x1="0" y1="165" x2="1030" y2="165" stroke="rgba(255,118,155,0.07)" stroke-width="1"/>
+      <rect x="0" y="165" width="1030" height="60" fill="rgba(240,235,227,0.01)"/>
+      <text x="72" y="197" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.38)">Goals</text>
+      <text x="220" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">No specific</text>
+      <text x="220" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">goals yet</text>
+      <text x="368" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">Find best music</text>
+      <text x="368" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">social app</text>
+      <text x="516" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">Listen &amp;</text>
+      <text x="516" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">find friends</text>
+      <text x="664" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">Easy contact,</text>
+      <text x="664" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">many songs</text>
+      <text x="812" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">Easy to use,</text>
+      <text x="812" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">get help fast</text>
+      <text x="960" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">Share feelings,</text>
+      <text x="960" y="202" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.35)">give feedback</text>
+
+      <!-- ── TOUCHPOINTS ROW y=225..285 height=60 ── -->
+      <line x1="0" y1="225" x2="1030" y2="225" stroke="rgba(255,118,155,0.07)" stroke-width="1"/>
+      <rect x="0" y="225" width="1030" height="60" fill="rgba(130,63,84,0.07)"/>
+      <text x="72" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.38)">Touchpoints</text>
+      <!-- Pills: rect y=239 h=32 (taller for breathing room), text at y=255 central -->
+      <rect x="158" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="220" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">Social · Word of mouth</text>
+      <rect x="306" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="368" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">App Store · Website</text>
+      <rect x="454" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="516" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">App · Email</text>
+      <rect x="602" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="664" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">App · Website</text>
+      <rect x="750" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="812" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">App · Email</text>
+      <rect x="898" y="239" width="124" height="32" rx="16" fill="rgba(255,118,155,0.08)" stroke="rgba(255,118,155,0.2)" stroke-width="1"/>
+      <text x="960" y="255" text-anchor="middle" dominant-baseline="central" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(255,118,155,0.7)">App · Website</text>
+
+      <!-- ── OUR GOALS ROW y=285..345 height=60 ── -->
+      <line x1="0" y1="285" x2="1030" y2="285" stroke="rgba(255,118,155,0.07)" stroke-width="1"/>
+      <rect x="0" y="285" width="1030" height="60" fill="rgba(240,235,227,0.01)"/>
+      <text x="72" y="317" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(240,235,227,0.38)">Our Goals</text>
+      <text x="220" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">Increase</text>
+      <text x="220" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">awareness</text>
+      <text x="368" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">More ad</text>
+      <text x="368" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">reviews</text>
+      <text x="516" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">↑ Downloads &amp;</text>
+      <text x="516" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">conversations</text>
+      <text x="664" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">Help find right</text>
+      <text x="664" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">person</text>
+      <text x="812" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">↑ Retention &amp;</text>
+      <text x="812" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">post frequency</text>
+      <text x="960" y="308" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">Turn users</text>
+      <text x="960" y="322" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(240,235,227,0.28)">into advocates</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 11 STYLE GUIDE -->
+<section class="section reveal">
+  <div class="ch">11 — Style Guide</div>
+  <h2 class="s-title">The language of <em>night and rose</em></h2>
+  <p class="s-sub">Comfortaa typeface. Five colours. One consistent mood.</p>
+  <div class="sg-layout">
+    <div class="sg-top">
+      <div class="sg-type">
+        <div class="sg-type-label">Typeface</div>
+        <div class="sg-type-name">Comfortaa</div>
+        <div class="sg-type-weights">
+          <span class="sg-type-w" style="font-weight:700;color:var(--cream)">Bold</span>
+          <span class="sg-type-w" style="font-weight:300">Light</span>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:16px;align-items:baseline">
+          <span style="font-size:36px;color:var(--cream);line-height:1">Aa</span>
+          <span style="font-size:20px;color:var(--muted);line-height:1">Bb Cc</span>
+          <span style="font-size:14px;color:var(--muted2);line-height:1">123</span>
+        </div>
+      </div>
+      <div class="sg-logo-cell">
+        <div class="sg-logo-circle">
+          <!-- headphones icon -->
+          <svg width="32" height="28" viewBox="0 0 32 28" fill="none">
+            <path d="M4 18v-5C4 8.5 9.4 4 16 4s12 4.5 12 9v5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <rect x="1" y="18" width="6" height="8" rx="3" fill="white"/>
+            <rect x="25" y="18" width="6" height="8" rx="3" fill="white"/>
+            <path d="M14 22 Q16 20 18 22" stroke="rgba(255,118,155,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="sg-logo-name">Heartbeat</span>
+      </div>
+    </div>
+    <div class="sg-colors">
+      <div class="sg-color-cell">
+        <div class="sg-color-swatch" style="background:#13101A"></div>
+        <div class="sg-color-info">
+          <div class="sg-color-hex">#13101A</div>
+          <div class="sg-color-role">Night · BG</div>
+        </div>
+      </div>
+      <div class="sg-color-cell">
+        <div class="sg-color-swatch" style="background:#823F54"></div>
+        <div class="sg-color-info">
+          <div class="sg-color-hex">#823F54</div>
+          <div class="sg-color-role">Wine · Secondary</div>
+        </div>
+      </div>
+      <div class="sg-color-cell">
+        <div class="sg-color-swatch" style="background:#FF769B"></div>
+        <div class="sg-color-info">
+          <div class="sg-color-hex">#FF769B</div>
+          <div class="sg-color-role">Rose · Primary</div>
+        </div>
+      </div>
+      <div class="sg-color-cell">
+        <div class="sg-color-swatch" style="background:#FF9737"></div>
+        <div class="sg-color-info">
+          <div class="sg-color-hex">#FF9737</div>
+          <div class="sg-color-role">Amber · Accent</div>
+        </div>
+      </div>
+      <div class="sg-color-cell">
+        <div class="sg-color-swatch" style="background:#FFFFFF;border-bottom:1px solid var(--rule)"></div>
+        <div class="sg-color-info">
+          <div class="sg-color-hex">#FFFFFF</div>
+          <div class="sg-color-role">White · Text</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 ALL SCREENS -->
+<section class="section reveal">
+  <div class="ch">12 — All Screens</div>
+  <h2 class="s-title">The full <em>universe</em></h2>
+  <p class="s-sub">Every screen, together — from splash to profile, matching to chat.</p>
+  <div class="all-ph" style="aspect-ratio:3/4;min-height:400px">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="rgba(240,235,227,0.2)" stroke-width="1.5">
+      <rect x="2" y="2" width="12" height="20" rx="2"/>
+      <rect x="18" y="2" width="12" height="20" rx="2"/>
+      <rect x="2" y="26" width="12" height="4" rx="1"/>
+      <rect x="18" y="26" width="12" height="4" rx="1"/>
+    </svg>
+    All Screens — Placeholder
+  </div>
+</section>
+
+<!-- ECG final divider -->
+<div class="ecg-div">
+  <svg viewBox="0 0 1440 48" preserveAspectRatio="none" fill="none" width="100%" height="48">
+    <path id="ecg-end-path"
+      d="M0,24 L200,24 L218,24 L226,6 L234,42 L242,6 L250,42 L258,24 L276,24 L500,24 L518,24 L526,6 L534,42 L542,6 L550,42 L558,24 L576,24 L800,24 L818,24 L826,6 L834,42 L842,6 L850,42 L858,24 L876,24 L1100,24 L1118,24 L1126,6 L1134,42 L1142,6 L1150,42 L1158,24 L1176,24 L1440,24"
+      stroke="#FF769B" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+  </svg>
+</div>
+
+<!-- THANK YOU -->
+<section class="thanks">
+  <div class="thanks-left">
+    <span class="thanks-eyebrow">Heartbeat · 2023</span>
+    <h2 class="thanks-title">Thanks for<br>watching.</h2>
+    <p class="thanks-sub">Feedback is always welcome.</p>
+  </div>
+  <div class="thanks-right">
+    <a class="thanks-btn" href="https://figmashort.link/JdiCSr" target="_blank">Try Prototype →</a>
+    <a class="thanks-btn" href="https://www.youtube.com/watch?v=4oGgocBoOc8" target="_blank">Watch Demo →</a>
+    <a class="thanks-btn ghost" href="glowin.html">Next: Glowin →</a>
+    <a class="thanks-btn ghost" href="index.html">← Portfolio</a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Bambi Li</span>
+  <span style="color:var(--rose);opacity:.5">♥</span>
+  <span>Heartbeat — Mobile App Design · 2023</span>
+</footer>
+
+<script>
+// ── CURSOR
+const cur=document.getElementById('cursor');
+const ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+(function animR(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animR);
+})();
+document.querySelectorAll('a,button,.sol-card,.prob-item,.screen-ph,.wf-cell').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.width='42px';ring.style.height='42px';ring.style.borderColor='rgba(255,118,155,.65)'});
+  el.addEventListener('mouseleave',()=>{ring.style.width='26px';ring.style.height='26px';ring.style.borderColor='rgba(255,118,155,.38)'});
+});
+
+// ── PROGRESS
+const prog=document.getElementById('progress');
+window.addEventListener('scroll',()=>{
+  const max=document.body.scrollHeight-window.innerHeight;
+  prog.style.width=(window.scrollY/max*100)+'%';
+},{passive:true});
+
+// ── SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+
+// ── HERO ECG CANVAS — animated heartbeat line at bottom of hero
+(function(){
+  const canvas=document.getElementById('hero-ecg');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,offset=0;
+  function resize(){
+    W=canvas.width=canvas.offsetWidth;
+    H=canvas.height=canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  // ECG pulse shape — one beat cycle normalized 0..1
+  function ecgY(x,period){
+    const t=((x%period)+period)%period/period; // 0..1
+    if(t<0.3) return 0;
+    if(t<0.35) return -0.08*(t-0.3)/0.05; // tiny dip
+    if(t<0.4)  return  0.08*(t-0.35)/0.05+(-0.08);  // back up
+    if(t<0.42) return  0;
+    if(t<0.44) return  0.85*(t-0.42)/0.02; // sharp up
+    if(t<0.46) return  0.85-1.7*(t-0.44)/0.02; // sharp down
+    if(t<0.5)  return -0.85+0.85*(t-0.46)/0.04; // recovery
+    if(t<0.58) return  0.22*Math.sin((t-0.5)/0.08*Math.PI); // S wave
+    return 0;
+  }
+
+  const PERIOD=320; // px per beat
+  const BASE=0.72;   // y baseline as fraction of H
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    offset=(offset+0.8)%PERIOD;
+
+    // faint trail lines (multiple beats visible)
+    for(let line=0;line<2;line++){
+      const alpha=line===0?0.18:0.07;
+      ctx.beginPath();
+      ctx.strokeStyle=`rgba(255,118,155,${alpha})`;
+      ctx.lineWidth=line===0?2:1.2;
+      ctx.lineCap='round';
+      ctx.lineJoin='round';
+      for(let x=0;x<=W;x+=2){
+        const y=BASE*H - ecgY(x+offset+(line*160),PERIOD)*H*0.55;
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+
+    // bright leading segment — front portion of the wave
+    const leadLen=80;
+    const leadStart=W*0.55;
+    ctx.beginPath();
+    const grad=ctx.createLinearGradient(leadStart,0,leadStart+leadLen,0);
+    grad.addColorStop(0,'rgba(255,118,155,0)');
+    grad.addColorStop(0.5,'rgba(255,118,155,0.7)');
+    grad.addColorStop(1,'rgba(255,200,130,0.85)');
+    ctx.strokeStyle=grad;
+    ctx.lineWidth=2.2;
+    for(let x=leadStart;x<=leadStart+leadLen;x+=1){
+      const y=BASE*H - ecgY(x+offset,PERIOD)*H*0.55;
+      x===leadStart?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── INTERVIEW FLIP CARDS
+document.querySelectorAll('.iq-card').forEach(card=>{
+  card.addEventListener('click',()=>card.classList.toggle('flipped'));
+});
+
+// ── ECG DIVIDER DRAW-IN on scroll
+(function(){
+  const path=document.getElementById('ecg-mid-path');
+  if(!path)return;
+  const len=path.getTotalLength()||2000;
+  path.style.strokeDasharray=len;
+  path.style.strokeDashoffset=len;
+  path.style.transition='stroke-dashoffset 1.4s ease';
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){path.style.strokeDashoffset='0';obs.disconnect();}
+    });
+  },{threshold:.2});
+  obs.observe(path);
+})();
+</script>
+</body>
+</html>

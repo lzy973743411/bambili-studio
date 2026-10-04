@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glowin Platform — Bambi Li</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F6F3;
+  --bg2:#EFEDE8;
+  --ink:#1A1825;
+  --ink2:#4A4650;
+  --muted:#8B8680;
+  --purple:#6B45FF;
+  --purple-l:rgba(107,69,255,0.08);
+  --purple-b:rgba(107,69,255,0.18);
+  --purple-m:rgba(107,69,255,0.55);
+  --gold:#C9A87C;
+  --pink:#F5307C;
+  --rule:rgba(26,24,37,0.07);
+  --rule2:rgba(26,24,37,0.12);
+  --shadow:0 1px 3px rgba(26,24,37,0.06),0 4px 16px rgba(26,24,37,0.06);
+  --shadow-md:0 2px 8px rgba(26,24,37,0.07),0 8px 32px rgba(26,24,37,0.08);
+  --grid:rgba(26,24,37,0.028);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow-x:hidden;
+  cursor:none;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+/* cursor */
+.cursor-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;top:0;left:0}
+.cursor-ring{width:30px;height:30px;border-radius:50%;border:1px solid rgba(107,69,255,0.4);position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9998;top:0;left:0;transition:width .28s,height .28s,border-color .28s}
+.cursor-ring.hov{width:50px;height:50px;border-color:rgba(107,69,255,0.85)}
+
+/* sticky nav */
+.top-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 2.5rem;
+  backdrop-filter:saturate(1.8) blur(20px);
+  -webkit-backdrop-filter:saturate(1.8) blur(20px);
+  background:rgba(247,246,243,0.82);
+  border-bottom:.5px solid var(--rule2);
+  transform:translateY(-100%);
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+  opacity:0;
+}
+.top-nav.vis{transform:translateY(0);opacity:1}
+.nav-back{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s}
+.nav-back:hover{color:var(--purple)}
+.nav-title{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(26,24,37,0.35)}
+.nav-prog{position:absolute;bottom:0;left:0;height:1.5px;background:linear-gradient(90deg,var(--purple),var(--pink));width:0;transition:width .08s linear}
+
+/* hero */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:0 2.5rem;position:relative;overflow:hidden;
+  background:#FDFCFA;
+}
+@media(min-width:1024px){.hero{padding:0 5.5rem}}
+
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+#il-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+
+.il-scene{position:absolute;inset:0;z-index:2;pointer-events:none}
+
+.il-node{
+  position:absolute;
+  left:var(--tx);top:var(--ty);
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  opacity:0;animation:il-float-in .8s cubic-bezier(.16,1,.3,1) forwards;
+  pointer-events:none;
+}
+.il-node:nth-child(1){animation-delay:.4s}
+.il-node:nth-child(2){animation-delay:.55s}
+.il-node:nth-child(3){animation-delay:.7s}
+.il-node:nth-child(4){animation-delay:.5s}
+.il-node:nth-child(5){animation-delay:.65s}
+.il-node:nth-child(6){animation-delay:.45s}
+@keyframes il-float-in{
+  0%{opacity:0;transform:translate(-50%,-50%) translateY(8px)}
+  100%{opacity:1;transform:translate(-50%,-50%) translateY(0)}
+}
+.il-node-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--c,#6B45FF);
+  opacity:.55;
+  margin-bottom:2px;
+  flex-shrink:0;
+}
+.il-node-label{
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:400;
+  color:var(--ink);
+  line-height:1;
+  white-space:nowrap;
+}
+.il-node-sub{
+  font-family:'DM Sans',sans-serif;
+  font-size:10px;
+  color:var(--muted);
+  white-space:nowrap;
+  opacity:.7;
+}
+.il-hint{
+  position:absolute;
+  bottom:2.5rem;right:2.5rem;
+  font-family:'DM Sans',sans-serif;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);opacity:.4;
+  transition:opacity .6s;
+}
+.il-hint.hidden{opacity:0}
+.hero-c{
+  position:relative;z-index:3;
+  max-width:480px;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--purple);
+  border:.5px solid var(--purple-b);
+  background:var(--purple-l);
+  padding:4px 12px;border-radius:4px;
+  margin-bottom:2rem;
+  opacity:0;animation:fup .6s .2s forwards;
+}
+h1.hero-h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(46px,7.5vw,100px);
+  font-weight:300;letter-spacing:-.03em;line-height:.9;
+  margin-bottom:1.75rem;
+  color:var(--ink);
+}
+h1.hero-h1 span{display:block;overflow:hidden}
+h1.hero-h1 span em{display:block;transform:translateY(110%);opacity:0;animation:sup .95s cubic-bezier(.16,1,.3,1) forwards;font-style:normal}
+h1.hero-h1 span:nth-child(1) em{animation-delay:.3s}
+h1.hero-h1 span:nth-child(2) em{animation-delay:.44s;font-style:italic;color:var(--purple)}
+.hero-sub{font-size:15px;line-height:1.8;color:var(--ink2);max-width:480px;opacity:0;animation:fup .7s .95s forwards}
+.hero-meta{
+  margin-top:2.5rem;
+  display:grid;grid-template-columns:repeat(3,auto);gap:0;
+  opacity:0;animation:fup .7s 1.15s forwards;
+  border:.5px solid var(--rule2);border-radius:6px;overflow:hidden;width:fit-content;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(8px);
+}
+.mi{padding:.7rem 1.4rem;border-right:.5px solid var(--rule2)}
+.mi:last-child{border-right:none}
+.mi label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+.mi span{font-size:11px;color:var(--ink2)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:2.5rem;z-index:2;display:flex;align-items:center;gap:8px;opacity:0;animation:fup .7s 1.4s forwards}
+@media(min-width:1024px){.hero-scroll{left:5.5rem}}
+.scroll-line{width:28px;height:.5px;background:var(--purple);opacity:.4}
+.scroll-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+/* sections */
+.sec{padding:3.5rem 2.5rem;max-width:1160px;margin:0 auto}
+@media(min-width:1024px){.sec{padding:4.5rem 5.5rem}}
+.sec-rule{width:100%;height:.5px;background:linear-gradient(90deg,var(--purple-b),transparent);margin-bottom:2.5rem}
+.chapter{display:flex;align-items:baseline;gap:.9rem;margin-bottom:1.1rem}
+.chapter-num{font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:var(--purple);opacity:.7;min-width:2rem}
+.chapter-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.s-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,52px);font-weight:300;letter-spacing:-.02em;line-height:1.08;margin-bottom:1.25rem;color:var(--ink)}
+.s-h2 em{font-style:italic;color:var(--purple)}
+.s-body{font-size:14px;line-height:1.85;color:var(--ink2);max-width:560px}
+.s-body strong{color:var(--ink);font-weight:400}
+.two-col{display:grid;grid-template-columns:1fr;gap:3rem;margin-top:2.5rem}
+@media(min-width:768px){.two-col{grid-template-columns:1fr 1fr;gap:4.5rem;align-items:start}}
+
+/* problem list */
+.prob-list{margin-top:2rem}
+.prob-item{padding:1.4rem 0 1.4rem 1rem;border-top:.5px solid var(--rule);display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;position:relative}
+.prob-item::before{content:'';position:absolute;left:0;top:1.4rem;bottom:1.4rem;width:1.5px;background:var(--purple);opacity:0;transition:opacity .3s;border-radius:1px}
+.prob-item:hover::before{opacity:.5}
+.prob-num{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:var(--purple);padding-top:2px}
+.prob-t{font-size:13px;color:var(--ink);margin-bottom:.3rem}
+.prob-d{font-size:13px;line-height:1.75;color:var(--ink2)}
+
+/* arch section */
+.arch-wrap{padding:3.5rem 0;position:relative;background:linear-gradient(180deg,var(--bg) 0%,#EDE9F8 40%,#EDE9F8 60%,var(--bg) 100%)}
+.arch-in{max-width:1160px;margin:0 auto;padding:0 2.5rem}
+@media(min-width:1024px){.arch-in{padding:0 5.5rem}}
+
+/* channel cards */
+.ch-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:2.5rem 0}
+@media(min-width:640px){.ch-grid{grid-template-columns:repeat(3,1fr)}}
+.ch-card{
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-radius:8px;padding:1.5rem;
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:box-shadow .3s,transform .35s cubic-bezier(.16,1,.3,1),border-color .3s;
+}
+.ch-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ch-ac,var(--purple));opacity:0;transition:opacity .3s}
+.ch-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.ch-card:hover::before{opacity:1}
+.ch-card.c-pos{--ch-ac:var(--purple)}
+.ch-card.c-online{--ch-ac:var(--pink)}
+.ch-card.c-ai{--ch-ac:var(--gold)}
+.ch-lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.85rem;display:flex;align-items:center;gap:5px}
+.ch-lbl::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ch-ac,var(--purple));flex-shrink:0}
+.c-pos .ch-lbl{color:var(--purple)}
+.c-online .ch-lbl{color:var(--pink)}
+.c-ai .ch-lbl{color:var(--gold)}
+.ch-t{font-size:13px;color:var(--ink);margin-bottom:.35rem}
+.ch-d{font-size:12px;line-height:1.65;color:var(--ink2)}
+
+/* rule table */
+.rtable-wrap{overflow-x:auto;margin-top:2rem;border:.5px solid var(--rule2);border-radius:8px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.rtable{width:100%;border-collapse:collapse}
+.rtable th{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:.65rem 1rem;text-align:left;border-bottom:.5px solid var(--rule2);background:rgba(107,69,255,.03)}
+.rtable td{font-size:12px;padding:.8rem 1rem;border-bottom:.5px solid var(--rule);color:var(--ink2);vertical-align:middle}
+.rtable td:first-child{color:var(--ink)}
+.rtable tr:last-child td{border-bottom:none}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.p-g{background:rgba(34,197,94,.08);border:.5px solid rgba(34,197,94,.2);color:#16A34A}
+.p-y{background:rgba(202,138,4,.08);border:.5px solid rgba(202,138,4,.2);color:#B45309}
+.p-p{background:rgba(107,69,255,.08);border:.5px solid rgba(107,69,255,.2);color:var(--purple)}
+.p-r{background:rgba(245,48,124,.08);border:.5px solid rgba(245,48,124,.2);color:var(--pink)}
+.p-o{background:rgba(201,168,124,.1);border:.5px solid rgba(201,168,124,.22);color:#92712A}
+
+/* UI shell — light card style */
+.monitor{
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:var(--shadow-md);
+}
+/* pair layout: monitor stretches, content fills */
+.pair-col-top .monitor,.pair-col-bottom .monitor{flex:1}
+.pair-col-top .ai-wrap{flex:1;justify-content:space-between}
+.pair-col-bottom .cf-content{flex:1}
+.monitor-bar{
+  height:34px;background:#FAFAF8;
+  display:flex;align-items:center;padding:0 14px;gap:6px;
+  border-bottom:.5px solid var(--rule);
+}
+.m-dot{width:8px;height:8px;border-radius:50%}
+.m-title{font-size:10px;color:rgba(26,24,37,.3);margin:0 auto;letter-spacing:.05em}
+.m-badge{font-size:9px;padding:2px 7px;border-radius:3px;background:var(--purple-l);border:.5px solid var(--purple-b);color:var(--purple);margin-left:auto}
+
+/* status badges */
+.ub{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:3px;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.ub-online{background:rgba(107,69,255,.08);border:.5px solid rgba(107,69,255,.2);color:var(--purple)}
+.ub-ai{background:rgba(22,163,74,.08);border:.5px solid rgba(22,163,74,.2);color:#16A34A}
+.ub-pos{background:rgba(26,24,37,.06);border:.5px solid rgba(26,24,37,.12);color:var(--ink2)}
+.ub-pending{background:rgba(202,138,4,.08);border:.5px solid rgba(202,138,4,.2);color:#B45309}
+.ub-confirmed{background:rgba(107,69,255,.08);border:.5px solid rgba(107,69,255,.2);color:var(--purple)}
+.ub-progress{background:rgba(37,99,235,.08);border:.5px solid rgba(37,99,235,.2);color:#1D4ED8}
+.ub-new{background:rgba(245,48,124,.08);border:.5px solid rgba(245,48,124,.2);color:var(--pink)}
+
+/* annotation card */
+.ann{margin-top:8px;background:rgba(107,69,255,.04);border:.5px solid rgba(107,69,255,.12);border-radius:6px;padding:.9rem 1.2rem}
+.ann-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--purple);display:flex;align-items:center;gap:5px;margin-bottom:.35rem}
+.ann-tag::before{content:'◈';font-size:7px}
+.ann-text{font-size:12.5px;line-height:1.7;color:var(--ink2)}
+.ann-text strong{color:var(--ink);font-weight:400}
+
+/* QUEUE */
+.q-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:.5px solid var(--rule)}
+.q-header h3{font-size:13px;font-weight:500;color:var(--ink);font-family:'DM Sans',sans-serif}
+.q-live{display:flex;align-items:center;gap:5px;font-size:10px;color:#16A34A;letter-spacing:.04em;font-family:'DM Sans',sans-serif}
+.q-live::before{content:'';width:5px;height:5px;border-radius:50%;background:#16A34A;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.q-group{padding:7px 12px 4px}
+.q-g-lbl{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-family:'DM Sans',sans-serif}
+.q-g-dot{width:5px;height:5px;border-radius:50%}
+.q-row{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:6px;cursor:pointer;transition:background .2s;border:.5px solid transparent;font-family:'DM Sans',sans-serif}
+.q-row:hover{background:rgba(107,69,255,.04);border-color:rgba(107,69,255,.1)}
+.q-row.active{background:rgba(107,69,255,.06);border-color:rgba(107,69,255,.18)}
+.q-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.q-name{font-size:11px;color:var(--ink)}
+.q-svc{font-size:10px;color:var(--muted)}
+.q-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:auto}
+.q-time{font-size:10px;color:var(--muted)}
+.q-badges{display:flex;gap:3px}
+.q-detail{display:none;background:rgba(107,69,255,.04);border-top:.5px solid rgba(107,69,255,.1);padding:9px 16px;font-family:'DM Sans',sans-serif}
+.q-detail.open{display:block}
+.q-dr{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.q-dr span:first-child{color:var(--muted)}
+.q-dr span:last-child{color:var(--ink2)}
+.q-acts{display:flex;gap:5px;margin-top:7px}
+.q-btn{font-size:10px;padding:5px 11px;border-radius:4px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.q-btn-ok{background:var(--purple);color:#fff}
+.q-btn-ok:hover{opacity:.85}
+.q-btn-no{background:rgba(26,24,37,.06);color:var(--ink2);border:.5px solid var(--rule2)}
+.q-btn-no:hover{opacity:.7}
+
+/* CALENDAR */
+.cal-wrap{overflow-x:auto}
+.cal-grid{min-width:580px}
+.cal-hdr{display:grid;grid-template-columns:64px repeat(7,1fr);border-bottom:.5px solid var(--rule)}
+.cal-dh{padding:8px 6px;text-align:center}
+.cal-dn{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Sans',sans-serif}
+.cal-dd{font-size:15px;font-weight:300;color:var(--ink2);font-family:'Cormorant Garamond',serif;margin-top:1px}
+.cal-dh.today .cal-dd{color:var(--purple)}
+.cal-body{display:grid;grid-template-columns:64px repeat(7,1fr)}
+.cal-tc{display:flex;flex-direction:column}
+.cal-ts{height:54px;display:flex;align-items:flex-start;padding:5px 8px 0;font-size:9px;color:rgba(26,24,37,.25);border-top:.5px solid var(--rule);font-family:'DM Sans',sans-serif}
+.cal-dc{border-left:.5px solid var(--rule);position:relative}
+.cal-dc .cal-ts{border-top:.5px solid var(--rule)}
+.cal-ev{position:absolute;left:3px;right:3px;border-radius:5px;padding:4px 6px;font-size:9px;cursor:pointer;transition:opacity .2s,transform .15s;font-family:'DM Sans',sans-serif;overflow:hidden}
+.cal-ev:hover{opacity:.82;transform:scale(1.02)}
+.ev-t{font-weight:500;font-size:9px;line-height:1.2}
+.ev-s{font-size:8px;margin-top:1px;opacity:.7}
+.ev-bs{display:flex;gap:2px;margin-top:2px;flex-wrap:wrap}
+.ev-b{font-size:7.5px;padding:1px 4px;border-radius:2px}
+.ev-online{background:rgba(107,69,255,.15);border:.5px solid rgba(107,69,255,.3);color:var(--purple)}
+.ev-ai{background:rgba(22,163,74,.12);border:.5px solid rgba(22,163,74,.25);color:#16A34A}
+.ev-pos{background:rgba(26,24,37,.08);border:.5px solid rgba(26,24,37,.14);color:var(--ink2)}
+/* calendar event card colors */
+.ev-blue{background:linear-gradient(160deg,#EDE9FF 0%,#DDD5FF 100%);color:var(--purple)}
+.ev-blue .ev-t{color:#3B1FAE}
+.ev-purple{background:linear-gradient(160deg,#FCE7F1 0%,#F9C8E0 100%)}
+.ev-purple .ev-t{color:#9D174D}
+.ev-green{background:linear-gradient(160deg,#DCFCE7 0%,#BBF7D0 100%)}
+.ev-green .ev-t{color:#166534}
+
+/* DASHBOARD */
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;border-bottom:.5px solid var(--rule)}
+.ds{background:var(--bg);border-radius:6px;padding:10px 12px;border:.5px solid var(--rule2)}
+.ds-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;margin-bottom:6px}
+.ds-label{font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif}
+.ds-num{font-size:20px;font-weight:300;color:var(--ink);font-family:'Cormorant Garamond',serif;line-height:1.1}
+.ds-delta{font-size:9px;margin-top:2px;font-family:'DM Sans',sans-serif}
+.d-up{color:#16A34A}.d-dn{color:#DC2626}
+.dash-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+@media(max-width:540px){.dash-body{grid-template-columns:1fr}}
+.dp{background:var(--bg);border:.5px solid var(--rule2);border-radius:6px;padding:10px}
+.dp-title{font-size:10px;font-weight:500;color:var(--ink2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-family:'DM Sans',sans-serif}
+.d-issue{border-radius:5px;padding:7px 9px;margin-bottom:5px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.d-issue.warn{background:rgba(202,138,4,.06);border:.5px solid rgba(202,138,4,.14)}
+.d-issue.warn:hover{background:rgba(202,138,4,.1)}
+.d-issue.err{background:rgba(220,38,38,.05);border:.5px solid rgba(220,38,38,.13)}
+.d-issue.err:hover{background:rgba(220,38,38,.09)}
+.d-it{font-size:10px;color:var(--ink)}
+.d-is{font-size:9px;color:var(--muted);margin-top:1px}
+.chan-r{display:flex;align-items:center;gap:7px;padding:4px 0;font-family:'DM Sans',sans-serif}
+.chan-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chan-n{font-size:10px;color:var(--ink2);flex:1}
+.chan-v{font-size:11px;color:var(--ink)}
+.chan-p{font-size:9px;color:var(--muted)}
+.chan-bw{height:3px;background:rgba(26,24,37,.07);border-radius:2px;margin-top:1px;overflow:hidden}
+.chan-bf{height:100%;border-radius:2px;transition:width .9s ease}
+.peak{margin-top:8px;background:#fff;border:.5px solid var(--rule2);border-radius:5px;padding:6px 9px;display:flex;justify-content:space-between;font-family:'DM Sans',sans-serif}
+.peak-l{font-size:9px;color:var(--muted)}
+.peak-v{font-size:10px;color:var(--ink2)}
+
+/* AI BOOKING */
+.ai-wrap{padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.ai-msg{padding:9px 12px;border-radius:8px;font-size:11px;line-height:1.6;max-width:82%;font-family:'DM Sans',sans-serif}
+.ai-user{background:var(--purple);color:#fff;align-self:flex-end}
+.ai-resp{background:#fff;border:.5px solid var(--rule2);color:var(--ink2);align-self:flex-start}
+.ai-proc{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0;color:var(--muted);font-size:9px;letter-spacing:.1em;font-family:'DM Sans',sans-serif}
+.ai-dots{display:flex;gap:3px}
+.ai-d{width:4px;height:4px;border-radius:50%;background:var(--purple);animation:db 1.2s infinite}
+.ai-d:nth-child(2){animation-delay:.2s}.ai-d:nth-child(3){animation-delay:.4s}
+@keyframes db{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-4px);opacity:1}}
+.ai-divider{height:.5px;background:var(--rule);margin:0 4px}
+.ai-result{background:#fff;border:.5px solid var(--rule2);border-radius:8px;overflow:hidden;font-family:'DM Sans',sans-serif}
+.ai-rh{display:flex;align-items:center;gap:5px;padding:9px 12px;border-bottom:.5px solid var(--rule);background:rgba(107,69,255,.03)}
+.ai-rh-dot{width:5px;height:5px;border-radius:50%;background:var(--purple)}
+.ai-rh span{font-size:10px;color:var(--purple);font-weight:500}
+.ai-rrow{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:.5px solid var(--rule)}
+.ai-rrow:last-child{border-bottom:none}
+.ai-rico{width:24px;height:24px;border-radius:6px;background:var(--purple-l);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.ai-rinfo label{font-size:9px;color:var(--muted);display:block}
+.ai-rinfo strong{font-size:11px;color:var(--ink);font-weight:500}
+.ai-rinfo small{font-size:9px;color:var(--muted)}
+
+/* CUSTOMER FLOW */
+.cf-steps{display:flex;padding:12px 16px;border-bottom:.5px solid var(--rule);background:#FAFAF8;position:relative}
+.cf-step{flex:1;text-align:center;position:relative}
+.cf-sn{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;margin:0 auto 4px;transition:all .3s;font-family:'DM Sans',sans-serif}
+.cf-sl{font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif;transition:color .3s}
+.cf-step.active .cf-sn{background:var(--purple);color:#fff}
+.cf-step.active .cf-sl{color:var(--ink2)}
+.cf-step.done .cf-sn{background:rgba(107,69,255,.12);color:var(--purple);border:.5px solid rgba(107,69,255,.25)}
+.cf-step.done .cf-sl{color:var(--muted)}
+.cf-step.todo .cf-sn{background:rgba(26,24,37,.06);color:var(--muted);border:.5px solid var(--rule2)}
+.cf-conn{position:absolute;top:12px;left:calc(50% + 14px);right:calc(-50% + 14px);height:.5px;background:var(--rule2)}
+.cf-conn.done{background:rgba(107,69,255,.3)}
+.cf-content{padding:16px 18px;background:#fff;display:flex;flex-direction:column}
+.cf-panel{display:none;flex:1;flex-direction:column}
+.cf-panel.active{display:flex;flex-direction:column;flex:1}
+.cf-si{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;cursor:pointer;transition:all .2s;border:.5px solid var(--rule);margin-bottom:7px;font-family:'DM Sans',sans-serif}
+.cf-si:hover{background:rgba(107,69,255,.04);border-color:rgba(107,69,255,.18)}
+.cf-si.sel{background:rgba(107,69,255,.07);border-color:rgba(107,69,255,.3)}
+.cf-sico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.cf-sname{font-size:12px;color:var(--ink);flex:1}
+.cf-smeta{font-size:10px;color:var(--muted)}
+.cf-sprice{font-size:12px;color:var(--ink2);text-align:right}
+.cf-chk{width:15px;height:15px;border-radius:50%;border:.5px solid var(--rule2);display:flex;align-items:center;justify-content:center;font-size:8px;color:transparent;transition:all .2s;flex-shrink:0}
+.cf-si.sel .cf-chk{background:var(--purple);border-color:var(--purple);color:#fff}
+.cf-nav{display:flex;justify-content:flex-end;gap:6px;margin-top:auto;padding-top:12px}
+.cf-btn{font-size:10px;padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.cf-next{background:var(--purple);color:#fff}
+.cf-next:hover{opacity:.85}
+.cf-back{background:var(--bg);color:var(--ink2);border:.5px solid var(--rule2)}
+.cf-back:hover{opacity:.7}
+.cf-tg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}
+.cf-ts{padding:7px;border-radius:5px;border:.5px solid var(--rule);text-align:center;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.cf-ts:hover:not(.na){background:rgba(107,69,255,.04);border-color:rgba(107,69,255,.18)}
+.cf-ts.sel{background:rgba(107,69,255,.08);border-color:rgba(107,69,255,.3);color:var(--purple)}
+.cf-ts.na{opacity:.3;cursor:default}
+.cf-tv{font-size:11px;color:var(--ink2)}
+.cf-confirm{background:var(--bg);border:.5px solid var(--rule2);border-radius:7px;overflow:hidden;font-family:'DM Sans',sans-serif}
+.cf-ch{display:flex;align-items:center;gap:7px;padding:9px 12px;border-bottom:.5px solid var(--rule);background:#F0FDF4}
+.cf-chk2{width:18px;height:18px;border-radius:50%;background:#16A34A;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;flex-shrink:0}
+.cf-ch span{font-size:11px;color:#16A34A}
+.cf-crow{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:.5px solid var(--rule)}
+.cf-crow:last-child{border-bottom:none}
+.cf-cico{width:22px;height:22px;border-radius:5px;background:#fff;border:.5px solid var(--rule2);display:flex;align-items:center;justify-content:center;font-size:10px}
+.cf-clabel{font-size:9px;color:var(--muted);display:block}
+.cf-cval{font-size:11px;color:var(--ink)}
+
+/* decisions */
+.dec-list{display:flex;flex-direction:column;gap:8px;margin-top:2rem}
+.dec-card{
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-left:2px solid rgba(107,69,255,.2);
+  border-radius:0 6px 6px 0;
+  padding:1.4rem 1.5rem;
+  box-shadow:var(--shadow);
+  transition:border-left-color .3s,transform .35s cubic-bezier(.16,1,.3,1),box-shadow .3s;
+}
+.dec-card:hover{border-left-color:var(--purple);transform:translateX(4px);box-shadow:var(--shadow-md)}
+.dec-q{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--purple);margin-bottom:.4rem}
+.dec-t{font-size:14px;color:var(--ink);margin-bottom:.4rem}
+.dec-b{font-size:13px;line-height:1.75;color:var(--ink2)}
+
+/* impact */
+.imp-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:2rem}
+@media(min-width:640px){.imp-grid{grid-template-columns:repeat(3,1fr)}}
+.imp-card{
+  padding:1.5rem;background:#fff;
+  border:.5px solid var(--rule2);
+  border-top:2px solid var(--purple);
+  border-radius:0 0 6px 6px;
+  box-shadow:var(--shadow);
+}
+.imp-stat{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;color:var(--purple);line-height:1;margin-bottom:.4rem}
+.imp-label{font-size:12px;color:var(--ink2);line-height:1.6}
+
+/* reflection */
+.refl{
+  padding:3.5rem;background:#fff;
+  border:.5px solid var(--rule2);
+  border-left:3px solid var(--purple);
+  border-radius:0 8px 8px 0;
+  box-shadow:var(--shadow-md);
+  position:relative;overflow:hidden;margin-top:2.5rem;
+}
+.refl::after{content:'◈';position:absolute;right:2rem;top:1.5rem;font-size:72px;color:rgba(107,69,255,.05);line-height:1}
+.refl-text{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,1.65vw,21px);font-weight:300;line-height:1.6;color:var(--ink2)}
+.refl-text em{color:var(--purple);font-style:italic}
+
+/* footer */
+.case-foot{border-top:.5px solid var(--rule2);padding:2.5rem 2.5rem;max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+@media(min-width:1024px){.case-foot{padding:2.5rem 5.5rem}}
+.foot-back{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s}
+.foot-back:hover{color:var(--purple)}
+.foot-c{font-size:11px;color:var(--muted)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+
+
+/* pair row — side by side, staggered */
+.pair-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  align-items:stretch;
+}
+.pair-col-top,.pair-col-bottom{display:flex;flex-direction:column;}
+.pair-col-top .monitor,.pair-col-bottom .monitor{flex:1;display:flex;flex-direction:column;}
+.pair-col-top .ai-wrap,.pair-col-bottom .cf-content{flex:1;}
+.pair-col-top .ann,.pair-col-bottom .ann{margin-top:8px;flex-shrink:0;}
+@media(max-width:860px){.pair-row{grid-template-columns:1fr}}
+.pair-col-top{padding-top:0}
+.pair-col-bottom{padding-top:0}
+
+50%{opacity:.15}}
+.devices-wrap rect[fill="#F5307C"]:not([opacity="0"]){animation:dv-bar 1.5s ease-in-out infinite}
+.ipad-mod-icon{font-size:11px;line-height:1}
+
+/* animated lines inside screen */
+.ipad-flow-lines{
+  position:absolute;bottom:0;left:0;right:0;height:36%;
+  opacity:0.5;pointer-events:none;
+}
+.flow-path{stroke-dasharray:5 4;animation:flow-dash 3s linear infinite}
+@keyframes flow-dash{to{stroke-dashoffset:-36}}
+
+/* Side buttons */
+.ipad-btn-vol{
+  position:absolute;left:-3px;top:80px;
+  width:2px;height:18px;
+  background:rgba(107,69,255,0.25);border-radius:1px;
+  box-shadow:0 22px 0 rgba(107,69,255,0.25);
+}
+.ipad-btn-pwr{
+  position:absolute;right:-3px;top:90px;
+  width:2px;height:22px;
+  background:rgba(107,69,255,0.25);border-radius:1px;
+}
+
+/* Home bar at bottom */
+.ipad-home-bar{
+  width:52px;height:3px;border-radius:2px;
+  background:rgba(107,69,255,0.2);
+  margin:10px auto 0;
+}
+
+@keyframes fup{to{opacity:1;transform:none}}
+@keyframes sup{to{opacity:1;transform:none}}
+
+@media(max-width:860px){
+  .hero{
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:flex-start;
+    padding-top:3.5rem;
+    padding-bottom:2rem;
+    gap:0;
+    min-height:0;
+    height:auto;
+  }
+  #hero-canvas{display:none}
+  #il-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+  .il-scene{
+    position:relative;
+    inset:auto;
+    width:100%;
+    height:52vw;
+    max-height:260px;
+    min-height:160px;
+    flex-shrink:0;
+    z-index:2;
+    overflow:hidden;
+  }
+  .il-hint{display:none}
+  .hero-c{
+    max-width:100%!important;
+    position:relative;z-index:3;
+    padding-top:1.5rem;
+    flex-shrink:0;
+  }
+  .hero-scroll{display:none}
+}
+/* ── System in Motion ── */
+.sim-wrap{padding:0 2.5rem 4rem;max-width:1160px;margin:0 auto}
+@media(min-width:1024px){.sim-wrap{padding:0 5.5rem 4rem}}
+.sim-inner{display:flex;flex-direction:column;align-items:center;gap:0}
+
+/* input nodes */
+.sim-layer{display:flex;gap:1rem;justify-content:center;margin-bottom:0}
+.sim-node{
+  display:flex;align-items:center;gap:7px;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;
+  color:var(--ink2);
+  border:.5px solid var(--rule2);
+  background:#fff;
+  border-radius:6px;padding:6px 14px;
+  box-shadow:var(--shadow);
+}
+.sim-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:.7}
+
+/* converge arrows svg */
+.sim-arrow-group{width:200px;height:48px}
+.sim-svg{width:100%;height:100%}
+
+/* pipeline */
+.sim-pipeline{
+  display:flex;align-items:center;
+  gap:0;width:100%;
+  overflow-x:auto;
+  padding:0 1rem;
+}
+@media(max-width:700px){
+  .sim-pipeline{flex-direction:column;align-items:stretch;padding:0}
+}
+.sim-step{flex:1;min-width:0}
+.sim-step-inner{
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-top:2px solid var(--purple);
+  border-radius:0 0 6px 6px;
+  padding:1.1rem 1.25rem;
+  box-shadow:var(--shadow);
+  height:100%;
+  transition:border-top-color .3s,box-shadow .3s;
+}
+.sim-step:hover .sim-step-inner{
+  border-top-color:var(--pink);
+  box-shadow:var(--shadow-md);
+}
+.sim-step-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:11px;font-style:italic;
+  color:var(--purple);opacity:.6;
+  margin-bottom:.3rem;
+}
+.sim-step-label{
+  font-size:13px;font-weight:400;
+  color:var(--ink);margin-bottom:.25rem;
+}
+.sim-step-sub{font-size:11px;color:var(--muted);line-height:1.5}
+.sim-connector{
+  width:28px;flex-shrink:0;height:1px;
+  background:linear-gradient(90deg,var(--rule2),var(--purple-b),var(--rule2));
+  position:relative;
+  margin-top:-2rem;
+}
+.sim-connector::after{
+  content:'';position:absolute;
+  right:-3px;top:-3px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--purple);opacity:.3;
+}
+@media(max-width:700px){
+  .sim-connector{width:1px;height:20px;margin:0 auto;margin-top:0;
+    background:linear-gradient(180deg,var(--rule2),var(--purple-b),var(--rule2));}
+  .sim-connector::after{right:-2.5px;bottom:-3px;top:auto}
+}
+
+/* tagline */
+.sim-tagline{
+  margin-top:2.5rem;
+  text-align:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(18px,2.2vw,26px);
+  font-weight:300;
+  color:var(--ink2);
+  line-height:1.5;
+}
+.sim-tagline-em{color:var(--purple);font-style:italic}
+/* ── Section 4: System in Motion ── */
+.sim-section{padding:3.5rem 2.5rem 1rem;max-width:1160px;margin:0 auto}
+@media(min-width:1024px){.sim-section{padding:4.5rem 5.5rem 1rem}}
+.sim-canvas-wrap{max-width:1160px;margin:0 auto;padding:0 2.5rem 4rem}
+@media(min-width:1024px){.sim-canvas-wrap{padding:0 5.5rem 5rem}}
+.sim-canvas{position:relative;display:flex;flex-direction:column;gap:2rem}
+.sim-connectors{position:absolute;inset:0;pointer-events:none;z-index:0;width:100%;height:100%}
+.sim-layer-label{position:absolute;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);writing-mode:vertical-rl;text-orientation:mixed;opacity:.4;left:-1.5rem}
+@media(max-width:860px){.sim-layer-label{display:none}}
+
+/* rows */
+.sim-row{display:flex;justify-content:center;gap:2rem;position:relative;z-index:1;flex-wrap:wrap}
+.sim-row-mid{justify-content:center}
+
+/* nodes */
+.sim-node-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.sim-node{
+  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  padding:.75rem 1.1rem;
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-radius:10px;
+  cursor:default;
+  transition:border-color .2s,box-shadow .2s,transform .25s cubic-bezier(.16,1,.3,1);
+  box-shadow:var(--shadow);
+  min-width:120px;
+  user-select:none;
+}
+.sim-node:hover{
+  border-color:rgba(107,69,255,.3);
+  box-shadow:var(--shadow-md),0 0 0 3px rgba(107,69,255,.06);
+  transform:translateY(-2px);
+}
+.sim-node-engine{
+  min-width:160px;
+  border-color:rgba(107,69,255,.25);
+  box-shadow:var(--shadow-md);
+}
+.sim-node-dot{width:7px;height:7px;border-radius:50%;margin-bottom:2px;opacity:.7}
+.sim-dot-pulse{animation:pulse 2s infinite}
+.sim-node-name{font-size:12px;font-weight:500;color:var(--ink)}
+.sim-node-desc{font-size:10px;color:var(--muted)}
+.sim-node-pink:hover{border-color:rgba(245,48,124,.3);box-shadow:var(--shadow-md),0 0 0 3px rgba(245,48,124,.06)}
+.sim-node-gold:hover{border-color:rgba(201,168,124,.3);box-shadow:var(--shadow-md),0 0 0 3px rgba(201,168,124,.06)}
+
+/* popup */
+.sim-popup{
+  position:absolute;
+  bottom:calc(100% + 10px);
+  left:50%;
+  transform:translateX(-50%) translateY(6px);
+  width:300px;
+  background:#fff;
+  border:.5px solid var(--rule2);
+  border-radius:12px;
+  box-shadow:0 4px 24px rgba(26,24,37,.1),0 1px 4px rgba(26,24,37,.06);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s,transform .22s cubic-bezier(.16,1,.3,1);
+  z-index:100;
+  overflow:hidden;
+}
+.sim-node-wrap:hover .sim-popup{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+  pointer-events:auto;
+}
+.sim-popup-center{width:340px}
+.sim-popup-ipad,.sim-popup-boss{width:300px}
+.sim-popup-crm{width:340px;bottom:auto;top:calc(100% + 10px);transform:translateX(-50%) translateY(-6px)}
+.sim-node-wrap:hover .sim-popup-crm{transform:translateX(-50%) translateY(0)}
+.sim-popup-top{bottom:auto;top:calc(100% + 10px)}
+.sim-pop-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem .9rem;
+  border-bottom:.5px solid var(--rule);
+  background:rgba(107,69,255,.03);
+}
+.sim-pop-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.sim-pop-live{font-size:9px;color:#16A34A;display:flex;align-items:center;gap:4px}
+.sim-pop-body{padding:.75rem}
+.sim-pop-svg{width:100%;height:auto;display:block}
+
+/* tagline */
+.sim-tagline{
+  text-align:center;
+  padding:2rem 0 0;
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(18px,2.2vw,26px);
+  font-weight:300;
+  color:var(--ink2);
+  display:flex;flex-direction:column;gap:.25rem;
+}
+.sim-tagline-em{font-style:italic;color:var(--purple)}
+
+@media(max-width:640px){
+  .sim-row{gap:1rem}
+  .sim-node{min-width:100px;padding:.6rem .85rem}
+  .sim-popup{display:none}
+}
+/* ── Mobile & Accessibility ── */
+
+/* Hide custom cursor on touch devices */
+@media(hover:none),(pointer:coarse){
+  body{cursor:auto}
+  .cursor-dot,.cursor-ring{display:none!important}
+}
+
+/* Respect prefers-reduced-motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+  .il-node{opacity:1!important;transform:translate(-50%,-50%)!important}
+  canvas{display:none!important}
+  .hero-scroll{display:none}
+}
+
+/* ── System in Motion: mobile tap-to-expand ── */
+@media(hover:none),(pointer:coarse){
+  /* Show tap hint */
+  .sim-node::after{
+    content:'Tap to expand';
+    display:block;
+    font-size:9px;
+    color:var(--muted);
+    margin-top:4px;
+    opacity:.5;
+    font-family:'DM Sans',sans-serif;
+  }
+  /* Popup: on mobile becomes a card below the node */
+  .sim-popup{
+    position:static!important;
+    transform:none!important;
+    width:100%!important;
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .3s,max-height .4s cubic-bezier(.16,1,.3,1);
+    border-radius:10px;
+    margin-top:8px;
+    box-shadow:var(--shadow-md);
+    pointer-events:auto;
+  }
+  .sim-popup.open{
+    opacity:1;
+    max-height:400px;
+  }
+  /* node-wrap stacks vertically */
+  .sim-node-wrap{
+    flex-direction:column;
+    align-items:stretch;
+    width:100%;
+    max-width:340px;
+  }
+  /* rows wrap into single column on small screens */
+  .sim-row{
+    flex-direction:column;
+    align-items:center;
+    gap:1rem;
+  }
+  /* Active node highlight */
+  .sim-node.active{
+    border-color:rgba(107,69,255,.35);
+    box-shadow:var(--shadow-md),0 0 0 3px rgba(107,69,255,.08);
+  }
+  /* Remove after content when active */
+  .sim-node.active::after{content:'Tap to close'}
+}
+
+/* Invisible Layer: on mobile connections are always visible */
+@media(hover:none),(pointer:coarse){
+  #il-canvas{opacity:1}
+}
+
+/* ── Interaction hint ── */
+.sim-tap-hint{
+  display:none;
+  text-align:center;
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:.08em;
+  margin-bottom:1.5rem;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  opacity:0;
+  animation:hint-fade 1s 1.5s forwards;
+}
+@keyframes hint-fade{to{opacity:1}}
+.sim-tap-hint svg{animation:hint-tap 1.8s 2s ease-in-out infinite}
+@keyframes hint-tap{
+  0%,100%{transform:translateY(0);opacity:.5}
+  40%{transform:translateY(3px);opacity:1}
+  60%{transform:translateY(0);opacity:.8}
+}
+/* show on touch, hide on desktop */
+@media(hover:none),(pointer:coarse){
+  .sim-tap-hint{display:flex}
+  .sim-hover-hint{display:none}
+}
+@media(hover:hover),(pointer:fine){
+  .sim-tap-hint{display:none}
+  .sim-hover-hint{display:flex}
+}
+.sim-hover-hint{
+  text-align:center;
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:.08em;
+  margin-bottom:1.5rem;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  opacity:0;
+  animation:hint-fade 1s 1.5s forwards;
+}
+.sim-hover-hint svg{animation:hint-cursor 2s 2s ease-in-out infinite}
+@keyframes hint-cursor{
+  0%,100%{transform:translate(0,0);opacity:.5}
+  50%{transform:translate(4px,4px);opacity:1}
+}
+
+/* Pulse ring on first node to draw attention */
+.sim-node-wrap:first-child .sim-node{
+  animation:node-pulse-once 2s 2.5s ease-in-out 2;
+}
+@keyframes node-pulse-once{
+  0%,100%{box-shadow:var(--shadow)}
+  50%{box-shadow:var(--shadow-md),0 0 0 4px rgba(107,69,255,.12)}
+}
+@media(prefers-reduced-motion:reduce){
+  .sim-node-wrap:first-child .sim-node{animation:none}
+  .sim-tap-hint svg,.sim-hover-hint svg{animation:none}
+  .sim-tap-hint,.sim-hover-hint{animation:none;opacity:1}
+}
+
+</style>
+</head>
+<body>
+<div class="cursor-dot" id="cdot"></div>
+<div class="cursor-ring" id="cring"></div>
+
+<nav class="top-nav" id="topNav">
+  <a href="index.html" class="nav-back hv">← Back</a>
+  <span class="nav-title">Glowin Platform</span>
+  <div class="nav-prog" id="prog"></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+
+  <!-- Invisible Layer interactive canvas -->
+  <canvas id="il-canvas"></canvas>
+
+  <!-- Floating nodes -->
+  <div class="il-scene" id="ilScene">
+
+    <div class="il-node" id="iln-booking" style="--tx:54%;--ty:14%">
+      <div class="il-node-dot" style="--c:#6B45FF"></div>
+      <div class="il-node-label">Booking</div>
+      <div class="il-node-sub">Online · customer-facing</div>
+    </div>
+
+    <div class="il-node" id="iln-pos" style="--tx:78%;--ty:48%">
+      <div class="il-node-dot" style="--c:#6B45FF"></div>
+      <div class="il-node-label">iPad POS</div>
+      <div class="il-node-sub">Merchant · walk-in</div>
+    </div>
+
+    <div class="il-node" id="iln-handheld" style="--tx:62%;--ty:80%">
+      <div class="il-node-dot" style="--c:#6B45FF"></div>
+      <div class="il-node-label">Handheld</div>
+      <div class="il-node-sub">Sunmi · floor staff</div>
+    </div>
+
+    <div class="il-node" id="iln-ai" style="--tx:90%;--ty:26%">
+      <div class="il-node-dot" style="--c:#F5307C"></div>
+      <div class="il-node-label">AI Call</div>
+      <div class="il-node-sub">Voice intake</div>
+    </div>
+
+    <div class="il-node" id="iln-crm" style="--tx:85%;--ty:74%">
+      <div class="il-node-dot" style="--c:#C9A87C"></div>
+      <div class="il-node-label">CRM</div>
+      <div class="il-node-sub">Customer record</div>
+    </div>
+
+    <div class="il-node" id="iln-queue" style="--tx:70%;--ty:50%">
+      <div class="il-node-dot" style="--c:#6B45FF"></div>
+      <div class="il-node-label">Queue</div>
+      <div class="il-node-sub">Live · unified</div>
+    </div>
+
+    <!-- hint text -->
+    <div class="il-hint" id="ilHint">move cursor to reveal</div>
+  </div>
+
+  <!-- Left text -->
+  <div class="hero-c">
+    <div class="hero-tag">Systems Design · B2B SaaS</div>
+    <h1 class="hero-h1">
+      <span><em>Glowin</em></span>
+      <span><em>Platform</em></span>
+    </h1>
+    <p class="hero-sub">Three entry points. One system. The connections you don't see are the ones that matter.</p>
+    <div class="hero-meta">
+      <div class="mi"><label>Role</label><span>Product Designer</span></div>
+      <div class="mi"><label>Scope</label><span>Systems design · Rule definition</span></div>
+      <div class="mi"><label>Platform</label><span>POS · Online · AI Phone</span></div>
+    </div>
+  </div>
+
+  <div class="hero-scroll"><div class="scroll-line"></div><span class="scroll-label">Scroll</span></div>
+</section>
+
+<!-- CONTEXT -->
+<div class="sec rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">01</span><span class="chapter-label">Context</span></div>
+  <div class="two-col">
+    <h2 class="s-h2">When expansion becomes a <em>consistency problem</em></h2>
+    <div>
+      <p class="s-body">When a platform serves multiple entry points — POS, online booking, and AI phone intake — the real design challenge isn't adding features. It's making sure everything <strong>behaves like one system.</strong></p>
+      <br>
+      <p class="s-body">As the product expanded, the challenge shifted from building new entry points to keeping behavior consistent across all of them.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="sec rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">02</span><span class="chapter-label">Problem Shift</span></div>
+  <h2 class="s-h2">Three core challenges <em>emerged</em></h2>
+  <div class="prob-list">
+    <div class="prob-item rv d1"><span class="prob-num">01</span><div><div class="prob-t">Intake logic</div><div class="prob-d">Different sources had different timing, validation needs, and confidence levels — the same request could behave differently depending on where it came from.</div></div></div>
+    <div class="prob-item rv d2"><span class="prob-num">02</span><div><div class="prob-t">State consistency</div><div class="prob-d">Once inside operations, requests couldn't be treated as separate flows — inconsistent handling meant staff had to compensate manually.</div></div></div>
+    <div class="prob-item rv d3"><span class="prob-num">03</span><div><div class="prob-t">Cross-surface visibility</div><div class="prob-d">Merchants needed a clear view of source, status, and next actions — without it, staying on top of activity meant constant context-switching.</div></div></div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="arch-wrap">
+  <div class="arch-in">
+    <div class="rv">
+      <div class="sec-rule"></div>
+      <div class="chapter"><span class="chapter-num">03</span><span class="chapter-label">Architectural Strategy</span></div>
+      <h2 class="s-h2">Channel-specific intake.<br><em>Consistent</em> downstream behavior.</h2>
+      <p class="s-body" style="margin-top:.75rem">Three distinct entry points — each with its own rules at intake — converging into one operational model. The system stays flexible where channels differ, predictable where merchants need to act.</p>
+    </div>
+    <div class="ch-grid">
+      <div class="ch-card c-pos rv d1"><div class="ch-lbl">POS</div><div class="ch-t">Merchant-Created Booking</div><div class="ch-d">Created directly by staff. Immediate confidence — auto-confirmed, enters queue instantly.</div></div>
+      <div class="ch-card c-online rv d2"><div class="ch-lbl">Online</div><div class="ch-t">Online Booking</div><div class="ch-d">Submitted by customers. Requires staff review before confirmation enters the queue.</div></div>
+      <div class="ch-card c-ai rv d3"><div class="ch-lbl">AI Phone</div><div class="ch-t">AI Phone Booking</div><div class="ch-d">Generated through AI-assisted phone calls. Auto-accepted, AI-tagged for tracking.</div></div>
+    </div>
+    <div class="rv">
+      <p class="s-body" style="margin-bottom:1.25rem">Two mechanisms kept the system coherent: <strong>source labeling</strong> (each request tagged by channel, visible at a glance) and <strong>state management</strong> (consistent status behavior across all entry points).</p>
+      <div class="rtable-wrap">
+        <table class="rtable">
+          <thead><tr><th>Channel</th><th>Acceptance</th><th>Entry State</th><th>Fallback</th><th>Label</th></tr></thead>
+          <tbody>
+            <tr><td>AI Phone</td><td><span class="pill p-g">● Auto-accepted</span></td><td><span class="pill p-p">● Confirmed</span></td><td><span class="pill p-o">● Human Review</span></td><td><span class="pill p-g">AI-Processed</span></td></tr>
+            <tr><td>Online</td><td><span class="pill p-y">● Requires Review</span></td><td><span class="pill p-r">● Pending</span></td><td>—</td><td><span class="pill p-y">Manual Order</span></td></tr>
+            <tr><td>POS / Walk-in</td><td><span class="pill p-g">● Auto-accepted</span></td><td><span class="pill p-p">● Confirmed</span></td><td>—</td><td><span class="pill p-p">POS</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SYSTEM IN MOTION -->
+
+
+<!-- OPERATIONAL SURFACES -->
+<div class="sec rv" style="padding-bottom:1.5rem">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">04</span><span class="chapter-label">Operational Surfaces</span></div>
+  <h2 class="s-h2">Consistent behavior across every<br><em>merchant-facing surface</em></h2>
+</div>
+
+<div class="sec" style="padding-top:0;display:flex;flex-direction:column;gap:3rem">
+
+  <!-- QUEUE -->
+  <div class="rv">
+    <div class="monitor">
+      <div class="monitor-bar"><div class="m-dot" style="background:#FF5F57"></div><div class="m-dot" style="background:#FFBD2E"></div><div class="m-dot" style="background:#28CA41"></div><span class="m-title">POS Queue</span><div class="m-badge">Live</div></div>
+      <div class="q-header"><h3>Incoming Bookings</h3><div class="q-live">Live</div></div>
+      <div class="q-group">
+        <div class="q-g-lbl"><div class="q-g-dot" style="background:#B45309"></div>Pending Approval</div>
+        <div class="q-row" id="qr1" onclick="selQ('qr1')">
+          <div class="q-av" style="background:rgba(107,69,255,.1);color:var(--purple)">SJ</div>
+          <div><div class="q-name">Sarah Johnson</div><div class="q-svc">Hair Styling</div></div>
+          <div class="q-right"><div class="q-time">2:30 PM</div><div class="q-badges"><span class="ub ub-online">Online</span><span class="ub ub-pending">Pending</span></div></div>
+        </div>
+        <div class="q-detail" id="qd1">
+          <div class="q-dr"><span>Duration</span><span>60 min</span></div>
+          <div class="q-dr"><span>Channel</span><span>Online Booking</span></div>
+          <div class="q-dr"><span>Customer</span><span>New client</span></div>
+          <div class="q-acts"><button class="q-btn q-btn-ok" onclick="qConfirm('qr1','qd1')">Confirm</button><button class="q-btn q-btn-no" onclick="qDismiss('qr1','qd1')">Dismiss</button></div>
+        </div>
+        <div class="q-row" id="qr2" onclick="selQ('qr2')">
+          <div class="q-av" style="background:rgba(22,163,74,.1);color:#16A34A">MC</div>
+          <div><div class="q-name">Mike Chen</div><div class="q-svc">Massage Therapy</div></div>
+          <div class="q-right"><div class="q-time">3:15 PM</div><div class="q-badges"><span class="ub ub-ai">AI</span><span class="ub ub-pending">Pending</span></div></div>
+        </div>
+        <div class="q-detail" id="qd2">
+          <div class="q-dr"><span>Duration</span><span>90 min</span></div>
+          <div class="q-dr"><span>Channel</span><span>AI Phone Intake</span></div>
+          <div class="q-dr"><span>Confidence</span><span>High</span></div>
+          <div class="q-acts"><button class="q-btn q-btn-ok" onclick="qConfirm('qr2','qd2')">Confirm</button><button class="q-btn q-btn-no" onclick="qDismiss('qr2','qd2')">Dismiss</button></div>
+        </div>
+      </div>
+      <div class="q-group" style="margin-top:2px">
+        <div class="q-g-lbl"><div class="q-g-dot" style="background:#1D4ED8"></div>In Progress</div>
+        <div class="q-row"><div class="q-av" style="background:rgba(37,99,235,.1);color:#1D4ED8">ED</div><div><div class="q-name">Emma Davis</div><div class="q-svc">Facial Treatment</div></div><div class="q-right"><div class="q-time">1:00 PM</div><div class="q-badges"><span class="ub ub-pos">POS</span><span class="ub ub-progress">In Progress</span></div></div></div>
+      </div>
+      <div class="q-group" style="margin-top:2px;padding-bottom:8px">
+        <div class="q-g-lbl"><div class="q-g-dot" style="background:#16A34A"></div>Confirmed & Upcoming</div>
+        <div class="q-row"><div class="q-av" style="background:rgba(22,163,74,.1);color:#16A34A">LA</div><div><div class="q-name">Lisa Anderson</div><div class="q-svc">Nail Art</div></div><div class="q-right"><div class="q-time">4:30 PM</div><div class="q-badges"><span class="ub ub-ai">AI</span><span class="ub ub-confirmed">Confirmed</span></div></div></div>
+      </div>
+    </div>
+    <div class="ann"><div class="ann-tag">POS Queue</div><p class="ann-text">Click any pending row to expand — source, status, and next action <strong>immediately visible</strong>. Staff can confirm or dismiss without ever switching context.</p></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="rv">
+    <div class="monitor">
+      <div class="monitor-bar"><div class="m-dot" style="background:#FF5F57"></div><div class="m-dot" style="background:#FFBD2E"></div><div class="m-dot" style="background:#28CA41"></div><span class="m-title">Calendar — Week View</span><div style="margin-left:auto;display:flex;gap:4px"><span class="ub ub-pos" style="font-size:8px">POS</span><span class="ub ub-online" style="font-size:8px">Online</span><span class="ub ub-ai" style="font-size:8px">AI</span></div></div>
+      <div style="padding:9px 14px 8px;border-bottom:.5px solid var(--rule);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;font-family:'Cormorant Garamond',serif;font-weight:300;color:var(--ink2)">Dec 18 – 24, 2024</span>
+      </div>
+      <div class="cal-wrap">
+        <div class="cal-grid">
+          <div class="cal-hdr">
+            <div></div>
+            <div class="cal-dh"><div class="cal-dn">MON</div><div class="cal-dd">18</div></div>
+            <div class="cal-dh"><div class="cal-dn">TUE</div><div class="cal-dd">19</div></div>
+            <div class="cal-dh today"><div class="cal-dn">WED</div><div class="cal-dd">20</div></div>
+            <div class="cal-dh"><div class="cal-dn">THU</div><div class="cal-dd">21</div></div>
+            <div class="cal-dh"><div class="cal-dn">FRI</div><div class="cal-dd">22</div></div>
+            <div class="cal-dh"><div class="cal-dn">SAT</div><div class="cal-dd">23</div></div>
+            <div class="cal-dh"><div class="cal-dn">SUN</div><div class="cal-dd">24</div></div>
+          </div>
+          <div class="cal-body">
+            <div class="cal-tc"><div class="cal-ts">9 AM</div><div class="cal-ts">10 AM</div><div class="cal-ts">11 AM</div><div class="cal-ts">12 PM</div><div class="cal-ts">1 PM</div><div class="cal-ts">2 PM</div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-blue" style="top:3px;height:46px"><div class="ev-t">Massage</div><div class="ev-s">Lisa A.</div><div class="ev-bs"><span class="ev-b ev-online">Online</span></div></div></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div></div>
+            <div class="cal-dc"><div class="cal-ts" style="position:relative"><div class="cal-ev ev-blue" style="top:3px;height:46px"><div class="ev-t">Hair Styling</div><div class="ev-s">Sarah J.</div><div class="ev-bs"><span class="ev-b ev-pos">POS</span></div></div></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-purple" style="top:3px;height:46px"><div class="ev-t">Waxing</div><div class="ev-s">Ava B.</div><div class="ev-bs"><span class="ev-b ev-ai">AI</span></div></div></div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-blue" style="top:3px;height:46px"><div class="ev-t">Manicure</div><div class="ev-s">Emma D.</div><div class="ev-bs"><span class="ev-b ev-online">Online</span></div></div></div><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-green" style="top:3px;height:104px"><div class="ev-t">Hair Coloring</div><div class="ev-s">Olivia M. · 120m</div><div class="ev-bs"><span class="ev-b ev-ai">AI</span></div></div></div><div class="cal-ts"></div><div class="cal-ts"></div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-green" style="top:3px;height:72px"><div class="ev-t">Facial Treat.</div><div class="ev-s">Michael C.</div><div class="ev-bs"><span class="ev-b ev-ai">AI</span></div></div></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-purple" style="top:3px;height:46px"><div class="ev-t">Eyebrow</div><div class="ev-s">Sophia T.</div><div class="ev-bs"><span class="ev-b ev-pos">POS</span></div></div></div><div class="cal-ts"></div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div></div>
+            <div class="cal-dc"><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts" style="position:relative"><div class="cal-ev ev-blue" style="top:3px;height:46px"><div class="ev-t">Pedicure</div><div class="ev-s">James W.</div><div class="ev-bs"><span class="ev-b ev-pos">POS</span></div></div></div><div class="cal-ts"></div><div class="cal-ts"></div><div class="cal-ts"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ann"><div class="ann-tag">Calendar View</div><p class="ann-text">Channel identity is <strong>visually encoded</strong> — Online (purple), AI (green), POS (neutral). Context is ambient; staff read state without investigating.</p></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="rv">
+    <div class="monitor">
+      <div class="monitor-bar"><div class="m-dot" style="background:#FF5F57"></div><div class="m-dot" style="background:#FFBD2E"></div><div class="m-dot" style="background:#28CA41"></div><span class="m-title">Dashboard</span></div>
+      <div class="dash-stats">
+        <div class="ds"><div class="ds-icon" style="background:rgba(202,138,4,.1)">⏳</div><div class="ds-label">Pending</div><div class="ds-num">18</div><div class="ds-delta d-up">↑ 3%</div></div>
+        <div class="ds"><div class="ds-icon" style="background:rgba(37,99,235,.1)">⚡</div><div class="ds-label">In Progress</div><div class="ds-num">42</div><div class="ds-delta d-dn">↓ 8%</div></div>
+        <div class="ds"><div class="ds-icon" style="background:rgba(22,163,74,.1)">✓</div><div class="ds-label">Completed</div><div class="ds-num">187</div><div class="ds-delta d-up">↑ 15%</div></div>
+      </div>
+      <div class="dash-body">
+        <div class="dp">
+          <div class="dp-title">Requires Attention <span class="ub ub-pending" style="font-size:8px">6 Issues</span></div>
+          <div class="d-issue err" onclick="this.style.transition='all .3s';this.style.opacity='0';this.style.maxHeight='0';this.style.padding='0';this.style.marginBottom='0';setTimeout(()=>this.remove(),300)"><div class="d-it">⚠ Time Conflict Detected</div><div class="d-is">Sarah Johnson – Hair Cut 2:00 PM</div></div>
+          <div class="d-issue warn" onclick="this.style.transition='all .3s';this.style.opacity='0';this.style.maxHeight='0';this.style.padding='0';this.style.marginBottom='0';setTimeout(()=>this.remove(),300)"><div class="d-it">ℹ Missing Customer Info</div><div class="d-is">Mike Chen – Massage Therapy</div></div>
+          <div class="d-issue warn" onclick="this.style.transition='all .3s';this.style.opacity='0';this.style.maxHeight='0';this.style.padding='0';this.style.marginBottom='0';setTimeout(()=>this.remove(),300)"><div class="d-it">💳 Payment Pending</div><div class="d-is">Emma Wilson – Facial Treatment</div></div>
+          <div style="font-size:9px;color:var(--muted);margin-top:5px;font-family:'DM Sans',sans-serif">Click to dismiss</div>
+        </div>
+        <div class="dp">
+          <div class="dp-title">Channel Distribution</div>
+          <div class="chan-r"><div class="chan-d" style="background:var(--purple)"></div><div class="chan-n">Online</div><div class="chan-v">142</div><div class="chan-p">57.5%</div></div>
+          <div class="chan-bw"><div class="chan-bf" id="cb1" style="width:0;background:var(--purple);opacity:.7"></div></div>
+          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:var(--ink2)"></div><div class="chan-n">POS</div><div class="chan-v">78</div><div class="chan-p">31.6%</div></div>
+          <div class="chan-bw"><div class="chan-bf" id="cb2" style="width:0;background:var(--ink2);opacity:.5"></div></div>
+          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:#16A34A"></div><div class="chan-n">AI Assistant</div><div class="chan-v">27</div><div class="chan-p">10.9%</div></div>
+          <div class="chan-bw"><div class="chan-bf" id="cb3" style="width:0;background:#16A34A;opacity:.7"></div></div>
+          <div class="peak"><div class="peak-l">Peak Hours</div><div class="peak-v">2:00 PM – 4:00 PM</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ann"><div class="ann-tag">Dashboard</div><p class="ann-text">Broader view for exceptions. <strong>Click issues to dismiss.</strong> The rule model surfaced what needed attention — not everything at once.</p></div>
+  </div>
+
+  <!-- AI BOOKING + CUSTOMER FLOW paired -->
+  <div class="pair-row rv">
+    <div class="pair-col pair-col-top">
+      <div class="monitor">
+        <div class="monitor-bar"><div class="m-dot" style="background:#FF5F57"></div><div class="m-dot" style="background:#FFBD2E"></div><div class="m-dot" style="background:#28CA41"></div><span class="m-title">AI Phone Intake</span></div>
+        <div class="ai-wrap">
+          <div class="ai-msg ai-user">"Gel pedicure tomorrow afternoon"</div>
+          <div class="ai-proc"><div class="ai-dots"><div class="ai-d"></div><div class="ai-d"></div><div class="ai-d"></div></div>AI Processing</div>
+          <div class="ai-divider"></div>
+          <div class="ai-result">
+            <div class="ai-rh"><div class="ai-rh-dot"></div><span>Generated Booking</span></div>
+            <div class="ai-rrow"><div class="ai-rico">💅</div><div class="ai-rinfo"><label>Service</label><strong>Gel Pedicure</strong></div></div>
+            <div class="ai-rrow"><div class="ai-rico">🕐</div><div class="ai-rinfo"><label>Time</label><strong>Tomorrow, 2:00 PM</strong><small> Dec 24, 2024</small></div></div>
+            <div class="ai-rrow"><div class="ai-rico">👤</div><div class="ai-rinfo"><label>Customer</label><strong>Sarah Mitchell</strong></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ann"><div class="ann-tag">AI Phone Booking</div><p class="ann-text">One natural sentence → <strong>fully structured booking</strong>. Enters the queue auto-confirmed, AI-tagged. First-class, not an exception.</p></div>
+    </div>
+
+    <div class="pair-col pair-col-bottom">
+    <div class="monitor">
+      <div class="monitor-bar"><div class="m-dot" style="background:#FF5F57"></div><div class="m-dot" style="background:#FFBD2E"></div><div class="m-dot" style="background:#28CA41"></div><span class="m-title">Customer Booking Flow</span></div>
+      <div class="cf-steps">
+        <div class="cf-step active" id="cfs1"><div class="cf-sn">1</div><div class="cf-sl">Service</div><div class="cf-conn" id="cfc1"></div></div>
+        <div class="cf-step todo" id="cfs2"><div class="cf-sn">2</div><div class="cf-sl">Time</div><div class="cf-conn" id="cfc2"></div></div>
+        <div class="cf-step todo" id="cfs3"><div class="cf-sn">3</div><div class="cf-sl">Contact</div><div class="cf-conn" id="cfc3"></div></div>
+        <div class="cf-step todo" id="cfs4"><div class="cf-sn">4</div><div class="cf-sl">Confirm</div></div>
+      </div>
+      <div class="cf-content">
+        <div class="cf-panel active" id="cfp1">
+          <div class="cf-si" id="sv1" onclick="pickSvc('sv1','Classic Manicure')"><div class="cf-sico" style="background:var(--purple-l)">✋</div><div style="flex:1"><div class="cf-sname">Classic Manicure</div><div style="font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif">45 min</div></div><div class="cf-sprice">$35</div><div class="cf-chk">✓</div></div>
+          <div class="cf-si" id="sv2" onclick="pickSvc('sv2','Deluxe Pedicure')"><div class="cf-sico" style="background:var(--purple-l)">🌸</div><div style="flex:1"><div class="cf-sname">Deluxe Pedicure</div><div style="font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif">60 min</div></div><div class="cf-sprice">$55</div><div class="cf-chk">✓</div></div>
+          <div class="cf-si" id="sv3" onclick="pickSvc('sv3','Gel Manicure')"><div class="cf-sico" style="background:var(--purple-l)">✨</div><div style="flex:1"><div class="cf-sname">Gel Manicure</div><div style="font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif">50 min</div></div><div class="cf-sprice">$45</div><div class="cf-chk">✓</div></div>
+          <div class="cf-nav"><button class="cf-btn cf-next" id="cfn1" onclick="cfNext(1)" disabled style="opacity:.35">Next →</button></div>
+        </div>
+        <div class="cf-panel" id="cfp2">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:7px;font-family:'DM Sans',sans-serif">Dec 24, 2024 — available slots</div>
+          <div class="cf-tg">
+            <div class="cf-ts" onclick="pickTime(this,'9:00 AM')"><div class="cf-tv">9:00 AM</div></div>
+            <div class="cf-ts na"><div class="cf-tv">10:00 AM</div></div>
+            <div class="cf-ts" onclick="pickTime(this,'11:00 AM')"><div class="cf-tv">11:00 AM</div></div>
+            <div class="cf-ts na"><div class="cf-tv">12:00 PM</div></div>
+            <div class="cf-ts" onclick="pickTime(this,'2:00 PM')"><div class="cf-tv">2:00 PM</div></div>
+            <div class="cf-ts" onclick="pickTime(this,'3:30 PM')"><div class="cf-tv">3:30 PM</div></div>
+          </div>
+          <div class="cf-nav"><button class="cf-btn cf-back" onclick="cfBack(2)">← Back</button><button class="cf-btn cf-next" id="cfn2" onclick="cfNext(2)" disabled style="opacity:.35">Next →</button></div>
+        </div>
+        <div class="cf-panel" id="cfp3">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <input type="text" placeholder="Full name" style="width:100%;padding:7px 10px;border-radius:5px;border:.5px solid var(--rule2);background:var(--bg);color:var(--ink);font-size:11px;font-family:'DM Sans',sans-serif;outline:none" oninput="chkContact()">
+            <input type="tel" placeholder="Phone number" style="width:100%;padding:7px 10px;border-radius:5px;border:.5px solid var(--rule2);background:var(--bg);color:var(--ink);font-size:11px;font-family:'DM Sans',sans-serif;outline:none" oninput="chkContact()">
+          </div>
+          <div class="cf-nav" style="margin-top:10px"><button class="cf-btn cf-back" onclick="cfBack(3)">← Back</button><button class="cf-btn cf-next" id="cfn3" onclick="cfNext(3)" disabled style="opacity:.35">Confirm →</button></div>
+        </div>
+        <div class="cf-panel" id="cfp4">
+          <div class="cf-confirm">
+            <div class="cf-ch"><div class="cf-chk2">✓</div><span>Booking confirmed</span><span style="margin-left:auto;font-size:9px;color:var(--muted);font-family:'DM Sans',sans-serif">#BK-4521</span></div>
+            <div class="cf-crow"><div class="cf-cico">💅</div><div><span class="cf-clabel">Service</span><span class="cf-cval" id="cfSvc">—</span></div></div>
+            <div class="cf-crow"><div class="cf-cico">🕐</div><div><span class="cf-clabel">Time</span><span class="cf-cval" id="cfTime">—</span></div></div>
+            <div class="cf-crow"><div class="cf-cico">📍</div><div><span class="cf-clabel">Status</span><span style="font-size:11px;color:#16A34A">Confirmed</span></div></div>
+          </div>
+          <div class="cf-nav"><button class="cf-btn cf-back" onclick="cfReset()">Start over</button></div>
+        </div>
+      </div>
+    </div>
+      <div class="ann"><div class="ann-tag">Customer Booking Flow</div><p class="ann-text"><strong>Work through all 4 steps.</strong> Simple for the customer — rules apply the moment the request enters the operations layer.</p></div>
+    </div>
+  </div><!-- /pair-row -->
+</div>
+
+
+<!-- SECTION 4: System in Motion -->
+<div class="sim-section rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">05</span><span class="chapter-label">System in Motion</span></div>
+  <h2 class="s-h2">How the system <em>actually runs</em></h2>
+  <p class="s-body" style="margin-bottom:3rem">Every booking — regardless of channel — flows through the same operational spine. Hover each node to see the surface it powers.</p>
+</div>
+
+<div class="sim-canvas-wrap rv">
+  <!-- Desktop hint -->
+  <div class="sim-hover-hint">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M5 2L5 9L7.5 7L9 10L10 9.5L8.5 6.5L11 6.5L5 2Z" fill="currentColor" opacity=".6"/>
+    </svg>
+    <span>Hover each node to preview</span>
+  </div>
+  <!-- Mobile hint -->
+  <div class="sim-tap-hint">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <circle cx="7" cy="5" r="3" stroke="currentColor" stroke-width="1.2" opacity=".7"/>
+      <path d="M4 8.5C4 8.5 4.5 12 7 12C9.5 12 10 8.5 10 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+    </svg>
+    <span>Tap each node to preview</span>
+  </div>
+  <div class="sim-canvas">
+
+    <!-- Layer labels -->
+    <div class="sim-layer-label" style="top:0;left:0">Customer</div>
+    <div class="sim-layer-label" style="top:50%;left:0;transform:translateY(-50%)">Operations</div>
+    <div class="sim-layer-label" style="bottom:0;left:0">Record</div>
+
+    <!-- SVG connectors -->
+    <svg class="sim-connectors" viewBox="0 0 900 500" preserveAspectRatio="none">
+      <defs>
+        <marker id="sc-arr" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M1 1L6 4L1 7" fill="none" stroke="rgba(107,69,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <!-- Customer → Queue -->
+      <path d="M150 80 Q150 200 300 250" fill="none" stroke="rgba(245,48,124,0.25)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M450 80 Q450 170 450 210" fill="none" stroke="rgba(107,69,255,0.3)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M750 80 Q750 200 600 250" fill="none" stroke="rgba(201,168,124,0.25)" stroke-width="1" stroke-dasharray="5 4"/>
+      <!-- Queue → Ops -->
+      <path d="M300 290 Q300 330 200 370" fill="none" stroke="rgba(107,69,255,0.2)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M450 290 L450 370" fill="none" stroke="rgba(107,69,255,0.2)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M600 290 Q600 330 700 370" fill="none" stroke="rgba(107,69,255,0.2)" stroke-width="1" stroke-dasharray="5 4"/>
+      <!-- Ops → CRM -->
+      <path d="M200 420 Q200 460 450 470" fill="none" stroke="rgba(107,69,255,0.15)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M450 420 L450 470" fill="none" stroke="rgba(107,69,255,0.15)" stroke-width="1" stroke-dasharray="5 4"/>
+      <path d="M700 420 Q700 460 450 470" fill="none" stroke="rgba(107,69,255,0.15)" stroke-width="1" stroke-dasharray="5 4"/>
+    </svg>
+
+    <!-- ROW 1: Customer Layer -->
+    <div class="sim-row sim-row-top">
+
+      <!-- AI Call -->
+      <div class="sim-node-wrap" data-node="ai">
+        <div class="sim-node sim-node-pink">
+          <div class="sim-node-dot" style="background:#F5307C"></div>
+          <div class="sim-node-name">AI Call</div>
+          <div class="sim-node-desc">Voice intake</div>
+        </div>
+        <div class="sim-popup sim-popup-ai">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#F5307C">AI Phone Intake</span>
+          </div>
+          <div class="sim-pop-body">
+            <!-- AI call SVG UI -->
+            <svg viewBox="0 0 240 200" class="sim-pop-svg">
+              <!-- user bubble -->
+              <rect x="60" y="16" width="160" height="32" rx="10" fill="#F5307C" opacity=".9"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" fill="white" x="80" y="36">"Gel pedicure tomorrow afternoon"</text>
+              <!-- processing -->
+              <circle cx="110" cy="68" r="3" fill="#6B45FF" opacity=".5"/>
+              <circle cx="120" cy="68" r="3" fill="#6B45FF" opacity=".7"/>
+              <circle cx="130" cy="68" r="3" fill="#6B45FF" opacity=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="120" y="84" text-anchor="middle">AI Processing</text>
+              <!-- result card -->
+              <rect x="12" y="96" width="216" height="94" rx="8" fill="white" stroke="rgba(107,69,255,0.2)" stroke-width=".7"/>
+              <circle cx="24" cy="110" r="4" fill="#6B45FF" opacity=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#6B45FF" x="32" y="113">Generated Booking</text>
+              <line x1="12" y1="120" x2="228" y2="120" stroke="rgba(107,69,255,0.1)" stroke-width=".5"/>
+              <!-- row 1 -->
+              <rect x="20" y="126" width="20" height="20" rx="5" fill="rgba(107,69,255,.08)"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="46" y="133">Service</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="46" y="144">Gel Pedicure</text>
+              <line x1="20" y1="150" x2="228" y2="150" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <!-- row 2 -->
+              <rect x="20" y="156" width="20" height="20" rx="5" fill="rgba(107,69,255,.08)"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="46" y="163">Time</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="46" y="174">Tomorrow, 2:00 PM</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Online Booking -->
+      <div class="sim-node-wrap" data-node="online">
+        <div class="sim-node sim-node-purple">
+          <div class="sim-node-dot" style="background:#6B45FF"></div>
+          <div class="sim-node-name">Online Booking</div>
+          <div class="sim-node-desc">Customer-facing</div>
+        </div>
+        <div class="sim-popup sim-popup-online">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#6B45FF">Customer Booking Flow</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 240 200" class="sim-pop-svg">
+              <!-- step indicators -->
+              <circle cx="48" cy="16" r="9" fill="#6B45FF"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="white" x="48" y="19" text-anchor="middle">1</text>
+              <line x1="57" y1="16" x2="87" y2="16" stroke="rgba(107,69,255,0.25)" stroke-width=".8"/>
+              <circle cx="96" cy="16" r="9" fill="none" stroke="rgba(107,69,255,0.3)" stroke-width=".8"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="96" y="19" text-anchor="middle">2</text>
+              <line x1="105" y1="16" x2="135" y2="16" stroke="rgba(107,69,255,0.25)" stroke-width=".8"/>
+              <circle cx="144" cy="16" r="9" fill="none" stroke="rgba(107,69,255,0.3)" stroke-width=".8"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="144" y="19" text-anchor="middle">3</text>
+              <line x1="153" y1="16" x2="183" y2="16" stroke="rgba(107,69,255,0.25)" stroke-width=".8"/>
+              <circle cx="192" cy="16" r="9" fill="none" stroke="rgba(107,69,255,0.3)" stroke-width=".8"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="192" y="19" text-anchor="middle">4</text>
+              <!-- labels -->
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="48" y="34" text-anchor="middle">Service</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="96" y="34" text-anchor="middle">Time</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="144" y="34" text-anchor="middle">Contact</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="192" y="34" text-anchor="middle">Confirm</text>
+              <!-- service items -->
+              <rect x="12" y="44" width="216" height="36" rx="5" fill="none" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <rect x="18" y="50" width="24" height="24" rx="5" fill="rgba(107,69,255,0.08)"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="50" y="60">Classic Manicure</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="50" y="71">45 min</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" fill="#4A4650" x="210" y="64" text-anchor="end">$35</text>
+
+              <rect x="12" y="84" width="216" height="36" rx="5" fill="rgba(107,69,255,0.07)" stroke="rgba(107,69,255,0.3)" stroke-width=".8"/>
+              <rect x="18" y="90" width="24" height="24" rx="5" fill="rgba(107,69,255,0.15)"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#6B45FF" x="50" y="100">Deluxe Pedicure</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="50" y="111">60 min</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" fill="#6B45FF" x="210" y="104" text-anchor="end">$55</text>
+              <circle cx="218" cy="102" r="6" fill="#6B45FF"/>
+              <path d="M215 102L217 104L221 100" fill="none" stroke="white" stroke-width="1" stroke-linecap="round"/>
+
+              <rect x="12" y="124" width="216" height="36" rx="5" fill="none" stroke="rgba(26,24,37,0.08)" stroke-width=".6"/>
+              <rect x="18" y="130" width="24" height="24" rx="5" fill="rgba(107,69,255,0.05)"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="50" y="140">Gel Manicure</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="50" y="151">50 min</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" fill="#4A4650" x="210" y="144" text-anchor="end">$45</text>
+
+              <!-- next button -->
+              <rect x="168" y="168" width="60" height="22" rx="5" fill="#6B45FF"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" fill="white" x="198" y="183" text-anchor="middle">Next →</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Walk-in -->
+      <div class="sim-node-wrap" data-node="walkin">
+        <div class="sim-node sim-node-gold">
+          <div class="sim-node-dot" style="background:#C9A87C"></div>
+          <div class="sim-node-name">Walk-in</div>
+          <div class="sim-node-desc">POS · staff</div>
+        </div>
+        <div class="sim-popup sim-popup-walkin">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#92712A">iPad POS · Sale</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 240 200" class="sim-pop-svg">
+              <!-- top bar -->
+              <rect x="0" y="0" width="240" height="24" rx="0" fill="white"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#6B45FF" x="12" y="15">Glowin</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="120" y="15" text-anchor="middle">EN / 中</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="210" y="15">Order#123</text>
+              <line x1="0" y1="24" x2="240" y2="24" stroke="rgba(26,24,37,0.08)" stroke-width=".5"/>
+              <!-- left category -->
+              <rect x="0" y="24" width="52" height="176" fill="rgba(107,69,255,0.04)"/>
+              <rect x="4" y="30" width="44" height="18" rx="4" fill="#6B45FF"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="white" x="26" y="42" text-anchor="middle">Manicure</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#4A4650" x="26" y="64" text-anchor="middle">Pedicure</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#4A4650" x="26" y="82" text-anchor="middle">Acrylic</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#4A4650" x="26" y="100" text-anchor="middle">Gel</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#4A4650" x="26" y="118" text-anchor="middle">Spa</text>
+              <!-- service grid -->
+              <rect x="56" y="28" width="56" height="44" rx="4" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="84" y="46" text-anchor="middle">French Add-on</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="84" y="62" text-anchor="middle">$15.00</text>
+              <rect x="116" y="28" width="56" height="44" rx="4" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="144" y="46" text-anchor="middle">UV/Acrylic</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="144" y="62" text-anchor="middle">$25.00</text>
+              <rect x="56" y="76" width="56" height="44" rx="4" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="84" y="94" text-anchor="middle">Nail Polish</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="84" y="110" text-anchor="middle">$10.00</text>
+              <rect x="116" y="76" width="56" height="44" rx="4" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="144" y="94" text-anchor="middle">Gel X</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="144" y="110" text-anchor="middle">$81.00</text>
+              <!-- right order panel -->
+              <rect x="178" y="24" width="62" height="176" fill="rgba(107,69,255,0.03)" stroke-left="none"/>
+              <line x1="178" y1="24" x2="178" y2="200" stroke="rgba(26,24,37,0.08)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="182" y="36">French Add-on</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="236" y="36" text-anchor="end">$15</text>
+              <line x1="182" y1="42" x2="236" y2="42" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="182" y="54">Gel Polish</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="236" y="54" text-anchor="end">$25</text>
+              <!-- pay button -->
+              <rect x="180" y="168" width="58" height="22" rx="5" fill="#6B45FF"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="white" x="209" y="183" text-anchor="middle">Pay $54</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Shared Queue (center) -->
+    <div class="sim-row sim-row-mid">
+      <div class="sim-node-wrap" data-node="queue">
+        <div class="sim-node sim-node-purple sim-node-engine">
+          <div class="sim-node-dot sim-dot-pulse" style="background:#6B45FF"></div>
+          <div class="sim-node-name">Shared Queue</div>
+          <div class="sim-node-desc">Unified · live</div>
+        </div>
+        <div class="sim-popup sim-popup-queue sim-popup-center">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#6B45FF">POS Queue · Live</span>
+            <span class="sim-pop-live">● Live</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 300 200" class="sim-pop-svg">
+              <!-- header -->
+              <text font-family="DM Sans,sans-serif" font-size="10" font-weight="500" fill="#1A1825" x="12" y="20">Incoming Bookings</text>
+              <circle cx="276" cy="16" r="4" fill="#16A34A"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#16A34A" x="284" y="19">Live</text>
+              <line x1="0" y1="28" x2="300" y2="28" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <!-- group: pending -->
+              <circle cx="14" cy="40" r="3.5" fill="#B45309"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" letter-spacing=".08em" fill="#8B8680" x="22" y="43">PENDING APPROVAL</text>
+              <!-- row 1 -->
+              <circle cx="20" cy="60" r="11" fill="rgba(107,69,255,0.12)"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#6B45FF" x="20" y="63" text-anchor="middle">SJ</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="38" y="57">Sarah Johnson</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="38" y="68">Hair Styling</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="180" y="57">2:30 PM</text>
+              <rect x="200" y="50" width="34" height="12" rx="3" fill="rgba(107,69,255,0.1)" stroke="rgba(107,69,255,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="217" y="59" text-anchor="middle">Online</text>
+              <rect x="238" y="50" width="44" height="12" rx="3" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#B45309" x="260" y="59" text-anchor="middle">Pending</text>
+              <line x1="8" y1="76" x2="292" y2="76" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <!-- row 2 -->
+              <circle cx="20" cy="94" r="11" fill="rgba(22,163,74,0.1)"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#16A34A" x="20" y="97" text-anchor="middle">MC</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="38" y="91">Mike Chen</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="38" y="102">Massage Therapy</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="180" y="91">3:15 PM</text>
+              <rect x="200" y="84" width="24" height="12" rx="3" fill="rgba(22,163,74,0.1)" stroke="rgba(22,163,74,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#16A34A" x="212" y="93" text-anchor="middle">AI</text>
+              <rect x="228" y="84" width="44" height="12" rx="3" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#B45309" x="250" y="93" text-anchor="middle">Pending</text>
+              <line x1="8" y1="110" x2="292" y2="110" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <!-- group: in progress -->
+              <circle cx="14" cy="122" r="3.5" fill="#1D4ED8"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" letter-spacing=".08em" fill="#8B8680" x="22" y="125">IN PROGRESS</text>
+              <circle cx="20" cy="142" r="11" fill="rgba(37,99,235,0.1)"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1D4ED8" x="20" y="145" text-anchor="middle">ED</text>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="38" y="139">Emma Davis</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="38" y="150">Facial Treatment</text>
+              <rect x="200" y="132" width="24" height="12" rx="3" fill="rgba(26,24,37,0.07)" stroke="rgba(26,24,37,0.14)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="212" y="141" text-anchor="middle">POS</text>
+              <rect x="228" y="132" width="56" height="12" rx="3" fill="rgba(37,99,235,0.1)" stroke="rgba(37,99,235,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1D4ED8" x="256" y="141" text-anchor="middle">In Progress</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Operations Layer -->
+    <div class="sim-row sim-row-ops">
+
+      <!-- iPad POS -->
+      <div class="sim-node-wrap" data-node="ipad">
+        <div class="sim-node sim-node-purple">
+          <div class="sim-node-dot" style="background:#6B45FF"></div>
+          <div class="sim-node-name">iPad POS</div>
+          <div class="sim-node-desc">Merchant surface</div>
+        </div>
+        <div class="sim-popup sim-popup-ipad">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#6B45FF">Calendar · Week View</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 260 200" class="sim-pop-svg">
+              <!-- calendar header -->
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#4A4650" x="12" y="14">Dec 18 – 24, 2024</text>
+              <!-- day headers -->
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="46" y="26" text-anchor="middle">MON</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="82" y="26" text-anchor="middle">TUE</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#6B45FF" x="118" y="26" text-anchor="middle">WED</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="154" y="26" text-anchor="middle">THU</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="190" y="26" text-anchor="middle">FRI</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="226" y="26" text-anchor="middle">SAT</text>
+              <line x1="0" y1="30" x2="260" y2="30" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <!-- time labels -->
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="12" y="52">9 AM</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="12" y="92">10 AM</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="12" y="132">11 AM</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="12" y="172">12 PM</text>
+              <!-- grid lines -->
+              <line x1="28" y1="44" x2="260" y2="44" stroke="rgba(26,24,37,0.05)" stroke-width=".5"/>
+              <line x1="28" y1="84" x2="260" y2="84" stroke="rgba(26,24,37,0.05)" stroke-width=".5"/>
+              <line x1="28" y1="124" x2="260" y2="124" stroke="rgba(26,24,37,0.05)" stroke-width=".5"/>
+              <line x1="28" y1="164" x2="260" y2="164" stroke="rgba(26,24,37,0.05)" stroke-width=".5"/>
+              <!-- events -->
+              <rect x="30" y="48" width="30" height="70" rx="4" fill="rgba(107,69,255,0.15)" stroke="rgba(107,69,255,0.3)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" font-weight="500" fill="#3B1FAE" x="45" y="62" text-anchor="middle">Hair</text>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#3B1FAE" x="45" y="72" text-anchor="middle">Styling</text>
+              <rect x="30" y="86" width="8" height="8" rx="2" fill="rgba(107,69,255,0.2)"/>
+              <text font-family="DM Sans,sans-serif" font-size="5" fill="#6B45FF" x="34" y="92" text-anchor="middle">POS</text>
+
+              <rect x="103" y="48" width="30" height="34" rx="4" fill="rgba(107,69,255,0.12)" stroke="rgba(107,69,255,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" font-weight="500" fill="#3B1FAE" x="118" y="60" text-anchor="middle">Manicure</text>
+              <rect x="103" y="56" width="8" height="8" rx="2" fill="rgba(245,48,124,0.15)"/>
+              <text font-family="DM Sans,sans-serif" font-size="5" fill="#F5307C" x="107" y="62" text-anchor="middle">AI</text>
+
+              <rect x="103" y="88" width="30" height="70" rx="4" fill="rgba(22,163,74,0.12)" stroke="rgba(22,163,74,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" font-weight="500" fill="#166534" x="118" y="104" text-anchor="middle">Hair</text>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#166534" x="118" y="114" text-anchor="middle">Coloring</text>
+
+              <rect x="175" y="88" width="30" height="34" rx="4" fill="rgba(201,168,124,0.15)" stroke="rgba(201,168,124,0.3)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" font-weight="500" fill="#92712A" x="190" y="104" text-anchor="middle">Facial</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Handheld -->
+      <div class="sim-node-wrap" data-node="handheld">
+        <div class="sim-node sim-node-purple">
+          <div class="sim-node-dot" style="background:#6B45FF"></div>
+          <div class="sim-node-name">Handheld</div>
+          <div class="sim-node-desc">Sunmi · floor</div>
+        </div>
+        <div class="sim-popup sim-popup-handheld">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#6B45FF">Sunmi · Orders</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 200 200" class="sim-pop-svg">
+              <!-- header -->
+              <text font-family="DM Sans,sans-serif" font-size="10" font-weight="500" fill="#1A1825" x="100" y="16" text-anchor="middle">Order</text>
+              <!-- filter tabs -->
+              <rect x="8" y="24" width="28" height="14" rx="7" fill="#1A1825"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="white" x="22" y="34" text-anchor="middle">All</text>
+              <rect x="40" y="24" width="28" height="14" rx="7" fill="none" stroke="rgba(26,24,37,0.15)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="54" y="34" text-anchor="middle">New</text>
+              <rect x="72" y="24" width="44" height="14" rx="7" fill="none" stroke="rgba(26,24,37,0.15)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="94" y="34" text-anchor="middle">In progress</text>
+              <rect x="120" y="24" width="36" height="14" rx="7" fill="none" stroke="rgba(26,24,37,0.15)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="138" y="34" text-anchor="middle">Ready</text>
+              <!-- card 1 -->
+              <rect x="8" y="44" width="184" height="54" rx="6" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="16" y="58">Mr. Zeng</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="168" y="58" text-anchor="end">#120939</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="16" y="70">Pick up · 6 items</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="168" y="70" text-anchor="end">$54.21</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" font-weight="500" fill="#1A1825" x="16" y="82">Est. Ready: 12:30 pm</text>
+              <rect x="16" y="86" width="152" height="7" rx="0" fill="none"/>
+              <rect x="16" y="88" width="80" height="6" rx="3" fill="#6B45FF" opacity=".15"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="white" x="56" y="93" text-anchor="middle"> </text>
+              <rect x="16" y="88" width="152" height="6" rx="3" fill="#6B45FF"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="white" x="92" y="93" text-anchor="middle">Accept</text>
+              <!-- card 2 -->
+              <rect x="8" y="104" width="184" height="46" rx="6" fill="white" stroke="rgba(26,24,37,0.08)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="16" y="118">Mr. Zeng</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="168" y="118" text-anchor="end">#120940</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="16" y="130">Delivery · 2 items</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="168" y="130" text-anchor="end">$23.90</text>
+              <rect x="16" y="136" width="152" height="6" rx="3" fill="rgba(22,163,74,0.9)"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="white" x="92" y="141" text-anchor="middle">Ready</text>
+              <!-- card 3 -->
+              <rect x="8" y="156" width="184" height="36" rx="6" fill="white" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="16" y="170">Mr. Zeng</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#8B8680" x="168" y="170" text-anchor="end">#120941</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#16A34A" x="16" y="182">Paid: $54.21</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boss App -->
+      <div class="sim-node-wrap" data-node="boss">
+        <div class="sim-node sim-node-purple">
+          <div class="sim-node-dot" style="background:#6B45FF"></div>
+          <div class="sim-node-name">Boss App</div>
+          <div class="sim-node-desc">Remote · reports</div>
+        </div>
+        <div class="sim-popup sim-popup-boss">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#6B45FF">Dashboard · Today</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 280 200" class="sim-pop-svg">
+              <!-- stat cards row -->
+              <rect x="8" y="8" width="60" height="44" rx="6" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="14" y="20">Total Sales</text>
+              <text font-family="DM Sans,sans-serif" font-size="11" font-weight="300" fill="#1A1825" font-family="Cormorant Garamond,serif" x="14" y="36">$12,345</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#16A34A" x="14" y="48">↑ 4.3%</text>
+
+              <rect x="74" y="8" width="60" height="44" rx="6" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="80" y="20">Orders</text>
+              <text font-family="DM Sans,sans-serif" font-size="11" font-weight="300" fill="#1A1825" font-family="Cormorant Garamond,serif" x="80" y="36">156</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#16A34A" x="80" y="48">91% paid</text>
+
+              <rect x="140" y="8" width="60" height="44" rx="6" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="146" y="20">Active</text>
+              <text font-family="DM Sans,sans-serif" font-size="11" font-weight="300" fill="#6B45FF" font-family="Cormorant Garamond,serif" x="146" y="36">23</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#F5307C" x="146" y="48">5 pending</text>
+
+              <rect x="206" y="8" width="66" height="44" rx="6" fill="white" stroke="rgba(26,24,37,0.1)" stroke-width=".6"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="212" y="20">Members</text>
+              <text font-family="DM Sans,sans-serif" font-size="11" font-weight="300" fill="#1A1825" font-family="Cormorant Garamond,serif" x="212" y="36">1,234</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#16A34A" x="212" y="48">↑ 12</text>
+
+              <!-- sales trend chart -->
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="8" y="66">Sales Trend</text>
+              <rect x="8" y="70" width="164" height="80" rx="5" fill="white" stroke="rgba(26,24,37,0.08)" stroke-width=".5"/>
+              <!-- bars -->
+              <rect x="18" y="114" width="12" height="28" rx="2" fill="#6B45FF" opacity=".5"/>
+              <rect x="34" y="104" width="12" height="38" rx="2" fill="#6B45FF" opacity=".6"/>
+              <rect x="50" y="96" width="12" height="46" rx="2" fill="#6B45FF" opacity=".7"/>
+              <rect x="66" y="84" width="12" height="58" rx="2" fill="#6B45FF" opacity=".85"/>
+              <rect x="82" y="90" width="12" height="52" rx="2" fill="#6B45FF" opacity=".75"/>
+              <rect x="98" y="98" width="12" height="44" rx="2" fill="#6B45FF" opacity=".65"/>
+              <rect x="114" y="88" width="12" height="54" rx="2" fill="#6B45FF" opacity=".8"/>
+              <rect x="130" y="95" width="12" height="47" rx="2" fill="#6B45FF" opacity=".7"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#8B8680" x="24" y="152" text-anchor="middle">10:00</text>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#8B8680" x="72" y="152" text-anchor="middle">14:00</text>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#8B8680" x="120" y="152" text-anchor="middle">18:00</text>
+
+              <!-- live orders -->
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="180" y="66">Live Orders</text>
+              <rect x="180" y="70" width="92" height="80" rx="5" fill="white" stroke="rgba(26,24,37,0.08)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="186" y="84">#1001 · Table 5</text>
+              <rect x="244" y="78" width="24" height="10" rx="3" fill="rgba(22,163,74,0.12)" stroke="rgba(22,163,74,0.25)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#16A34A" x="256" y="85" text-anchor="middle">Cooking</text>
+              <line x1="186" y1="92" x2="266" y2="92" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="186" y="104">#1002 · Delivery</text>
+              <rect x="244" y="98" width="24" height="10" rx="3" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.2)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#B45309" x="256" y="105" text-anchor="middle">Pending</text>
+              <line x1="186" y1="112" x2="266" y2="112" stroke="rgba(26,24,37,0.06)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="186" y="124">#1003 · Takeout</text>
+              <rect x="244" y="118" width="24" height="10" rx="3" fill="rgba(107,69,255,0.1)" stroke="rgba(107,69,255,0.2)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#6B45FF" x="256" y="125" text-anchor="middle">Ready</text>
+
+              <!-- by payment -->
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="8" y="166">By Payment</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="8" y="178">Cash</text>
+              <rect x="40" y="172" width="48" height="5" rx="2" fill="#6B45FF" opacity=".4"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="92" y="178">$3,456</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="130" y="178">Card</text>
+              <rect x="152" y="172" width="72" height="5" rx="2" fill="#6B45FF" opacity=".7"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="228" y="178">$7,234</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 4: Customer Record -->
+    <div class="sim-row sim-row-bottom">
+      <div class="sim-node-wrap" data-node="crm">
+        <div class="sim-node sim-node-gold">
+          <div class="sim-node-dot" style="background:#C9A87C"></div>
+          <div class="sim-node-name">Customer Record</div>
+          <div class="sim-node-desc">CRM · history</div>
+        </div>
+        <div class="sim-popup sim-popup-crm sim-popup-top">
+          <div class="sim-pop-header">
+            <span class="sim-pop-tag" style="color:#92712A">Client Profile</span>
+          </div>
+          <div class="sim-pop-body">
+            <svg viewBox="0 0 300 180" class="sim-pop-svg">
+              <!-- left: client list -->
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="8" y="16">Client List</text>
+              <line x1="8" y1="22" x2="160" y2="22" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="8" y="33">Name</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="90" y="33">Phone</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="138" y="33">Birthday</text>
+              <line x1="8" y1="37" x2="160" y2="37" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <rect x="0" y="38" width="162" height="18" rx="0" fill="rgba(107,69,255,0.05)"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#6B45FF" x="8" y="51">Bambi Li</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="90" y="51">111-111-1111</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="138" y="51">01/01/21</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#1A1825" x="8" y="68">Lisa Wang</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="90" y="68">111-111-1111</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="138" y="68">01/01/21</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#1A1825" x="8" y="85">Howell</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="90" y="85">111-111-1111</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="138" y="85">01/01/21</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" fill="#1A1825" x="8" y="102">Brielle</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="90" y="102">111-111-1111</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#4A4650" x="138" y="102">01/01/21</text>
+
+              <!-- divider -->
+              <line x1="168" y1="8" x2="168" y2="172" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+
+              <!-- right: client profile -->
+              <text font-family="DM Sans,sans-serif" font-size="9" font-weight="500" fill="#1A1825" x="176" y="16">Client Profile</text>
+              <!-- avatar row -->
+              <circle cx="184" cy="36" r="10" fill="rgba(107,69,255,0.1)" stroke="rgba(107,69,255,0.2)" stroke-width=".5"/>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#6B45FF" x="184" y="39" text-anchor="middle">B</text>
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="200" y="32">Lisa</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="200" y="42">917-698-9999</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="200" y="52">lisa@gmail.com</text>
+              <line x1="176" y1="60" x2="296" y2="60" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <!-- account info -->
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="176" y="73">Account Info</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="176" y="85">Account Balance</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="292" y="85" text-anchor="end">$123.23</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="176" y="97">VIP Gift Card</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="292" y="97" text-anchor="end">$123.23</text>
+              <line x1="176" y1="104" x2="296" y2="104" stroke="rgba(26,24,37,0.07)" stroke-width=".5"/>
+              <!-- history -->
+              <text font-family="DM Sans,sans-serif" font-size="8" font-weight="500" fill="#1A1825" x="176" y="117">History</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="176" y="130">02/06/2025</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="236" y="130">$120.00</text>
+              <rect x="270" y="124" width="26" height="10" rx="3" fill="rgba(22,163,74,0.1)" stroke="rgba(22,163,74,0.2)" stroke-width=".4"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#16A34A" x="283" y="131" text-anchor="middle">Done</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="176" y="146">02/06/2025</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="236" y="146">$120.00</text>
+              <rect x="270" y="140" width="26" height="10" rx="3" fill="rgba(22,163,74,0.1)" stroke="rgba(22,163,74,0.2)" stroke-width=".4"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#16A34A" x="283" y="147" text-anchor="middle">Done</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#8B8680" x="176" y="162">02/06/2025</text>
+              <text font-family="DM Sans,sans-serif" font-size="7" fill="#1A1825" x="236" y="162">$120.00</text>
+              <rect x="270" y="156" width="26" height="10" rx="3" fill="rgba(22,163,74,0.1)" stroke="rgba(22,163,74,0.2)" stroke-width=".4"/>
+              <text font-family="DM Sans,sans-serif" font-size="6" fill="#16A34A" x="283" y="163" text-anchor="middle">Done</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline -->
+    <div class="sim-tagline rv">
+      <span>Channel-specific intake.</span>
+      <span class="sim-tagline-em">Shared downstream behavior.</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- DECISIONS -->
+<div class="sec rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">06</span><span class="chapter-label">Design Decisions</span></div>
+  <h2 class="s-h2">The real work was in<br><em>rules, states, and edge cases</em></h2>
+  <div class="dec-list">
+    <div class="dec-card rv d1"><div class="dec-q">Decision 01</div><div class="dec-t">Channel-specific intake, unified downstream</div><div class="dec-b">Rather than normalizing all channels at intake, I preserved channel identity through source labeling — so different rules could apply without fragmenting the operational model.</div></div>
+    <div class="dec-card rv d2"><div class="dec-q">Decision 02</div><div class="dec-t">Source labeling as ambient context</div><div class="dec-b">Each booking tagged by channel, visible at a glance without requiring staff to investigate. This wasn't a feature — it was a prerequisite for reducing the manual compensation that was already happening.</div></div>
+    <div class="dec-card rv d3"><div class="dec-q">Decision 03</div><div class="dec-t">Explicit state model over implicit behavior</div><div class="dec-b">Merchants could trust the behavior without needing to understand the logic. New features evaluated against an existing rule model — which shifted how the team collaborated internally.</div></div>
+  </div>
+</div>
+
+<!-- IMPACT -->
+<div class="sec rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">07</span><span class="chapter-label">Impact & Outcomes</span></div>
+  <h2 class="s-h2">The UI made the logic <em>self-evident</em></h2>
+  <p class="s-body" style="margin-top:.75rem">Sales demos became significantly faster. Onboarding required less explanation — merchants could identify source and next actions immediately.</p>
+  <div class="imp-grid">
+    <div class="imp-card rv d1"><div class="imp-stat">↑</div><div class="imp-label">Faster sales demo cycles — the rule model made onboarding self-evident</div></div>
+    <div class="imp-card rv d2"><div class="imp-stat">↓</div><div class="imp-label">Manual staff compensation for channel inconsistencies</div></div>
+    <div class="imp-card rv d3"><div class="imp-stat">→</div><div class="imp-label">Internal conversations shifted from "what should this do?" to "does this fit the system?"</div></div>
+  </div>
+</div>
+
+<!-- REFLECTION -->
+<div class="sec rv">
+  <div class="sec-rule"></div>
+  <div class="chapter"><span class="chapter-num">08</span><span class="chapter-label">Reflection</span></div>
+  <div class="refl">
+    <p class="refl-text">I initially approached this as an <em>interface problem</em>, but the real work turned out to be in rules, states, and edge cases. Working in a startup where both the PM and I were doing this for the first time, we relied heavily on early customers — a small group, but loyal ones whose feedback shaped a lot of the decisions. We figured things out as we went, which meant the system had to be flexible enough to <em>absorb changes without breaking existing behavior.</em></p>
+  </div>
+</div>
+
+<div class="case-foot rv">
+  <div style="display:flex;gap:1.75rem;align-items:center">
+    <a href="index.html" class="foot-back hv">← All work</a>
+    <a href="heartbeat.html" class="foot-back hv">Next: Heartbeat →</a>
+  </div>
+  <span class="foot-c">© 2026 Bambi Li</span>
+</div>
+
+<script>
+// cursor
+const cdot=document.getElementById('cdot'),cring=document.getElementById('cring');
+let mx=300,my=300,rx=300,ry=300;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.left=mx+'px';cdot.style.top=my+'px'});
+(function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cring.style.left=rx+'px';cring.style.top=ry+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('.hv').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cring.classList.add('hov'));
+  el.addEventListener('mouseleave',()=>cring.classList.remove('hov'));
+});
+
+// nav + progress
+const topNav=document.getElementById('topNav'),prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY,t=document.body.scrollHeight-window.innerHeight;
+  prog.style.width=Math.min(100,(s/t)*100)+'%';
+  topNav.classList.toggle('vis',s>80);
+},{passive:true});
+
+// reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.06});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// dashboard bars
+const dObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    setTimeout(()=>{document.getElementById('cb1').style.width='57.5%'},200);
+    setTimeout(()=>{document.getElementById('cb2').style.width='31.6%'},350);
+    setTimeout(()=>{document.getElementById('cb3').style.width='10.9%'},500);
+    dObs.unobserve(e.target);
+  }
+}),{threshold:.3});
+const de=document.querySelector('.dash-body');
+if(de)dObs.observe(de);
+
+// hero canvas — grid nodes only, mouse activates + ripple
+(function(){
+  const cv=document.getElementById('hero-canvas');
+  const ctx=cv.getContext('2d');
+  const heroEl=cv.parentElement;
+  let W,H,nodes=[],nbMap={};
+
+  let tmx=-999,tmy=-999,cmx=0,cmy=0;
+  heroEl.addEventListener('mousemove',e=>{
+    const r=heroEl.getBoundingClientRect();
+    tmx=e.clientX-r.left; tmy=e.clientY-r.top;
+  });
+  heroEl.addEventListener('mouseleave',()=>{tmx=-999;tmy=-999;});
+
+  // click ripple
+  let ripples=[];
+  heroEl.addEventListener('click',e=>{
+    const r=heroEl.getBoundingClientRect();
+    ripples.push({x:e.clientX-r.left,y:e.clientY-r.top,t:0});
+  });
+
+  const STEP=52;
+
+  function buildGrid(){
+    W=cv.width=heroEl.offsetWidth;
+    H=cv.height=heroEl.offsetHeight;
+    nodes=[];nbMap={};
+    const cols=Math.ceil(W/STEP)+1, rows=Math.ceil(H/STEP)+1;
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+      const key=`${c},${r}`;
+      nodes.push({
+        c,r,key,
+        bx:c*STEP, by:r*STEP,
+        x:c*STEP,  y:r*STEP,
+        phase:Math.random()*Math.PI*2,
+        spd:.00035+Math.random()*.00025,
+        lit:0,       // mouse activation 0..1
+        rlit:0,      // ripple activation 0..1
+        // accent color: most purple, sparse pink/gold
+        col: Math.random()<.08 ? [245,48,124] : Math.random()<.05 ? [201,168,124] : [107,69,255]
+      });
+      nbMap[key]=nodes[nodes.length-1];
+    }
+  }
+  buildGrid();
+  window.addEventListener('resize',buildGrid);
+
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+
+    // smooth cursor
+    if(tmx<0){cmx+=(W*.55-cmx)*.03;cmy+=(H*.5-cmy)*.03;}
+    else{cmx+=(tmx-cmx)*.1;cmy+=(tmy-cmy)*.1;}
+
+    // text safe zone — hero content is roughly left 55%, vertical 12%–85%
+    const tsX=W*.56, tsY1=H*.1, tsY2=H*.88;
+
+    nodes.forEach(n=>{
+      // gentle drift
+      n.x=n.bx+Math.sin(t*n.spd+n.phase)*2.5;
+      n.y=n.by+Math.cos(t*n.spd*.75+n.phase)*2;
+
+      // mouse proximity
+      const dx=n.x-cmx, dy=n.y-cmy;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const mouseAct=Math.max(0,1-dist/160);
+      n.lit+=(mouseAct-n.lit)*.09;
+
+      // ripple activation
+      let rAct=0;
+      ripples.forEach(rp=>{
+        const rd=Math.sqrt((n.bx-rp.x)**2+(n.by-rp.y)**2);
+        const front=rp.t*180; // ripple travels at 180px/unit
+        const width=60;
+        const d=Math.abs(rd-front);
+        if(d<width) rAct=Math.max(rAct,(1-d/width)*(1-rp.t*.8));
+      });
+      n.rlit+=(rAct-n.rlit)*.18;
+
+      const totalLit=Math.min(1,n.lit+n.rlit);
+      const inText=n.bx<tsX && n.by>tsY1 && n.by<tsY2;
+
+      // base opacity — very low, only right side slightly more visible
+      const baseOp=inText ? .016 : .038;
+      const op=baseOp+totalLit*(inText?.12:.28);
+      if(op<.005) return;
+
+      const [cr,cg,cb]=n.col;
+      const radius=1+totalLit*3;
+
+      // node dot
+      ctx.globalAlpha=op;
+      ctx.fillStyle=`rgb(${cr},${cg},${cb})`;
+      ctx.beginPath();ctx.arc(n.x,n.y,radius,0,Math.PI*2);ctx.fill();
+
+      // connecting edges to right + bottom neighbors when lit
+      if(totalLit>.12){
+        const right=nbMap[`${n.c+1},${n.r}`];
+        const down =nbMap[`${n.c},${n.r+1}`];
+        [right,down].forEach(nb=>{
+          if(!nb)return;
+          const edgeOp=totalLit*(inText?.03:.07);
+          ctx.globalAlpha=edgeOp;
+          ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
+          ctx.lineWidth=.5;
+          ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(nb.x,nb.y);ctx.stroke();
+        });
+      }
+    });
+
+    // advance ripples
+    ripples.forEach(rp=>rp.t+=.012);
+    ripples=ripples.filter(rp=>rp.t<1.2);
+
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// queue
+let aRow=null,aPanel=null;
+function selQ(id){
+  const row=document.getElementById(id),pid=id.replace('qr','qd'),panel=document.getElementById(pid);
+  if(aRow&&aRow!==row){aRow.classList.remove('active');if(aPanel)aPanel.classList.remove('open')}
+  const open=panel.classList.contains('open');
+  row.classList.toggle('active',!open);panel.classList.toggle('open',!open);
+  aRow=open?null:row;aPanel=open?null:panel;
+}
+function qConfirm(rid,pid){
+  const row=document.getElementById(rid),panel=document.getElementById(pid);
+  row.querySelectorAll('.ub-pending').forEach(b=>{b.className='ub ub-confirmed';b.textContent='Confirmed'});
+  panel.classList.remove('open');row.classList.remove('active');
+}
+function qDismiss(rid,pid){
+  const row=document.getElementById(rid),panel=document.getElementById(pid);
+  [row,panel].forEach(el=>{el.style.transition='all .3s';el.style.opacity='0';el.style.maxHeight='0';el.style.overflow='hidden';el.style.padding='0'});
+  setTimeout(()=>{row.remove();panel.remove()},300);
+}
+
+// customer flow
+let selSvc=null,selTime=null;
+function pickSvc(id,name){
+  document.querySelectorAll('.cf-si').forEach(el=>el.classList.remove('sel'));
+  document.getElementById(id).classList.add('sel');selSvc=name;
+  const b=document.getElementById('cfn1');b.disabled=false;b.style.opacity='1';
+}
+function pickTime(el,t){
+  if(el.classList.contains('na'))return;
+  document.querySelectorAll('.cf-ts').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');selTime=t;
+  const b=document.getElementById('cfn2');b.disabled=false;b.style.opacity='1';
+}
+function chkContact(){
+  const ok=[...document.querySelectorAll('#cfp3 input')].every(i=>i.value.trim().length>1);
+  const b=document.getElementById('cfn3');b.disabled=!ok;b.style.opacity=ok?'1':'.35';
+}
+function cfNext(step){
+  document.getElementById('cfp'+step).classList.remove('active');
+  document.getElementById('cfp'+(step+1)).classList.add('active');
+  document.getElementById('cfs'+step).className='cf-step done';
+  const c=document.getElementById('cfc'+step);if(c)c.classList.add('done');
+  if(step+1<=4)document.getElementById('cfs'+(step+1)).className='cf-step active';
+  if(step===3){document.getElementById('cfSvc').textContent=selSvc||'—';document.getElementById('cfTime').textContent=selTime||'—';}
+}
+function cfBack(step){
+  document.getElementById('cfp'+step).classList.remove('active');
+  document.getElementById('cfp'+(step-1)).classList.add('active');
+  document.getElementById('cfs'+step).className='cf-step todo';
+  document.getElementById('cfs'+(step-1)).className='cf-step active';
+  const c=document.getElementById('cfc'+(step-1));if(c)c.classList.remove('done');
+}
+function cfReset(){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('cfp'+i).classList.remove('active');
+    document.getElementById('cfs'+i).className='cf-step todo';
+    const c=document.getElementById('cfc'+i);if(c)c.classList.remove('done');
+  });
+  document.getElementById('cfp1').classList.add('active');
+  document.getElementById('cfs1').className='cf-step active';
+  document.querySelectorAll('.cf-si').forEach(el=>el.classList.remove('sel'));
+  document.querySelectorAll('.cf-ts').forEach(el=>el.classList.remove('sel'));
+  document.querySelectorAll('#cfp3 input').forEach(i=>i.value='');
+  selSvc=null;selTime=null;
+  ['cfn1','cfn2','cfn3'].forEach(id=>{const b=document.getElementById(id);if(b){b.disabled=true;b.style.opacity='.35'}});
+}
+
+// ── Invisible Layer ──
+(function(){
+  const canvas = document.getElementById('il-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const hero = document.getElementById('hero');
+  const hint = document.getElementById('ilHint');
+
+  let W, H, mx = -1, my = -1, reveal = 0;
+  let animating = false;
+
+  const isMobile = () => window.innerWidth <= 860;
+
+  function resize(){
+    W = canvas.width = hero.offsetWidth;
+    if(isMobile()){
+      const scene = document.querySelector('.il-scene');
+      const sceneH = scene ? scene.offsetHeight : Math.round(window.innerHeight * 0.52);
+      H = canvas.height = sceneH;
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = sceneH + 'px';
+    } else {
+      H = canvas.height = hero.offsetHeight;
+      canvas.style.position = '';
+      canvas.style.top = '';
+      canvas.style.left = '';
+      canvas.style.width = '';
+      canvas.style.height = '';
+    }
+    buildNodes();
+    // On mobile, reparent canvas into scene so it clips correctly
+    const scene = document.querySelector('.il-scene');
+    if(isMobile() && scene && canvas.parentElement !== scene){
+      scene.insertBefore(canvas, scene.firstChild);
+    } else if(!isMobile() && canvas.parentElement !== hero){
+      hero.insertBefore(canvas, hero.firstChild);
+    }
+  }
+
+  // Node definitions — positions as fractions of W/H
+  const NODE_DEFS = [
+    {id:'iln-booking',   fx:.54, fy:.14, color:'107,69,255'},
+    {id:'iln-pos',       fx:.78, fy:.48, color:'107,69,255'},
+    {id:'iln-handheld',  fx:.62, fy:.80, color:'107,69,255'},
+    {id:'iln-ai',        fx:.90, fy:.26, color:'245,48,124'},
+    {id:'iln-crm',       fx:.85, fy:.74, color:'201,168,124'},
+    {id:'iln-queue',     fx:.70, fy:.50, color:'107,69,255'},
+  ];
+
+  // Connections that should be revealed
+  const EDGES = [
+    [0,5], // Booking → Queue
+    [1,5], // POS → Queue
+    [2,5], // Handheld → Queue
+    [3,5], // AI → Queue
+    [4,5], // CRM → Queue
+    [0,4], // Booking → CRM (shared state)
+    [1,4], // POS → CRM
+    [3,0], // AI → Booking (same flow)
+  ];
+
+  let nodes = [];
+
+  // Spread across full width on mobile
+  const MOBILE_POS = [
+    {fx:.18, fy:.14}, // booking — top left (enough margin for text)
+    {fx:.72, fy:.10}, // pos     — top right
+    {fx:.16, fy:.80}, // handheld — bottom left (enough margin)
+    {fx:.86, fy:.52}, // ai      — right mid
+    {fx:.52, fy:.86}, // crm     — bottom center
+    {fx:.42, fy:.44}, // queue   — center
+  ];
+
+  function buildNodes(){
+    nodes = NODE_DEFS.map((d,i) => {
+      const pos = isMobile() ? MOBILE_POS[i] : d;
+      return { ...d, x: pos.fx * W, y: pos.fy * H };
+    });
+    // Also update DOM node positions on mobile
+    if(isMobile()){
+      NODE_DEFS.forEach((d,i) => {
+        const el = document.getElementById(d.id);
+        if(!el) return;
+        const p = MOBILE_POS[i];
+        el.style.setProperty('--tx', (p.fx*100)+'%');
+        el.style.setProperty('--ty', (p.fy*100)+'%');
+      });
+    }
+  }
+
+  function doResize(){
+    resize();
+    if(isMobile() && !animating){ animating=true; tick(); }
+  }
+  window.addEventListener('resize', doResize);
+  // Wait for flex layout to settle before measuring
+  requestAnimationFrame(()=>{ requestAnimationFrame(doResize); });
+
+
+  // Mouse tracking
+  function getPos(e){
+    const r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  hero.addEventListener('mousemove', e => {
+    const p = getPos(e);
+    mx = p.x; my = p.y;
+    if(hint) hint.classList.add('hidden');
+    if(!animating) { animating = true; tick(); }
+  });
+
+  hero.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    const p = getPos(t);
+    mx = p.x; my = p.y;
+    if(!animating) { animating = true; tick(); }
+  }, {passive:false});
+
+  hero.addEventListener('mouseleave', () => { mx=-1; my=-1; });
+  hero.addEventListener('touchend',   () => { mx=-1; my=-1; });
+
+
+
+  function easeInOut(t){ return t < .5 ? 2*t*t : -1+(4-2*t)*t }
+
+  function tick(){
+    ctx.clearRect(0, 0, W, H);
+
+    // Mobile: always show at half. Desktop: hover triggers reveal
+    const targetReveal = isMobile() ? 0.5 : ((mx > W * .38 && mx > 0) ? 1 : 0);
+    reveal += (targetReveal - reveal) * .06;
+
+    if(reveal < .001 && targetReveal === 0 && !isMobile()){
+      animating = false;
+      ctx.clearRect(0,0,W,H);
+      return;
+    }
+
+    const r = easeInOut(Math.min(1, reveal));
+
+    // Draw edges
+    EDGES.forEach(([ai, bi], i) => {
+      const a = nodes[ai], b = nodes[bi];
+      if(!a || !b) return;
+
+      // proximity boost — edges near cursor get extra brightness
+      let prox = 0;
+      if(mx > 0){
+        const midx = (a.x+b.x)/2, midy = (a.y+b.y)/2;
+        const d = Math.sqrt((midx-mx)**2+(midy-my)**2);
+        prox = Math.max(0, 1 - d/220);
+      }
+
+      const alpha = r * (.18 + prox * .45);
+      const acol = a.color;
+
+      // dashed animated line
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = `rgb(${acol})`;
+      ctx.lineWidth = .8 + prox * .8;
+      ctx.setLineDash([5, 5]);
+      ctx.lineDashOffset = -(Date.now() / 60) % 10;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      // slight curve via control point
+      const cpx = (a.x + b.x)/2 + (b.y - a.y) * .12;
+      const cpy = (a.y + b.y)/2 - (b.x - a.x) * .12;
+      ctx.quadraticCurveTo(cpx, cpy, b.x, b.y);
+      ctx.stroke();
+      ctx.restore();
+
+      // small dot on path near cursor
+      if(prox > .3){
+        const t = ((Date.now()/1200 + i*0.3) % 1);
+        const px = (1-t)*(1-t)*a.x + 2*(1-t)*t*cpx + t*t*b.x;
+        const py = (1-t)*(1-t)*a.y + 2*(1-t)*t*cpy + t*t*b.y;
+        ctx.save();
+        ctx.globalAlpha = prox * r * .9;
+        ctx.fillStyle = `rgb(${acol})`;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+
+    // Node halos near cursor
+    nodes.forEach(n => {
+      if(mx < 0) return;
+      const d = Math.sqrt((n.x-mx)**2 + (n.y-my)**2);
+      const p = Math.max(0, 1 - d/160) * r;
+      if(p < .01) return;
+      ctx.save();
+      ctx.globalAlpha = p * .12;
+      ctx.fillStyle = `rgb(${n.color})`;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 32, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    requestAnimationFrame(tick);
+  }
+})();
+
+
+
+// ── Mobile tap-to-expand for System in Motion ──
+(function(){
+  const isTouch = () => window.matchMedia('(hover:none),(pointer:coarse)').matches;
+
+  document.querySelectorAll('.sim-node-wrap').forEach(wrap => {
+    const node = wrap.querySelector('.sim-node');
+    const popup = wrap.querySelector('.sim-popup');
+    if(!node || !popup) return;
+
+    node.addEventListener('click', () => {
+      if(!isTouch()) return;
+      const isOpen = popup.classList.contains('open');
+      // Close all others
+      document.querySelectorAll('.sim-popup.open').forEach(p => {
+        p.classList.remove('open');
+        p.closest('.sim-node-wrap')?.querySelector('.sim-node')?.classList.remove('active');
+      });
+      if(!isOpen){
+        popup.classList.add('open');
+        node.classList.add('active');
+        // Smooth scroll into view
+        setTimeout(() => popup.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+      }
+    });
+  });
+
+  // Close on outside tap
+  document.addEventListener('click', e => {
+    if(!isTouch()) return;
+    if(!e.target.closest('.sim-node-wrap')){
+      document.querySelectorAll('.sim-popup.open').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.sim-node.active').forEach(n => n.classList.remove('active'));
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
