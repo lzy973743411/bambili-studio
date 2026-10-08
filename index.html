@@ -1,2082 +1,436 @@
-<!doctype html>
-<html lang="en" data-screen="ask">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tossy — stuck? toss it.</title>
-<meta name="description" content="Stuck on a small decision? Ask Tossy, a pixel dice with attitude. It answers at random, on purpose.">
-<link rel="canonical" href="https://tossy.me/">
-<meta name="theme-color" content="#74d7f2">
-<!-- link previews (iMessage, Slack, X, LinkedIn, Discord…) -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Tossy">
-<meta property="og:url" content="https://tossy.me/">
-<meta property="og:title" content="Tossy — stuck? toss it.">
-<meta property="og:description" content="A pixel dice with attitude for small decisions. Random on purpose.">
-<meta property="og:image" content="https://tossy.me/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Tossy, a smiling pixel dice, next to the words: stuck? toss it.">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Tossy — stuck? toss it.">
-<meta name="twitter:description" content="A pixel dice with attitude for small decisions. Random on purpose.">
-<meta name="twitter:image" content="https://tossy.me/og.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="Tossy">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' shape-rendering='crispEdges'%3E%3Crect width='28' height='28' fill='%23292544'/%3E%3Crect x='4' y='4' width='20' height='20' fill='%2374d7f2'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23292544'/%3E%3Crect x='16' y='16' width='4' height='4' fill='%23292544'/%3E%3C/svg%3E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bambi Li — Product Designer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
 <style>
-/* Chinese pixel font: Fusion Pixel 12px (OFL-1.1). unicode-range means the ~600KB file
-   is only downloaded when Chinese characters are actually on screen. */
-@font-face{
-  font-family:'Tossy CJK';font-style:normal;font-weight:400;font-display:swap;
-  src:url(https://cdn.jsdelivr.net/npm/@fontsource/fusion-pixel-12px-proportional-sc@5.3.0/files/fusion-pixel-12px-proportional-sc-latin-400-normal.woff2) format('woff2');
-  unicode-range:U+2E80-2FDF,U+3000-303F,U+3040-30FF,U+3100-312F,U+3190-31FF,U+3400-4DBF,U+4E00-9FFF,U+F900-FAFF,U+FE30-FE4F,U+FF00-FFEF,U+2018-201F,U+2026,U+00B7;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#edf9fc;--dots:#cdeef6;--line:#292544;--text:#292544;--sub:#4a4766;--card:#ffffff;--hard:#292544;
-  --btn:#74d7f2;--btnText:#292544;--bubble:#74d7f2;--drop:#a6e3f0;--shade:#cdeef6;--body:#f3fcfe;--on:#292544;
-  --mode:#a88cf7;
-  --px:'Press Start 2P','Tossy CJK','Silkscreen',ui-monospace,'PingFang SC','Microsoft YaHei',monospace;
-  --ui:'Silkscreen','Tossy CJK',ui-monospace,'PingFang SC','Microsoft YaHei',monospace;
-  --d:220px;
+  --paper:#07060A;
+  --ink:#EDE8DF;
+  --pink:#F5307C;
+  --gold:#C9A87C;
+  --muted2:#7A736A;
+  --rule:rgba(237,232,223,0.07);
+  --rule2:rgba(237,232,223,0.11);
 }
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-html{background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:16px 16px;transition:background-color .2s steps(2)}
-/* one dot layer, on the root: it also covers the area behind Safari's floating bottom bar */
-/* iPhone Safari only paints a flat color in the rubber-band area, never the dots, so the
-   native bounce is off and Tossy has its own pull-to-refresh (see "pull to refresh" in the script) */
-html,body{overscroll-behavior:none}
-/* own pull-to-refresh indicator */
-.ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:60;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;pointer-events:none;transform:translate(-50%,-64px);font-size:11px;font-weight:700;color:var(--sub)}
-.ptr-die{width:36px;height:36px}.ptr-die svg{width:100%;height:100%;display:block;transition:transform .15s steps(2)}
-.ptr.ready .ptr-die svg{transform:rotate(-12deg) scale(1.1)}
-.ptr.go .ptr-die svg{animation:ptrSpin .5s steps(8) infinite}
-@keyframes ptrSpin{to{transform:rotate(360deg)}}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);overflow-x:hidden;cursor:none;position:relative}
 
-body{
-  background:transparent;
-  color:var(--text);font-family:var(--ui);
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+/* ── Cursor ── */
+.cursor-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;top:0;left:0;transition:transform 0.15s}
+.cursor-ring{width:32px;height:32px;border-radius:50%;border:1px solid rgba(245,48,124,0.4);position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9998;top:0;left:0;transition:width 0.32s,height 0.32s,border-color 0.32s}
+.cursor-ring.hov{width:54px;height:54px;border-color:rgba(245,48,124,0.85)}
+
+/* ── Sesame rail ── */
+.s-rail{position:absolute;left:0;top:0;pointer-events:none;z-index:5;width:36px}
+@media(min-width:1024px){.s-rail{width:64px}}
+
+/* ── Nav ── */
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 1.5rem 1.5rem 3rem;border-bottom:0.5px solid var(--rule);position:relative;z-index:10}
+@media(min-width:1024px){nav{padding:1.75rem 3rem 1.75rem 5rem}}
+.logo{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;font-style:italic;color:var(--pink);letter-spacing:0.04em}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{font-size:11px;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted2);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:var(--pink)}
+
+/* ── Hero ── */
+.hero{position:relative;min-height:calc(92vh - 57px);display:flex;flex-direction:column;justify-content:center;padding:0 1.5rem 0 3rem;border-bottom:0.5px solid var(--rule);overflow:hidden}
+@media(min-width:1024px){.hero{min-height:calc(92vh - 61px);padding:0 4rem 0 5rem}}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-content{position:relative;z-index:2}
+.eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted2);margin-bottom:2.5rem;display:flex;align-items:center;gap:12px;opacity:0;animation:fup 0.7s 0.2s forwards}
+.eyebrow::before{content:'';width:20px;height:0.5px;background:var(--pink);display:block}
+.headline{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:-0.025em;margin-bottom:2rem}
+.hl{display:block;overflow:hidden}
+.hli{display:block;opacity:0;transform:translateY(110%);animation:sup 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
+.hl:nth-child(1) .hli{animation-delay:0.28s;font-size:clamp(40px,6vw,80px);line-height:1.08;color:var(--ink)}
+.hl:nth-child(2) .hli{animation-delay:0.4s;font-size:clamp(40px,6vw,80px);line-height:1.08;color:var(--ink)}
+.hl:nth-child(3) .hli{animation-delay:0.52s;font-size:clamp(40px,6vw,80px);line-height:1.08;font-style:italic;color:var(--pink)}
+.subhead{font-size:14px;line-height:1.8;color:var(--muted2);max-width:420px;opacity:0;animation:fup 0.7s 0.85s forwards}
+.subhead em{color:rgba(245,48,124,0.7);font-style:normal}
+
+/* ── Work ── */
+.work{padding:0 1.5rem 5rem 3rem}
+@media(min-width:1024px){.work{padding:0 4rem 7rem 5rem}}
+.thesis{padding:3rem 0 2.5rem;border-top:0.5px solid var(--rule);opacity:0;transform:translateY(12px);transition:opacity 0.7s,transform 0.7s}
+.thesis.in{opacity:1;transform:none}
+.sec-lb{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted2);margin-bottom:1.5rem}
+.thesis-statement{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.1vw,22px);font-weight:300;color:var(--muted2);max-width:520px;line-height:1.6}
+.thesis-statement em{color:var(--ink);font-style:normal}
+
+/* ── Project cards ── */
+.projects{display:flex;flex-direction:column;gap:10px}
+.pcard{position:relative;overflow:hidden;border-radius:16px;cursor:pointer;height:340px;opacity:0;transform:translateY(24px);transition:opacity 0.7s,transform 0.7s cubic-bezier(0.16,1,0.3,1),height 0.5s cubic-bezier(0.16,1,0.3,1)}
+.pcard.in{opacity:1;transform:none}
+.pcard:nth-child(2){transition-delay:0.1s}
+.pcard:nth-child(3){transition-delay:0.2s}
+.pcard:hover{height:420px}
+.pcard-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 0.7s cubic-bezier(0.16,1,0.3,1),filter 0.7s ease;filter:blur(3px) brightness(0.3);transform:scale(1.06)}
+.pcard:hover .pcard-img{filter:blur(0px) brightness(0.42);transform:scale(1)}
+.pcard-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,6,10,0.96) 0%,rgba(7,6,10,0.35) 50%,rgba(7,6,10,0.08) 100%)}
+.pcard-line{position:absolute;bottom:0;left:0;height:2px;background:var(--pink);width:0;transition:width 0.6s cubic-bezier(0.16,1,0.3,1)}
+.pcard:hover .pcard-line{width:100%}
+.pcard-role{position:absolute;top:1.25rem;left:1.5rem;font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;padding:4px 12px;border-radius:20px;border:0.5px solid rgba(245,48,124,0.3);color:var(--pink);background:rgba(245,48,124,0.07)}
+.pcard-type{position:absolute;top:1.25rem;right:1.5rem;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(237,232,223,0.25);opacity:0;transition:opacity 0.4s}
+.pcard:hover .pcard-type{opacity:1}
+.pcard-content{position:absolute;bottom:0;left:0;right:0;padding:1.75rem 1.5rem 1.5rem}
+.pcard-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4.5vw,52px);font-weight:300;letter-spacing:-0.025em;line-height:0.95;color:var(--ink);margin-bottom:0.6rem;transform:translateY(6px);transition:transform 0.5s cubic-bezier(0.16,1,0.3,1)}
+.pcard:hover .pcard-title{transform:translateY(0)}
+.pcard-desc{font-size:12px;color:rgba(237,232,223,0.45);line-height:1.65;opacity:0;transform:translateY(8px);transition:opacity 0.4s 0.06s,transform 0.4s 0.06s;margin-bottom:0.875rem;max-width:480px}
+.pcard:hover .pcard-desc{opacity:1;transform:translateY(0)}
+.pcard-tags{display:flex;gap:6px;flex-wrap:wrap}
+.ptag{font-size:10px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(237,232,223,0.12);color:rgba(237,232,223,0.35);opacity:0;transform:translateY(5px);transition:opacity 0.3s,transform 0.3s}
+.pcard:hover .ptag{opacity:1;transform:none}
+.pcard:hover .ptag:nth-child(2){transition-delay:0.06s}
+.pcard:hover .ptag:nth-child(3){transition-delay:0.12s}
+
+@media(min-width:1024px){
+  .projects{flex-direction:row;align-items:stretch;height:520px;gap:12px}
+  .pcard{flex:1;height:100%!important;transition:flex 0.5s cubic-bezier(0.16,1,0.3,1),opacity 0.7s,transform 0.7s}
+  .pcard:hover{flex:1.75;height:100%!important}
 }
-button,input{font:inherit;color:inherit}
-button,a,.die{touch-action:manipulation}
-button{cursor:pointer}
-:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-[hidden]{display:none !important}
-
-/* ---------- header ---------- */
-.top{position:absolute;left:0;right:0;top:env(safe-area-inset-top,0px);height:96px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;z-index:5}
-.brand{display:flex;align-items:center;gap:12px;font-family:var(--px);font-size:14px;text-decoration:none;color:var(--text)}
-.top-right{display:flex;align-items:center;gap:20px}
-.counter{height:40px;padding:0 12px;display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--line);box-shadow:2px 2px 0 var(--hard);font-size:13px;font-weight:700}
-.counter:active{transform:translate(2px,2px);box-shadow:none}
-.counter .num{min-width:20px;padding:1px 5px;background:var(--btn);color:var(--btnText);border:2px solid var(--line);font-size:11px;text-align:center}
-.badge{height:40px;padding:0 12px;display:flex;align-items:center;gap:8px;background:var(--mode);border:2px solid var(--line);color:var(--on);font-size:13px;font-weight:700;text-transform:uppercase}
-.badge i{width:10px;height:10px;background:var(--on)}
-.skins{display:flex;align-items:center;gap:6px}
-.skin{width:28px;height:28px;padding:0;display:grid;place-items:center;border:2px solid var(--line);opacity:.85}
-.skin span{width:10px;height:10px}
-.skin[aria-pressed="true"]{width:34px;height:34px;border-width:3px;opacity:1;box-shadow:2px 2px 0 var(--hard)}
-.skin[aria-pressed="true"] span{width:12px;height:12px}
-.tog{width:40px;height:40px;padding:0;display:grid;place-items:center;background:var(--card);border:2px solid var(--line);box-shadow:2px 2px 0 var(--hard);font-size:13px;font-weight:700}
-.tog:active{transform:translate(2px,2px);box-shadow:none}
-.tog[aria-pressed="true"]{background:var(--btn);color:var(--btnText)}
-.tog .off{display:none}.tog[aria-pressed="false"] .on{display:none}.tog[aria-pressed="false"] .off{display:inline}
-.tog svg{display:block}
-html[data-screen="stage"] .top .skins,html[data-screen="stage"] #langBtn{display:none}
-html[data-screen="ask"] .badge{display:none}
-
-/* ---------- layout ---------- */
-main{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:96px 48px}
-.screen{width:100%;display:flex;flex-direction:column;align-items:center}
-
-/* ---------- ask ---------- */
-.hero{position:relative;width:760px;max-width:100%;height:184px}
-.hero .die{position:absolute;left:50%;top:0;margin-left:-88px;width:176px;height:176px}
-.bubble{position:absolute;left:calc(50% + 114px);top:18px;width:250px;padding:14px 16px;background:var(--card);border:3px solid var(--line);box-shadow:4px 4px 0 var(--bubble);font-size:15px;line-height:1.4}
-.bubble svg{position:absolute;left:-12px;top:20px}
-.bubble.nudge{animation:shake .4s steps(4)}
-h1.title{margin:26px 0 0;font-family:var(--px);font-size:40px;font-weight:400;line-height:1;letter-spacing:0}
-.tagline{margin:14px 0 0;font-size:15px;color:var(--sub)}
-.modes{margin-top:40px;display:flex;gap:12px}
-.mode{width:172px;height:60px;padding:0 12px;display:flex;align-items:center;gap:10px;border:3px solid var(--line);background:var(--card);box-shadow:3px 3px 0 var(--hard);font-family:var(--px);font-size:11px;text-align:left;transition:transform .1s steps(2)}
-.mode svg{flex-shrink:0}
-.mode[aria-pressed="true"]{background:var(--c);color:var(--on);box-shadow:4px 4px 0 var(--hard);transform:translate(-1px,-2px)}
-.mode:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--hard)}
-.askbox{margin-top:32px;width:760px;max-width:100%;min-height:80px;padding:9px 9px 9px 22px;display:flex;align-items:center;gap:12px;background:var(--card);border:3px solid var(--line);box-shadow:6px 6px 0 var(--hard)}
-.askbox.nudge{animation:shake .4s steps(4)}
-.askbox input{flex:1;min-width:0;height:56px;border:0;background:transparent;font-family:var(--ui);font-size:20px;text-transform:uppercase;outline:none}
-.askbox input::placeholder{color:var(--sub);opacity:.85}
-.cta{--charge:0;height:58px;min-width:150px;padding:0 26px;flex-shrink:0;border:3px solid var(--line);background:linear-gradient(to right,var(--mode) calc(var(--charge) * 100%),var(--btn) 0);box-shadow:3px 3px 0 var(--line);color:var(--btnText);font-family:var(--px);font-size:15px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.cta *{pointer-events:none}
-.cta.charging{color:var(--on)}
-.cta.max{animation:shake .2s steps(2) infinite}
-.cta:active,.act:active,.cta.pressed{transform:translate(3px,3px);box-shadow:none}
-.row{width:760px;max-width:100%;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
-.extras{display:flex;gap:10px}
-.link{height:44px;padding:0 12px;border:2px solid transparent;background:transparent;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:4px}
-.link[aria-pressed="true"]{background:var(--mode);border-color:var(--line);color:var(--on);text-decoration:none}
-.options{width:760px;max-width:100%;margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.opt{position:relative}
-.opt input{width:100%;height:46px;padding:0 44px 0 14px;border:2px solid var(--line);background:var(--card);font-size:15px;text-transform:uppercase;outline:none}
-.opt input:focus{box-shadow:3px 3px 0 var(--hard)}
-.opt.wild{height:46px;padding:0 44px 0 14px;display:flex;align-items:center;gap:10px;border:2px dashed var(--line);background:var(--card);font-size:15px;font-weight:700}
-.opt.wild .tag{padding:2px 6px;background:var(--mode);color:var(--on);font-size:10px;border:2px solid var(--line)}
-.tipwrap{position:relative;display:inline-flex;align-items:center;gap:4px}
-.tip-q{width:24px;height:24px;padding:0;flex-shrink:0;border:2px solid var(--line);background:var(--card);font-size:12px;font-weight:700;line-height:1}
-.tip{position:absolute;left:50%;bottom:calc(100% + 12px);width:260px;margin-left:-130px;padding:10px 12px;background:var(--card);border:2px solid var(--line);box-shadow:3px 3px 0 var(--hard);color:var(--text);font-size:12px;font-weight:400;line-height:1.5;text-align:left;visibility:hidden;opacity:0;transform:translateY(4px);transition:opacity .12s steps(2),transform .12s steps(2),visibility .12s;z-index:20;pointer-events:none}
-.tip::after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:var(--line)}
-.tipwrap:hover .tip,.tipwrap:focus-within .tip,.tipwrap.open .tip{visibility:visible;opacity:1;transform:none}
-.opt > button{position:absolute;right:4px;top:4px;width:38px;height:38px;border:0;background:transparent;font-size:16px;font-weight:700}
-.more{height:46px;border:2px dashed var(--line);background:transparent;font-size:13px;font-weight:700}
-.picks{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.pick{height:38px;padding:0 14px;border:2px dashed var(--line);background:transparent;color:var(--sub);font-size:13px;text-transform:uppercase}
-.pick:hover{color:var(--text);background:var(--card)}
-.skins-mobile{display:none}
-.fineprint{margin:28px 0 0;max-width:520px;text-align:center;font-size:11px;line-height:1.5;color:var(--sub)}
-
-/* ---------- stage / reveal ---------- */
-.reveal{width:1200px;max-width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:80px;align-items:center}
-.arena{position:relative;height:440px}
-.arena .die-wrap{position:absolute;left:calc(50% - var(--d) / 2);top:calc(50% - var(--d) / 2);width:var(--d);height:var(--d);transform-origin:50% 60%}
-.arena .die-wrap svg{width:100%;height:100%;display:block}
-.arena{--T:2600ms}
-.flyer,.tumble,.squash{position:absolute;inset:0}
-.squash{transform-origin:50% 100%}
-.tumble{transform-origin:50% 55%}
-.trail{position:absolute;left:50%;width:36px;margin-left:-18px;height:28px;display:flex;justify-content:space-between;visibility:hidden}
-.trail i{width:6px;height:100%;background:var(--line);opacity:.35}
-.trail i:nth-child(2){height:70%;align-self:flex-end;background:var(--bubble);opacity:.9}
-.die-wrap.up .trail{visibility:visible;top:calc(100% + 6px);animation:blink .18s steps(2) infinite}
-.die-wrap.down .trail{visibility:visible;bottom:calc(100% + 6px);animation:blink .18s steps(2) infinite}
-.die-wrap.go .flyer{animation:fly var(--T) linear forwards}
-.die-wrap.hold .flyer,.die-wrap.hold .tumble,.die-wrap.hold .squash,.ground.hold{animation-play-state:paused !important}
-.die-wrap.go .squash{animation:squash var(--T) linear forwards}
-.die-wrap.go.t3 .tumble{animation:tumble3 var(--T) linear forwards}
-.die-wrap.go.t4 .tumble{animation:tumble4 var(--T) linear forwards}
-.die-wrap.go.t5 .tumble{animation:tumble5 var(--T) linear forwards}
-.ground.go{animation:shadowT var(--T) linear forwards}
-.arena.quake{animation:quake .28s steps(4)}
-.fx .spark{position:absolute;top:calc(50% + var(--d) / 2 - 18px);left:calc(50% - 4px);width:8px;height:8px;background:#ffd463;outline:2px solid var(--line)}
-.ground{position:absolute;left:calc(50% - var(--d) * .32);top:calc(50% + var(--d) / 2 + 14px);width:calc(var(--d) * .64);height:12px;background:var(--drop)}
-.rolling{position:absolute;left:0;right:0;top:calc(50% + 24px);z-index:3;margin:0;text-align:center;font-family:var(--px);font-size:14px;visibility:hidden}
-.fx{position:absolute;inset:0;pointer-events:none;visibility:hidden}
-.fx .ring{position:absolute;left:calc(50% - var(--d) * .64);top:calc(50% + var(--d) / 2 - 4px);width:calc(var(--d) * 1.28);height:50px;border:3px solid var(--line)}
-.fx .ring.b{border-color:var(--bubble)}
-.fx .dust{position:absolute;top:calc(50% + var(--d) / 2 + 2px);width:10px;height:10px;background:var(--line)}
-.fx .dust.l{left:calc(50% - var(--d) * .5)}.fx .dust.r{left:calc(50% + var(--d) * .5 - 10px)}
-.fx .dust.s{width:8px;height:8px;background:var(--bubble);margin-top:-16px}
-.answer-col{display:flex;flex-direction:column;gap:22px}
-.qslot{height:116px;display:flex;align-items:flex-end}
-.qtag{max-width:100%;padding:10px 16px;background:var(--card);border:2px solid var(--line);font-size:15px;text-transform:uppercase;overflow-wrap:anywhere}
-.aslot{min-height:210px;display:flex;flex-direction:column;justify-content:center}
-.answer{position:relative;padding:22px 26px 22px;background:var(--card);border:4px solid var(--line);box-shadow:7px 7px 0 var(--bubble);display:flex;flex-direction:column;align-items:flex-start;gap:14px;visibility:hidden}
-.answer .says{padding:5px 12px;background:var(--mode);border:2px solid var(--line);color:var(--on);font-size:13px;font-weight:700;text-transform:uppercase}
-.answer h2{margin:0;font-family:var(--px);font-size:34px;font-weight:400;line-height:1.3;overflow-wrap:anywhere}
-.answer p{margin:0;font-size:17px;line-height:1.4;color:var(--sub)}
-.actions{display:flex;flex-direction:column;gap:12px}
-.actions .sec{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:12px}
-.act.big{flex:none;width:100%;height:60px;font-size:16px}
-.act.small{height:44px;font-size:11px;box-shadow:3px 3px 0 var(--hard)}
-.answer .foot{display:flex;gap:4px 18px;flex-wrap:wrap;margin:-4px 0 -8px -12px}
-.link.small{height:36px;font-size:12px}
-/* 3rd+ re-toss: the "other one" link steps forward */
-.link.hot{height:40px;padding:0 14px;background:var(--mode);border:2px solid var(--line);box-shadow:3px 3px 0 var(--hard);color:var(--on);text-decoration:none;animation:hot 1s steps(2) 3}
-.link.hot::after{content:" ◀"}
-@keyframes hot{50%{transform:translateX(4px)}}
-/* Chinese: pixel CJK glyphs read best at multiples of 12px and need more line height */
-html[lang="zh-CN"] body{font-synthesis:none}
-html[lang="zh-CN"] .askbox input,html[lang="zh-CN"] .opt input{text-transform:none}
-html[lang="zh-CN"] .answer h2{font-size:36px;line-height:1.35}
-html[lang="zh-CN"] h1.title{letter-spacing:0}
-html[lang="zh-CN"] .bubble,html[lang="zh-CN"] .answer p,html[lang="zh-CN"] .tagline,html[lang="zh-CN"] .qtag{line-height:1.6}
-html[lang="zh-CN"] .mode{font-size:12px}
-.chooser{width:100%;margin-top:6px;padding-top:12px;border-top:2px dashed var(--line);display:flex;flex-direction:column;gap:10px}
-.chooser p{margin:0;font-size:13px;font-weight:700;color:var(--text)}
-.chooser .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{min-height:40px;padding:6px 12px;border:2px solid var(--line);background:var(--card);box-shadow:2px 2px 0 var(--hard);font-size:13px;font-weight:700;text-transform:uppercase}
-.chip:hover{background:var(--mode);color:var(--on)}
-.chooser form{display:flex;gap:8px}
-.chooser input{flex:1;min-width:0;height:40px;padding:0 10px;border:2px solid var(--line);background:var(--card);font-size:14px;text-transform:uppercase;outline:none}
-.stamp{position:absolute;top:-16px;right:18px;padding:6px 10px;background:var(--mode);border:3px solid var(--line);color:var(--on);font-family:var(--px);font-size:11px;transform:rotate(-6deg);box-shadow:3px 3px 0 var(--hard)}
-.stamp.on{animation:stampIn .35s cubic-bezier(.34,1.56,.64,1) both}
-.say{position:absolute;left:50%;top:calc(50% - var(--d) / 2 - 78px);z-index:4;transform:translateX(-50%);max-width:92%;margin:0;padding:10px 14px;background:var(--card);border:3px solid var(--line);box-shadow:4px 4px 0 var(--bubble);font-size:14px;font-weight:700;text-align:center;visibility:hidden}
-.say::after{content:"";position:absolute;left:50%;top:100%;margin-left:-7px;border:7px solid transparent;border-top-color:var(--line)}
-.say,.bubble span,.answer p{text-wrap:balance}
-.say.on{visibility:visible;animation:sayIn .4s cubic-bezier(.34,1.56,.64,1) both}
-.die-wrap.cheer{animation:cheer .7s cubic-bezier(.3,.7,.4,1)}
-/* dialogs */
-.overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(20,18,36,.45)}
-.panel{width:min(560px,calc(100vw - 40px));max-width:100%;max-height:min(80vh,720px);overflow:auto;padding:22px 24px;background:var(--card);border:4px solid var(--line);box-shadow:8px 8px 0 var(--hard);color:var(--text)}
-.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.panel-head h2{margin:0;font-family:var(--px);font-size:16px;font-weight:400}
-.x{width:44px;height:44px;border:2px solid var(--line);background:var(--card);font-size:20px;font-weight:700}
-.panel-note{margin:10px 0 16px;font-size:12px;color:var(--sub)}
-.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.hist li{position:relative;padding:12px 52px 12px 14px;border:2px solid var(--line);background:var(--bg)}
-.hist .hq{font-size:12px;color:var(--sub);text-transform:uppercase;overflow-wrap:anywhere}
-.hist .ha{margin-top:6px;font-size:15px;font-weight:700;text-transform:uppercase;overflow-wrap:anywhere}
-.hist .hm{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--sub)}
-.hist .st{padding:1px 6px;border:2px solid var(--line);background:var(--card);color:var(--text);font-weight:700}
-.hist .st.done{background:var(--btn);color:var(--btnText)}
-.hist .st.switch{background:var(--mode);color:var(--on)}
-.hist .del{position:absolute;right:6px;top:6px;width:40px;height:40px;border:0;background:transparent;font-size:18px;font-weight:700}
-.hist .empty{padding:18px;border:2px dashed var(--line);background:transparent;font-size:13px;text-align:center;color:var(--sub)}
-.tally{margin:0 0 12px;padding:10px 14px;border:2px solid var(--line);background:var(--bg);font-family:var(--px);font-size:13px;line-height:1.5;text-align:center}
-.tally b{font-weight:400;font-size:18px;padding:0 4px}
-.panel-foot{margin-top:14px;display:flex;justify-content:flex-end}
-/* share: everything (card, toggle, buttons) fits on screen without scrolling;
-   the card preview shrinks to whatever height is left */
-.link.tiny{height:auto;padding:0 2px;font-size:inherit;color:inherit;vertical-align:baseline}
-.privacy-panel{width:min(480px,calc(100vw - 40px))}
-.plist{margin:14px 0 4px;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.55}
-.plist li{padding-left:18px;position:relative}
-.plist li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;background:var(--mode)}
-.share-panel{--chrome:212px;width:min(480px,calc(100vw - 40px));max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow:hidden;padding:18px 20px}
-.share-preview{margin:12px 0 6px;min-width:0;display:flex;justify-content:center}
-.share-preview img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 40px - var(--chrome));max-height:calc(100dvh - 40px - var(--chrome));aspect-ratio:4/5;border:2px solid var(--line);background:var(--bg)}
-.share-panel .check{min-height:40px}
-.share-panel .share-acts{margin-top:6px}
-.check{display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px;font-weight:700;cursor:pointer}
-.check input{width:20px;height:20px;accent-color:var(--line)}
-.share-acts{margin-top:10px;display:flex;gap:12px}
-.share-acts .act{flex:1;height:52px;display:grid;place-items:center;font-size:12px;text-decoration:none;color:var(--text)}
-.share-acts .act.primary{color:var(--btnText)}
-.act{flex:1;height:60px;border:3px solid var(--line);background:var(--card);box-shadow:5px 5px 0 var(--hard);font-family:var(--px);font-size:14px}
-.act.primary{background:var(--btn);color:var(--btnText)}
-.act:disabled{opacity:.5;cursor:default}
-
-/* ---------- pixel die parts ---------- */
-.d-drop{fill:var(--drop)}.d-line{fill:var(--line)}.d-body{fill:var(--body)}.d-shade{fill:var(--shade)}.d-hi{fill:#fff}.d-blush{fill:#ff9dca}
-.d-ring{fill:none;stroke:var(--line);stroke-width:4}
-
-/* ---------- motion ---------- */
-.bob{animation:bob 1.2s steps(2) infinite}
-.listen{animation:listen .5s steps(4) infinite}
-.hero .die.charging{animation:none;transform-origin:50% 100%;transform:translateY(calc(var(--charge) * 10px)) scale(calc(1 + var(--charge) * .18),calc(1 - var(--charge) * .3))}
-.hero .die.charging.max{animation:squashShake .2s steps(2) infinite}
-.fx.on{visibility:visible}
-.fx.on .ring{animation:ripple .6s steps(5) forwards}
-.fx.on .ring.b{opacity:0;animation-delay:.15s}
-.fx.on .dust.l{animation:dustL .5s steps(4) forwards}
-.fx.on .dust.r{animation:dustR .5s steps(4) forwards}
-.fx.on .spark.a{animation:sparkA .45s cubic-bezier(.2,.8,.4,1) forwards}
-.fx.on .spark.b{animation:sparkB .45s cubic-bezier(.2,.8,.4,1) forwards}
-.fx.on .spark.c{animation:sparkC .5s cubic-bezier(.2,.8,.4,1) forwards}
-.fx.on .spark.d{animation:sparkD .5s cubic-bezier(.2,.8,.4,1) forwards}
-.answer.on{visibility:visible;animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both}
-.answer.on > *{animation:slideIn .35s cubic-bezier(.2,.8,.4,1) both}
-.answer.on > :nth-child(1){animation-delay:.12s}.answer.on > :nth-child(2){animation-delay:.2s}.answer.on > :nth-child(3){animation-delay:.3s}
-.rolling.on{visibility:visible;animation:blink .6s steps(2) infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes squashShake{0%,100%{transform:translate(-3px,10px) scale(1.18,.7)}50%{transform:translate(3px,10px) scale(1.18,.7)}}
-@keyframes listen{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
-@keyframes fly{
-0%{transform:translate(0,0);animation-timing-function:ease-in-out}
-11.5%{transform:translate(0,6px);animation-timing-function:cubic-bezier(.15,.75,.35,1)}
-30.8%{transform:translate(-26px,var(--rise,-170px));animation-timing-function:ease-in-out}
-46%{transform:translate(-10px,calc(var(--rise,-170px) - 16px));animation-timing-function:ease-in-out}
-61.5%{transform:translate(0,var(--rise,-170px));animation-timing-function:cubic-bezier(.6,0,.95,.55)}
-75%{transform:translate(0,0);animation-timing-function:cubic-bezier(.2,.8,.4,1)}
-82.7%{transform:translate(0,-42px);animation-timing-function:cubic-bezier(.6,0,1,.6)}
-88.5%{transform:translate(0,0);animation-timing-function:cubic-bezier(.2,.8,.4,1)}
-93%{transform:translate(0,-12px);animation-timing-function:cubic-bezier(.6,0,1,.6)}
-97%,100%{transform:translate(0,0)}}
-@keyframes squash{
-0%{transform:scale(1,1);animation-timing-function:ease-in}
-11.5%{transform:scale(1.25,.72);animation-timing-function:ease-out}
-16%{transform:scale(.84,1.22);animation-timing-function:ease-out}
-30.8%,61.5%{transform:scale(.72,.72);animation-timing-function:ease-in}
-72%{transform:scale(.8,1.02)}
-75%{transform:scale(1.32,.66);animation-timing-function:ease-out}
-79%{transform:scale(.92,1.12);animation-timing-function:ease-out}
-82.7%{transform:scale(1,1);animation-timing-function:ease-in}
-88.5%{transform:scale(1.16,.84);animation-timing-function:ease-out}
-92%{transform:scale(.97,1.04)}
-96%{transform:scale(1.04,.97)}
-100%{transform:scale(1,1)}}
-@keyframes shadowT{
-0%{transform:scale(1);opacity:1}
-11.5%{transform:scale(1.2);opacity:1;animation-timing-function:cubic-bezier(.15,.75,.35,1)}
-30.8%,61.5%{transform:scale(.35);opacity:.35;animation-timing-function:cubic-bezier(.6,0,.95,.55)}
-75%{transform:scale(1.3);opacity:1}
-82.7%{transform:scale(.8)}
-88.5%{transform:scale(1.12)}
-93%{transform:scale(.95)}
-100%{transform:scale(1);opacity:1}}
-@keyframes tumble3{0%,11.5%{transform:rotate(0);animation-timing-function:steps(12,end)}75%{transform:rotate(1080deg);animation-timing-function:ease-out}79%{transform:rotate(1071deg)}84%{transform:rotate(1086deg)}90%{transform:rotate(1077deg)}95%{transform:rotate(1081deg)}100%{transform:rotate(1080deg)}}
-@keyframes tumble4{0%,11.5%{transform:rotate(0);animation-timing-function:steps(16,end)}75%{transform:rotate(1440deg);animation-timing-function:ease-out}79%{transform:rotate(1431deg)}84%{transform:rotate(1446deg)}90%{transform:rotate(1437deg)}95%{transform:rotate(1441deg)}100%{transform:rotate(1440deg)}}
-@keyframes tumble5{0%,11.5%{transform:rotate(0);animation-timing-function:steps(20,end)}75%{transform:rotate(1800deg);animation-timing-function:ease-out}79%{transform:rotate(1791deg)}84%{transform:rotate(1806deg)}90%{transform:rotate(1797deg)}95%{transform:rotate(1801deg)}100%{transform:rotate(1800deg)}}
-@keyframes quake{0%{transform:translate(0,0)}25%{transform:translate(-4px,3px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,2px)}100%{transform:translate(0,0)}}
-@keyframes sparkA{from{transform:translate(0,0);opacity:1}to{transform:translate(-70px,-54px);opacity:0}}
-@keyframes sparkB{from{transform:translate(0,0);opacity:1}to{transform:translate(70px,-54px);opacity:0}}
-@keyframes sparkC{from{transform:translate(0,0) scale(.7);opacity:1}to{transform:translate(-38px,-86px) scale(.7);opacity:0}}
-@keyframes sparkD{from{transform:translate(0,0) scale(.7);opacity:1}to{transform:translate(40px,-90px) scale(.7);opacity:0}}
-@keyframes popIn{0%{transform:scale(.6) rotate(-2deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-@keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
-@keyframes cheer{0%,100%{transform:translateY(0)}25%{transform:translateY(-26px)}50%{transform:translateY(0)}72%{transform:translateY(-10px)}}
-@keyframes sayIn{0%{transform:translateX(-50%) scale(.5);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
-@keyframes stampIn{0%{transform:rotate(-6deg) scale(2.2);opacity:0}100%{transform:rotate(-6deg) scale(1);opacity:1}}
-@keyframes ripple{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.8);opacity:0}}
-@keyframes dustL{to{transform:translate(-44px,-20px);opacity:0}}
-@keyframes dustR{to{transform:translate(44px,-20px);opacity:0}}
-@keyframes blink{50%{opacity:.25}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;animation-delay:0s !important;transition:none !important}}
-
-/* ---------- mobile ---------- */
-@media (max-width:860px){
-  :root{--d:150px}
-  .top{height:72px;padding:0 20px}
-  .top .skins{display:none}
-  .counter,.badge{height:36px;font-size:12px}
-  main{padding:88px 20px 32px;align-items:center}
-  .hero{height:auto;display:flex;align-items:center;gap:14px}
-  .hero .die{position:static;margin:0;width:112px;height:112px;flex-shrink:0}
-  .bubble{position:relative;left:auto;top:auto;width:auto;flex:1;font-size:13px;padding:12px 14px}
-  h1.title{font-size:28px;margin-top:22px}
-  .tagline{font-size:13px;text-align:center}
-  .modes{margin-top:24px;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-  .mode{width:auto;height:64px;padding:6px 2px;flex-direction:column;justify-content:center;gap:6px;font-size:8px;text-align:center}
-  .askbox{margin-top:22px;flex-direction:column;align-items:stretch;padding:10px}
-  .askbox input{height:48px;font-size:16px;padding:0 6px}
-  .cta{width:100%;height:56px}
-  .row{margin-top:16px}
-  .options{grid-template-columns:1fr}
-  .picks{justify-content:flex-start}
-  .skins-mobile{display:flex;width:100%;margin-top:24px;align-items:center;justify-content:space-between;font-size:12px;font-weight:700}
-  .reveal{grid-template-columns:1fr;row-gap:8px}
-  .arena{height:300px}
-  .qslot{height:auto}
-  .aslot{min-height:170px;margin-top:16px}
-  .answer .foot{justify-content:center;margin-left:0}
-  .say{top:calc(50% - var(--d) / 2 - 64px);font-size:12px}
-  .counter span:first-of-type{display:none}
-  .answer{padding:16px 18px 20px;align-items:center;text-align:center}
-  .answer h2{font-size:24px}
-  .answer p{font-size:15px}
-  .act.big{height:54px;font-size:13px}
-  .act.small{font-size:10px}
-  .top-right{gap:8px}
-  .tog{width:36px;height:36px}
-  .badge{padding:0 8px}
-  .badge .bt{display:none}
-  html[lang="zh-CN"] .answer h2{font-size:24px}
-  html[lang="zh-CN"] .mode{font-size:12px}
-  html[lang="zh-CN"] .act.small{font-size:12px}
+@media(orientation:landscape) and (max-width:1023px){
+  .projects{flex-direction:row;align-items:stretch;height:400px;gap:8px}
+  .pcard{flex:1;height:100%!important;transition:flex 0.5s cubic-bezier(0.16,1,0.3,1),opacity 0.7s,transform 0.7s}
+  .pcard:hover{flex:1.75;height:100%!important}
 }
 
-.copy{position:fixed;left:48px;bottom:14px;margin:0;font-size:10px;letter-spacing:.04em;color:var(--sub);z-index:1}
-html[data-screen="stage"] .copy{display:none}
-@media (max-width:860px){.copy{position:static;text-align:center;padding:0 0 calc(10px + env(safe-area-inset-bottom,0px))}main{min-height:calc(100dvh - 26px)}}
-/* ---------- fit one screen: sizes and gaps scale with viewport height, scroll only when truly too short ---------- */
-main{padding:clamp(72px,11vh,96px) 48px clamp(12px,3vh,32px)}
-.hero{--hd:clamp(112px,18vh,176px);height:calc(var(--hd) + 8px)}
-.hero .die{left:calc(50% - var(--hd) / 2);margin-left:0;width:var(--hd);height:var(--hd)}
-.bubble{left:calc(50% + var(--hd) / 2 + 26px);top:calc(var(--hd) * .1)}
-h1.title{margin-top:clamp(8px,2.2vh,26px);font-size:clamp(30px,5vh,40px)}
-.tagline{margin-top:clamp(6px,1.4vh,14px)}
-.modes{margin-top:clamp(14px,3.4vh,40px)}
-.mode{height:clamp(50px,7vh,60px)}
-.askbox{margin-top:clamp(14px,3vh,32px);min-height:0;padding-top:clamp(5px,1vh,9px);padding-bottom:clamp(5px,1vh,9px)}
-.askbox input{height:clamp(46px,6.4vh,56px)}
-.cta{height:clamp(48px,6.6vh,58px)}
-.row{margin-top:clamp(6px,1.6vh,18px)}
-.picks{margin-top:clamp(6px,1.6vh,18px)}
-.fineprint{margin-top:clamp(10px,2.6vh,28px)}
-.arena{height:clamp(280px,54vh,440px)}
-:root{--d:clamp(140px,26vh,220px)}
-.qslot{height:auto;min-height:0}
-.aslot{min-height:0}
-.answer-col{gap:clamp(10px,2vh,22px)}
-.answer{padding:clamp(14px,2.4vh,22px) 26px;gap:clamp(8px,1.4vh,14px)}
-.answer h2{font-size:clamp(24px,4.4vh,34px)}
-.act.big{height:clamp(46px,7vh,60px)}
-.act.small{height:clamp(38px,5.4vh,44px)}
-.actions{gap:clamp(8px,1.4vh,12px)}
-@media (max-width:860px){
-  main{padding:clamp(64px,10vh,88px) 20px clamp(12px,3vh,32px)}
-  .hero{--hd:clamp(72px,12vh,112px);height:auto}
-  .hero .die{width:var(--hd);height:var(--hd)}
-  .bubble{left:auto;top:auto}
-  h1.title{font-size:clamp(22px,3.6vh,28px);margin-top:clamp(8px,2.2vh,22px)}
-  .modes{margin-top:clamp(12px,2.6vh,24px)}
-  .mode{height:64px}
-  .askbox{margin-top:clamp(12px,2.4vh,22px);padding:clamp(6px,1.2vh,10px)}
-  .askbox input{height:clamp(40px,5.6vh,48px)}
-  .cta{height:clamp(44px,6.4vh,56px)}
-  .picks{margin-top:clamp(6px,1.6vh,18px)}
-  .pick{height:clamp(32px,4.4vh,38px)}
-  .picks{gap:8px}
-  .qtag{padding:8px 14px;font-size:14px}
-  .answer-col{gap:clamp(8px,1.6vh,22px)}
-  .answer .foot{margin-top:-6px;margin-bottom:-10px}
-  .fineprint{margin-top:clamp(10px,2.4vh,28px)}
-  .skins-mobile{margin-top:clamp(8px,2vh,24px)}
-  /* phone ask page: main content centered, skins row sits at the bottom next to the copyright */
-  html[data-screen="ask"] main{align-items:stretch}
-  #ask{justify-content:flex-start}
-  #ask .hero{margin-top:auto}
-  #ask .skins-mobile{margin-top:auto;padding-top:clamp(4px,1.2vh,24px)}
-  :root{--d:clamp(92px,16vh,150px)}
-  .arena{height:clamp(170px,30vh,300px)}
-  .aslot{margin-top:clamp(4px,1.4vh,16px)}
-  .answer{padding:clamp(12px,2vh,16px) 18px clamp(14px,2.2vh,20px)}
-  .answer h2{font-size:clamp(20px,3.4vh,24px)}
-  .act.big{height:clamp(44px,6.4vh,54px)}
-}
-@media (max-width:860px) and (max-height:700px){
-  :root{--d:96px}
-  .arena{height:190px}
-  .say{top:calc(50% - var(--d) / 2 - 56px);font-size:11px;padding:8px 10px}
-  .answer p{font-size:14px}
-  .act.big{height:44px}
-  .act.small{height:36px}
-}
+/* ── Manifesto ── */
+.manifesto{border-top:0.5px solid var(--rule);margin:0 1.5rem 0 3rem;padding:3.5rem 0;display:flex;align-items:center;gap:1.25rem;opacity:0;transform:translateY(12px);transition:opacity 0.7s,transform 0.7s}
+@media(min-width:1024px){.manifesto{margin:0 4rem 0 5rem;padding:5rem 0}}
+.manifesto.in{opacity:1;transform:none}
+.mw{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,64px);font-weight:300;letter-spacing:-0.02em}
+.mw-s{color:var(--ink)}
+.mx{font-size:clamp(18px,3vw,42px);color:rgba(237,232,223,0.18);margin:0 0.3rem}
+.mw-h{color:var(--pink);font-style:italic}
 
-/* ---------- pixel cursor (mouse only) ---------- */
-@media (hover:hover) and (pointer:fine){
-  html,body{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAAo0lEQVR4nNXXQQqDMBRF0ad0Kwq6Dl11XUcLuph0dCcRrWnNz88dCQbCMTGohm4KQzcFGdVaTbSb0EpqLnxw8VqfkqSxn4MkvbelyTFhOSHllpYXUi6pHyHdLfUnpLukfoX0r9S/kH6V1iOkVKl/4djPp/f5ajiS+hEiYY3i6j1pkCFg9yGt96SJZbkyFzbf3htiXLxrU5+MvfDqwKP/Dve79AO092OCylwpZAAAAABJRU5ErkJggg==) 1 1,auto}
-  button,a,label.check,.skin,.pick,.chip,.mode,.die,#stageDie,.link{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAAw0lEQVR4nNXX0Q2CMBAG4L+GVXiAMAabuIRxAMMSbuIYBh8cpj79hFxatHgt1/8FAoXLR48G0LWj79rRo1BOOW7qn+coYCmoJWWxWFF1oRvubr2VabgzX24AgH6CB4DX+xG8IKVoKFnmcCuNPKApDeV4IZNLakfIaEvtCRktqV0h86/UvpDZK61HyKRK7Qv76bp5nl8NMakdISWcI5l6VxrKKGD3UVrvSiNluVJc6L69NwzHya5NfTLlhb8OjP13mO/SDzFdbIPlt40gAAAAAElFTkSuQmCC) 1 1,pointer}
-  input[type=text],input:not([type]){cursor:text}
-  button:disabled{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAAo0lEQVR4nNXXQQqDMBRF0ad0Kwq6Dl11XUcLuph0dCcRrWnNz88dCQbCMTGohm4KQzcFGdVaTbSb0EpqLnxw8VqfkqSxn4MkvbelyTFhOSHllpYXUi6pHyHdLfUnpLukfoX0r9S/kH6V1iOkVKl/4djPp/f5ajiS+hEiYY3i6j1pkCFg9yGt96SJZbkyFzbf3htiXLxrU5+MvfDqwKP/Dve79AO092OCylwpZAAAAABJRU5ErkJggg==) 1 1,default}
-}
-.fx-canvas{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:100}
+/* ── About ── */
+.about-sec{display:grid;grid-template-columns:1fr;border-top:0.5px solid var(--rule);margin:0 1.5rem 0 3rem;padding:3rem 0 4rem;gap:2rem;opacity:0;transform:translateY(16px);transition:opacity 0.7s,transform 0.7s}
+@media(min-width:600px){.about-sec{grid-template-columns:1fr 1fr;gap:3rem}}
+@media(min-width:1024px){.about-sec{margin:0 4rem 0 5rem;padding:4rem 0 6rem}}
+.about-sec.in{opacity:1;transform:none}
+.al-label{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted2);margin-bottom:1.5rem}
+.al-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,30px);font-weight:300;line-height:1.45;color:var(--ink)}
+.al-quote em{font-style:italic;color:var(--pink)}
+.al-quote strong{font-weight:300;color:var(--gold)}
+.ar{padding-top:1.5rem;border-top:0.5px solid var(--rule);display:flex;flex-direction:column;justify-content:center;gap:1.5rem}
+@media(min-width:600px){.ar{border-top:none;border-left:0.5px solid var(--rule);padding-top:0;padding-left:2.5rem}}
+.bio{font-size:13px;line-height:1.85;color:var(--muted2)}
+.bio strong{color:var(--ink);font-weight:400}
+.tags{display:flex;flex-wrap:wrap;gap:0}
+.atag{font-size:11px;color:var(--muted2);letter-spacing:0.04em;padding-right:1.25rem;margin-bottom:0.5rem;position:relative;opacity:0;transform:translateY(6px);transition:opacity 0.5s,transform 0.5s}
+.atag::after{content:'·';position:absolute;right:0.45rem;color:rgba(237,232,223,0.2)}
+.atag:last-child::after{display:none}
+.about-sec.in .atag{opacity:1;transform:none}
+.about-sec.in .atag:nth-child(1){transition-delay:0.1s}
+.about-sec.in .atag:nth-child(2){transition-delay:0.22s}
+.about-sec.in .atag:nth-child(3){transition-delay:0.34s}
+.about-sec.in .atag:nth-child(4){transition-delay:0.46s}
+.about-sec.in .atag:nth-child(5){transition-delay:0.58s}
 
-/* ---------- hover: every button reacts a little (pixel steps, mouse only) ---------- */
-@media (hover:hover) and (pointer:fine){
-  .mode,.tog,.counter,.act,.cta,.pick,.chip,.x,.skin,.more{transition:transform .08s steps(2),box-shadow .08s steps(2),background-color .08s steps(2)}
-  .mode:hover:not([aria-pressed="true"]){transform:translate(-1px,-2px);box-shadow:5px 5px 0 var(--hard)}
-  .mode:hover svg{animation:wiggle .45s steps(4)}
-  .mode[aria-pressed="true"]:hover{transform:translate(-2px,-3px);box-shadow:5px 6px 0 var(--hard)}
-  .tog:hover,.counter:hover{transform:translate(-1px,-2px);box-shadow:3px 4px 0 var(--hard)}
-  .tog:hover svg,.counter:hover svg{animation:wiggle .45s steps(4)}
-  .act:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--hard)}
-  .act.small:hover:not(:disabled){box-shadow:5px 5px 0 var(--hard)}
-  .act:not(.primary):hover:not(:disabled){background:var(--bg)}
-  .cta:hover:not(.charging){transform:translate(-1px,-2px);box-shadow:4px 5px 0 var(--line)}
-  .cta:hover:not(.charging) #tossLabel{display:inline-block;animation:wiggle .45s steps(4)}
-  .pick:hover{border-style:solid;transform:translate(-1px,-2px);box-shadow:3px 3px 0 var(--hard)}
-  .chip:hover{transform:translate(-1px,-2px);box-shadow:3px 4px 0 var(--hard)}
-  .x:hover{background:var(--mode);color:var(--on)}
-  .skin:hover{transform:scale(1.14)}
-  .link:hover:not([aria-pressed="true"]):not(.hot){text-decoration-thickness:3px;text-underline-offset:6px}
-  .link.hot:hover{transform:translate(-1px,-2px);box-shadow:4px 5px 0 var(--hard);animation:none}
-  .brand:hover svg{animation:wiggle .45s steps(4)}
-  .opt > button:hover{color:var(--mode)}
-}
-.tap{animation:tapPop .3s steps(4)}
-.mode.tap svg,.tog.tap svg,.counter.tap svg{animation:wiggle .4s steps(4)}
-@keyframes tapPop{0%{transform:scale(1)}35%{transform:scale(.92)}70%{transform:scale(1.05)}100%{transform:scale(1)}}
-@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+/* ── Footer ── */
+footer{border-top:0.5px solid var(--rule);margin:0 1.5rem 0 3rem;padding:1rem 0;display:flex;justify-content:space-between;align-items:center;opacity:0;transform:translateY(8px);transition:opacity 0.6s,transform 0.6s}
+@media(min-width:1024px){footer{margin:0 4rem 0 5rem}}
+footer.in{opacity:1;transform:none}
+.ft-l{font-size:11px;color:var(--muted2)}
+.ft-r a{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);text-decoration:none;margin-left:1.5rem;transition:color 0.2s}
+.ft-r a:hover{color:var(--pink)}
 
-/* ---------- dice: eyes follow the mouse, hover hop, poke ---------- */
-.die svg,#stageFace svg{transform-origin:50% 90%;pointer-events:none}
-.die .face,#stageFace .face{transition:transform .12s steps(2)}
-.die.hovering svg,#stageDie.hovering #stageFace svg{animation:hop .5s steps(5)}
-.die.poked svg,#stageDie.poked #stageFace svg{animation:poke .42s steps(6)}
-@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px) scale(1.03,.97)}70%{transform:translateY(0) scale(1.06,.94)}}
-@keyframes poke{0%{transform:scale(1,1)}25%{transform:scale(1.18,.8)}55%{transform:scale(.9,1.12) translateY(-8px)}80%{transform:scale(1.04,.96)}100%{transform:scale(1,1)}}
-@keyframes lineIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-#answerSub.swap{animation:lineIn .35s ease-out}
+@keyframes fup{to{opacity:1;transform:none}}
+@keyframes sup{to{opacity:1;transform:none}}
+
+
+#pc1 .pcard-img{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDkwMCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJnIiBjeD0iNTAlIiBjeT0iMzglIiByPSI3MCUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzNhMzQ3MCIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMjExZDQ1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTAwZTIyIi8+PC9yYWRpYWxHcmFkaWVudD48cGF0dGVybiBpZD0iZCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cmVjdCB4PSIxMyIgeT0iMTMiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii4wNyIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2cpIi8+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2QpIi8+PHJlY3QgeD0iNDY1IiB5PSI0NjIiIHdpZHRoPSIyODAiIGhlaWdodD0iMTQiIGZpbGw9IiM3NEQ3RjIiIG9wYWNpdHk9Ii4yOCIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM0NSwyMzUpIHJvdGF0ZSgtMTIpIHRyYW5zbGF0ZSgtNzIsLTcyKSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTQuMzk5OTk5OTk5OTk5OTk5LDE0LjM5OTk5OTk5OTk5OTk5OSkiIG9wYWNpdHk9Ii45Ij48cmVjdCB4PSIxMiIgeT0iMCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxNDQiIGZpbGw9IiNBODhDRjciLz48cmVjdCB4PSIwIiB5PSIxMiIgd2lkdGg9IjE0NCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNBODhDRjciLz48L2c+PHJlY3QgeD0iMTIiIHk9IjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTQ0IiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMCIgeT0iMTIiIHdpZHRoPSIxNDQiIGhlaWdodD0iMTIwIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMTIiIHk9IjEyIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI0VFRTlGRiIvPjxyZWN0IHg9IjEyIiB5PSIxMiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMiIgZmlsbD0iI2ZmZmZmZiIvPjxyZWN0IHg9IjEyIiB5PSIxMiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2ZmZmZmZiIvPjxyZWN0IHg9IjEyMCIgeT0iMjQiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMDgiIGZpbGw9IiNBODhDRjciLz48cmVjdCB4PSIyNCIgeT0iMTIwIiB3aWR0aD0iMTA4IiBoZWlnaHQ9IjEyIiBmaWxsPSIjQTg4Q0Y3Ii8+PHJlY3QgeD0iMjQiIHk9IjQ4IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSIzNiIgeT0iNDgiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjQ4IiB5PSI0OCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iODQiIHk9IjQ4IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSI5NiIgeT0iNDgiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjEwOCIgeT0iNDgiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjQ4IiB5PSI2MCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMTA4IiB5PSI2MCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iNjAiIHk9Ijk2IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSI3MiIgeT0iOTYiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9Ijg0IiB5PSI4NCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMTguMCIgeT0iNzYuODAwMDAwMDAwMDAwMDEiIHdpZHRoPSIyNCIgaGVpZ2h0PSIxMiIgZmlsbD0iI0ZGOURDQSIvPjxyZWN0IHg9IjEwMi4wIiB5PSI3Ni44MDAwMDAwMDAwMDAwMSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjEyIiBmaWxsPSIjRkY5RENBIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDg2MCwyNzApIHJvdGF0ZSgxMCkgdHJhbnNsYXRlKC02NiwtNjYpIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMy4yLDEzLjIpIiBvcGFjaXR5PSIuOSI+PHJlY3QgeD0iMTEiIHk9IjAiIHdpZHRoPSIxMTAiIGhlaWdodD0iMTMyIiBmaWxsPSIjRkZENDYzIi8+PHJlY3QgeD0iMCIgeT0iMTEiIHdpZHRoPSIxMzIiIGhlaWdodD0iMTEwIiBmaWxsPSIjRkZENDYzIi8+PC9nPjxyZWN0IHg9IjExIiB5PSIwIiB3aWR0aD0iMTEwIiBoZWlnaHQ9IjEzMiIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjAiIHk9IjExIiB3aWR0aD0iMTMyIiBoZWlnaHQ9IjExMCIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjExIiB5PSIxMSIgd2lkdGg9IjExMCIgaGVpZ2h0PSIxMTAiIGZpbGw9IiNGRkY3REUiLz48cmVjdCB4PSIxMSIgeT0iMTEiIHdpZHRoPSIxMTAiIGhlaWdodD0iMTEiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB4PSIxMSIgeT0iMTEiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMTAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB4PSIxMTAiIHk9IjIyIiB3aWR0aD0iMTEiIGhlaWdodD0iOTkiIGZpbGw9IiNGRkQ0NjMiLz48cmVjdCB4PSIyMiIgeT0iMTEwIiB3aWR0aD0iOTkiIGhlaWdodD0iMTEiIGZpbGw9IiNGRkQ0NjMiLz48cmVjdCB4PSIyMiIgeT0iNDQiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjMzIiB5PSI1NSIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iNDQiIHk9IjQ0IiB3aWR0aD0iMTEiIGhlaWdodD0iMTEiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSI3NyIgeT0iNDQiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9Ijg4IiB5PSI1NSIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iOTkiIHk9IjQ0IiB3aWR0aD0iMTEiIGhlaWdodD0iMTEiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSI1NSIgeT0iODgiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjY2IiB5PSI4OCIgd2lkdGg9IjExIiBoZWlnaHQ9IjExIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMTYuNSIgeT0iNzIuNiIgd2lkdGg9IjIyIiBoZWlnaHQ9IjExIiBmaWxsPSIjRkY5RENBIi8+PHJlY3QgeD0iOTMuNSIgeT0iNzIuNiIgd2lkdGg9IjIyIiBoZWlnaHQ9IjExIiBmaWxsPSIjRkY5RENBIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDYwMCwzMDApIHJvdGF0ZSgwKSB0cmFuc2xhdGUoLTEyNiwtMTI2KSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUuMiwyNS4yKSIgb3BhY2l0eT0iLjkiPjxyZWN0IHg9IjIxIiB5PSIwIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjI1MiIgZmlsbD0iIzc0RDdGMiIvPjxyZWN0IHg9IjAiIHk9IjIxIiB3aWR0aD0iMjUyIiBoZWlnaHQ9IjIxMCIgZmlsbD0iIzc0RDdGMiIvPjwvZz48cmVjdCB4PSIyMSIgeT0iMCIgd2lkdGg9IjIxMCIgaGVpZ2h0PSIyNTIiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSIwIiB5PSIyMSIgd2lkdGg9IjI1MiIgaGVpZ2h0PSIyMTAiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSIyMSIgeT0iMjEiIHdpZHRoPSIyMTAiIGhlaWdodD0iMjEwIiBmaWxsPSIjRUFGOEZDIi8+PHJlY3QgeD0iMjEiIHk9IjIxIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjIxIiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMjEiIHk9IjIxIiB3aWR0aD0iMjEiIGhlaWdodD0iMjEwIiBmaWxsPSIjZmZmZmZmIi8+PHJlY3QgeD0iMjEwIiB5PSI0MiIgd2lkdGg9IjIxIiBoZWlnaHQ9IjE4OSIgZmlsbD0iIzc0RDdGMiIvPjxyZWN0IHg9IjQyIiB5PSIyMTAiIHdpZHRoPSIxODkiIGhlaWdodD0iMjEiIGZpbGw9IiM3NEQ3RjIiLz48cmVjdCB4PSI2MyIgeT0iODQiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjQyIiB5PSIxMDUiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9Ijg0IiB5PSIxMDUiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjE2OCIgeT0iODQiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjE0NyIgeT0iMTA1IiB3aWR0aD0iMjEiIGhlaWdodD0iMjEiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSIxODkiIHk9IjEwNSIgd2lkdGg9IjIxIiBoZWlnaHQ9IjIxIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iODQiIHk9IjE0NyIgd2lkdGg9IjIxIiBoZWlnaHQ9IjIxIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMTA1IiB5PSIxNjgiIHdpZHRoPSIyMSIgaGVpZ2h0PSIyMSIgZmlsbD0iIzFhMTczMyIvPjxyZWN0IHg9IjEyNiIgeT0iMTY4IiB3aWR0aD0iMjEiIGhlaWdodD0iMjEiIGZpbGw9IiMxYTE3MzMiLz48cmVjdCB4PSIxNDciIHk9IjE0NyIgd2lkdGg9IjIxIiBoZWlnaHQ9IjIxIiBmaWxsPSIjMWExNzMzIi8+PHJlY3QgeD0iMzEuNSIgeT0iMTM4LjYiIHdpZHRoPSI0MiIgaGVpZ2h0PSIyMSIgZmlsbD0iI0ZGOURDQSIvPjxyZWN0IHg9IjE3OC41IiB5PSIxMzguNiIgd2lkdGg9IjQyIiBoZWlnaHQ9IjIxIiBmaWxsPSIjRkY5RENBIi8+PC9nPjxnIGZpbGw9IiNGRkQ0NjMiPjxyZWN0IHg9IjQ2NS41IiB5PSIxMTYuNSIgd2lkdGg9IjkiIGhlaWdodD0iMjciLz48cmVjdCB4PSI0NTYuNSIgeT0iMTI1LjUiIHdpZHRoPSIyNyIgaGVpZ2h0PSI5Ii8+PC9nPjxnIGZpbGw9IiNGRjlEQ0EiPjxyZWN0IHg9Ijc2Ni41IiB5PSIxMDkuNSIgd2lkdGg9IjciIGhlaWdodD0iMjEiLz48cmVjdCB4PSI3NTkuNSIgeT0iMTE2LjUiIHdpZHRoPSIyMSIgaGVpZ2h0PSI3Ii8+PC9nPjxnIGZpbGw9IiM3NEQ3RjIiPjxyZWN0IHg9IjIwNi41IiB5PSI0MjkuNSIgd2lkdGg9IjciIGhlaWdodD0iMjEiLz48cmVjdCB4PSIxOTkuNSIgeT0iNDM2LjUiIHdpZHRoPSIyMSIgaGVpZ2h0PSI3Ii8+PC9nPjxnIGZpbGw9IiNBODhDRjciPjxyZWN0IHg9IjEwMDUuNSIgeT0iNTA2LjUiIHdpZHRoPSI5IiBoZWlnaHQ9IjI3Ii8+PHJlY3QgeD0iOTk2LjUiIHk9IjUxNS41IiB3aWR0aD0iMjciIGhlaWdodD0iOSIvPjwvZz48ZyBmaWxsPSIjZmZmZmZmIj48cmVjdCB4PSI5NTcuNSIgeT0iMTIyLjUiIHdpZHRoPSI1IiBoZWlnaHQ9IjE1Ii8+PHJlY3QgeD0iOTUyLjUiIHk9IjEyNy41IiB3aWR0aD0iMTUiIGhlaWdodD0iNSIvPjwvZz48ZyBmaWxsPSIjZmZmZmZmIj48cmVjdCB4PSIxNDcuNSIgeT0iMTYyLjUiIHdpZHRoPSI1IiBoZWlnaHQ9IjE1Ii8+PHJlY3QgeD0iMTQyLjUiIHk9IjE2Ny41IiB3aWR0aD0iMTUiIGhlaWdodD0iNSIvPjwvZz48L3N2Zz4=");filter:blur(3px) brightness(0.5)}
+#pc1:hover .pcard-img{filter:blur(0px) brightness(0.8)}
 </style>
 </head>
 <body>
-<header class="top">
-  <a class="brand" id="brand" href="#" aria-label="Tossy home">
-    <svg width="32" height="32" viewBox="0 0 28 28" shape-rendering="crispEdges" aria-hidden="true"><rect width="28" height="28" class="d-line"/><rect x="4" y="4" width="20" height="20" style="fill:var(--btn)"/><rect x="8" y="8" width="4" height="4" class="d-line"/><rect x="16" y="16" width="4" height="4" class="d-line"/></svg>
-    <span>TOSSY</span>
-  </a>
-  <div class="top-right">
-    <button class="counter" type="button" id="recentBtn" aria-haspopup="dialog" aria-controls="recent">
-      <svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>
-      <span data-i18n="recent">RECENT</span><span class="num" id="recentNum">0</span>
-    </button>
-    <button class="tog" type="button" id="langBtn" aria-label="中文 / English"><span id="langText">中</span></button>
-    <button class="tog" type="button" id="soundBtn" aria-pressed="false" data-i18n-label="soundLabel" aria-label="Sound and vibration">
-      <svg class="on" width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" fill="currentColor"/><rect x="6" y="5" width="2" height="10" fill="currentColor"/><rect x="8" y="3" width="2" height="14" fill="currentColor"/><rect x="13" y="6" width="2" height="2" fill="currentColor"/><rect x="15" y="8" width="2" height="4" fill="currentColor"/><rect x="13" y="12" width="2" height="2" fill="currentColor"/></svg>
-      <svg class="off" width="20" height="20" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" fill="currentColor"/><rect x="6" y="5" width="2" height="10" fill="currentColor"/><rect x="8" y="3" width="2" height="14" fill="currentColor"/><rect x="12" y="7" width="2" height="2" fill="currentColor"/><rect x="14" y="9" width="2" height="2" fill="currentColor"/><rect x="16" y="11" width="2" height="2" fill="currentColor"/><rect x="16" y="7" width="2" height="2" fill="currentColor"/><rect x="12" y="11" width="2" height="2" fill="currentColor"/></svg>
-    </button>
-    <div class="skins" role="group" aria-label="Skin" data-skins></div>
+
+<div class="cursor-dot" id="cdot"></div>
+<div class="cursor-ring" id="cring"></div>
+<canvas class="s-rail" id="rail"></canvas>
+
+<nav>
+  <div class="logo">Bambi Li</div>
+  <div class="nav-links">
+    <a href="#work" class="hv">Work</a>
+    <a href="#about" class="hv">About</a>
+    <a href="https://www.linkedin.com/in/bambili/" target="_blank" class="hv">LinkedIn ↗</a>
   </div>
-</header>
+</nav>
 
-<main>
-  <!-- ASK -->
-  <section class="screen" id="ask" aria-label="Ask a question">
-    <div class="hero">
-      <div class="die bob" id="askDie" aria-hidden="true"></div>
-      <div class="bubble" id="bubble">
-        <svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>
-        <span id="greeting" aria-live="polite"></span>
-      </div>
-    </div>
-    <h1 class="title">TOSSY</h1>
-    <p class="tagline" data-i18n="tagline">STUCK ON A SMALL DECISION? LET THE DICE PICK.</p>
-    <div class="modes" role="group" aria-label="Choose who answers" id="modes"></div>
-    <div class="askbox" id="askForm" role="group" aria-label="Ask Tossy">
-      <label class="sr" for="q" data-i18n="qLabel">Your question</label>
-      <input id="q" name="q" type="text" maxlength="140" autocomplete="off" enterkeyhint="go" placeholder="WHAT ARE YOU STUCK ON?" data-i18n-ph="qPh">
-      <button class="cta" type="button" id="tossBtn"><span id="tossLabel">TOSS IT!</span></button>
-    </div>
-    <div class="row">
-      <div class="extras">
-        <button class="link" type="button" id="optToggle" aria-controls="options">+ ADD OPTION</button>
-        <span class="tipwrap" id="wildWrap" hidden><button class="link" type="button" id="wildBtn" aria-describedby="wildTip" data-i18n="wildBtn">+ WILDCARD</button><button class="tip-q" type="button" aria-label="What is a wildcard?" data-i18n-label="wildQ" aria-expanded="false">?</button><span class="tip" role="tooltip" id="wildTip" data-i18n="wildTip">TOSSY ADDS ONE SURPRISE OPTION OF ITS OWN. IT HAS THE SAME ODDS AS YOUR OPTIONS, SO SOMETIMES THE DICE PICKS SOMETHING YOU DID NOT LIST.</span></span>
-      </div>
-    </div>
-    <div class="options" id="options" hidden></div>
-    <div class="picks" id="picks"></div>
-    <p class="fineprint"><span data-i18n="fine">TOSSY ANSWERS AT RANDOM. IT IS A PLAYFUL NUDGE, NOT ADVICE. FOR BIG DECISIONS, ASK A REAL PERSON.</span> <button class="link tiny" type="button" id="privacyBtn" aria-haspopup="dialog" data-i18n="privacy">PRIVACY</button></p>
-    <div class="skins-mobile"><span data-i18n="skin">SKIN</span><div class="skins" role="group" aria-label="Skin" data-skins></div></div>
-  </section>
-
-  <!-- TOSS + REVEAL -->
-  <section class="screen" id="stage" aria-label="Your answer" hidden>
-    <div class="reveal">
-      <div class="arena">
-        <p class="rolling" id="rolling" aria-hidden="true">ROLLING...</p>
-        <div class="ground" id="ground"></div>
-        <div class="fx" id="fx" aria-hidden="true">
-          <div class="ring"></div><div class="ring b"></div>
-          <div class="dust l"></div><div class="dust r"></div><div class="dust l s"></div><div class="dust r s"></div>
-          <div class="spark a"></div><div class="spark b"></div><div class="spark c"></div><div class="spark d"></div>
-        </div>
-        <p class="say" id="say" aria-live="polite"></p>
-        <div class="die-wrap" id="stageDie" aria-hidden="true"><div class="flyer"><div class="trail"><i></i><i></i><i></i></div><div class="tumble"><div class="squash" id="stageFace"></div></div></div></div>
-      </div>
-      <div class="answer-col">
-        <div class="qslot"><div class="qtag" id="qtag"></div></div>
-        <div class="aslot" aria-live="polite">
-          <article class="answer" id="answer">
-            <span class="stamp" id="stamp" hidden></span>
-            <span class="says" id="says"></span>
-            <h2 id="answerText"></h2>
-            <p id="answerSub"></p>
-            <div class="foot">
-              <button class="link small" type="button" id="otherBtn" aria-expanded="false" aria-controls="chooser" data-i18n="otherBtn">WANTED THE OTHER ONE?</button>
-              <button class="link small" type="button" id="shareBtn" aria-haspopup="dialog" data-i18n="shareCard">SHARE CARD</button>
-            </div>
-            <div class="chooser" id="chooser" hidden></div>
-          </article>
-        </div>
-        <div class="actions" id="preActs">
-          <button class="act primary big" type="button" id="commit" data-i18n="commit">LET'S DO IT</button>
-          <div class="sec">
-            <button class="act small" type="button" id="again" data-i18n="again">TOSS AGAIN</button>
-            <button class="act small" type="button" id="newQ" data-i18n="newQ">NEW QUESTION</button>
-          </div>
-        </div>
-        <div class="actions" id="sharedActs" hidden>
-          <button class="act primary big" type="button" id="tossOwn" data-i18n="tossOwn">TOSS YOUR OWN</button>
-        </div>
-        <div class="actions" id="postActs" hidden>
-          <button class="act primary big" type="button" id="newQ2" data-i18n="newQ">NEW QUESTION</button>
-          <div class="sec">
-            <button class="act small" type="button" id="shareBtn2" aria-haspopup="dialog" data-i18n="shareCard">SHARE CARD</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-<footer class="copy">© 2026 BAMBI LI</footer>
-
-<div class="overlay" id="recent" role="dialog" aria-modal="true" aria-labelledby="recentTitle" hidden>
-  <div class="panel">
-    <div class="panel-head"><h2 id="recentTitle" data-i18n="recentTitle">RECENT DECISIONS</h2><button class="x" type="button" data-close aria-label="Close" data-i18n-label="close">×</button></div>
-    <p class="panel-note" data-i18n="recentNote">YOUR HISTORY IS SAVED ON THIS DEVICE ONLY. NO ACCOUNT.</p>
-    <p class="tally" id="tally" hidden></p>
-    <ul class="hist" id="histList"></ul>
-    <div class="panel-foot"><button class="link small" type="button" id="clearHist" data-i18n="clearAll">CLEAR ALL</button></div>
+<section class="hero" id="hero">
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div class="eyebrow">Product Designer · New York · HCI</div>
+    <h1 class="headline">
+      <span class="hl"><span class="hli">Designing complexity</span></span>
+      <span class="hl"><span class="hli">with a</span></span>
+      <span class="hl"><span class="hli">human touch.</span></span>
+    </h1>
+    <p class="subhead">I work at the intersection of <em>AI, systems,</em> and the people <em>caught between them.</em></p>
   </div>
+</section>
+
+<section class="work" id="work">
+  <div class="thesis" id="thesis">
+    <div class="sec-lb">Selected Work</div>
+    <div class="thesis-statement">Three projects. One through-line:<br><em>AI that nudges, systems that connect, and the humans at the center of both.</em></div>
+  </div>
+  <div class="projects">
+    <div class="pcard hv" id="pc1" onclick="window.open('https://tossy.me','_blank','noopener')">
+      <div class="pcard-img"></div>
+      <div class="pcard-overlay"></div><div class="pcard-line"></div>
+      <div class="pcard-role">AI</div>
+      <div class="pcard-type">Web · Consumer</div>
+      <div class="pcard-content">
+        <div class="pcard-title">tossy.me</div>
+        <div class="pcard-desc">A pixel dice with attitude for small decisions — random on purpose. AI gives it a voice, never the verdict.</div>
+        <div class="pcard-tags"><span class="ptag">AI Interaction</span><span class="ptag">Decision Design</span><span class="ptag">Consumer</span><span class="ptag" style="opacity:.6">Case study coming soon</span></div>
+      </div>
+    </div>
+    <div class="pcard hv" id="pc2" onclick="location.href='glowin.html'">
+      <div class="pcard-img" style="background-image:url('https://cdn.prod.website-files.com/667df299b67bcaa5887e43b5/69fb6b18be562653f470b947_Glowin%20cover.png')"></div>
+      <div class="pcard-overlay"></div><div class="pcard-line"></div>
+      <div class="pcard-role">Systems</div>
+      <div class="pcard-type">B2B SaaS · iPad</div>
+      <div class="pcard-content">
+        <div class="pcard-title">Glowin Platform</div>
+        <div class="pcard-desc">Bridging service operations and the people running them — one workflow at a time.</div>
+        <div class="pcard-tags"><span class="ptag">Systems Design</span><span class="ptag">B2B SaaS</span><span class="ptag">Workflow</span></div>
+      </div>
+    </div>
+    <div class="pcard hv" id="pc3" onclick="location.href='heartbeat.html'">
+      <div class="pcard-img" style="background-image:url('https://cdn.prod.website-files.com/667df299b67bcaa5887e43b5/69fb6a8c61b1277139afa176_Heartbeat%20cover.png')"></div>
+      <div class="pcard-overlay"></div><div class="pcard-line"></div>
+      <div class="pcard-role">Human</div>
+      <div class="pcard-type">Mobile App</div>
+      <div class="pcard-content">
+        <div class="pcard-title">Heartbeat</div>
+        <div class="pcard-desc">Understanding how people form connections through shared listening — and what gets in the way.</div>
+        <div class="pcard-tags"><span class="ptag">User Research</span><span class="ptag">Social UX</span><span class="ptag">Mobile</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="manifesto" id="manifesto">
+  <span class="mw mw-s">Systems</span><span class="mx">×</span><span class="mw mw-h">Humanity</span>
 </div>
 
-<div class="overlay" id="privacy" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" hidden>
-  <div class="panel privacy-panel">
-    <div class="panel-head"><h2 id="privacyTitle" data-i18n="privacyTitle">PRIVACY</h2><button class="x" type="button" data-close aria-label="Close" data-i18n-label="close">×</button></div>
-    <ul class="plist">
-      <li data-i18n="pv1"></li>
-      <li data-i18n="pv2"></li>
-      <li data-i18n="pv3"></li>
-      <li data-i18n="pv4"></li>
-    </ul>
+<section class="about-sec" id="about">
+  <div>
+    <div class="al-label">About</div>
+    <div class="al-quote">Every <em>small decision</em><br>builds something<br><strong>larger than itself.</strong></div>
   </div>
-</div>
-
-<div class="overlay" id="share" role="dialog" aria-modal="true" aria-labelledby="shareTitle" hidden>
-  <div class="panel share-panel">
-    <div class="panel-head"><h2 id="shareTitle" data-i18n="shareTitle">SHARE YOUR RESULT</h2><button class="x" type="button" data-close aria-label="Close" data-i18n-label="close">×</button></div>
-    <div class="share-preview"><img id="shareImg" alt="Result card preview"></div>
-    <label class="check"><input type="checkbox" id="shareQ"> <span data-i18n="showQ">SHOW MY QUESTION ON THE CARD</span></label>
-    <div class="share-acts">
-      <button class="act primary" type="button" id="shareNative" hidden data-i18n="shareNative">SHARE…</button>
-      <a class="act primary dl" id="shareDl" download="tossy-result.png" href="#" data-i18n="download">DOWNLOAD PNG</a>
-      <button class="act" type="button" id="shareLink" data-i18n="copyLink">COPY LINK</button>
+  <div class="ar">
+    <div class="bio">New York–based product designer drawn to <strong>complex systems with human stakes</strong> — B2B SaaS, fintech, service operations. The edge case is someone's whole workflow.</div>
+    <div class="tags">
+      <span class="atag">HCI Research</span>
+      <span class="atag">Systems Design</span>
+      <span class="atag">User Research</span>
+      <span class="atag">Interaction Design</span>
+      <span class="atag">Detail-obsessed</span>
     </div>
   </div>
-</div>
+</section>
+
+<footer id="ft">
+  <div class="ft-l">© 2026 Bambi Li — Available for opportunities</div>
+  <div class="ft-r">
+    <a href="https://www.linkedin.com/in/bambili/" target="_blank" class="hv">LinkedIn</a>
+    <a href="https://www.instagram.com/_lightnlight/" target="_blank" class="hv">Instagram</a>
+  </div>
+</footer>
 
 <script>
-(function () {
-  "use strict";
+// ── Cursor ──
+const cdot=document.getElementById('cdot'),cring=document.getElementById('cring');
+let mx=300,my=300,rx=300,ry=300;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cdot.style.left=mx+'px';cdot.style.top=my+'px'});
+(function loop(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;cring.style.left=rx+'px';cring.style.top=ry+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('.hv').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cring.classList.add('hov'));
+  el.addEventListener('mouseleave',()=>cring.classList.remove('hov'));
+});
 
-  /* ---------- data ---------- */
-  var SKINS = [
-    { id: "lavender", name: "Lavender", bg: "#f1ecff", dots: "#d9d1ff", line: "#1c1740", text: "#1c1740", sub: "#3d3570", card: "#ffffff", hard: "#1c1740", btn: "#5b4bdb", btnText: "#ffffff", bubble: "#7c6bff", drop: "#b9acff", shade: "#d9d1ff", body: "#f4f0ff", on: "#1c1740" },
-    { id: "aqua", name: "Aqua", bg: "#edf9fc", dots: "#cdeef6", line: "#292544", text: "#292544", sub: "#4a4766", card: "#ffffff", hard: "#292544", btn: "#74d7f2", btnText: "#292544", bubble: "#74d7f2", drop: "#a6e3f0", shade: "#cdeef6", body: "#f3fcfe", on: "#292544" },
-    { id: "candy", name: "Candy", bg: "#fff1f7", dots: "#ffd6e8", line: "#3a2140", text: "#3a2140", sub: "#6b4a66", card: "#ffffff", hard: "#3a2140", btn: "#ff9dca", btnText: "#3a2140", bubble: "#ff9dca", drop: "#ffc2dc", shade: "#ffd6e8", body: "#fff7fb", on: "#3a2140" },
-    { id: "lemon", name: "Lemon", bg: "#fff9e3", dots: "#f6e7ad", line: "#3b2f1a", text: "#3b2f1a", sub: "#6e5d3a", card: "#ffffff", hard: "#3b2f1a", btn: "#ffd463", btnText: "#3b2f1a", bubble: "#ffd463", drop: "#f5dc86", shade: "#f6e7ad", body: "#fffcf0", on: "#3b2f1a" },
-    { id: "mint", name: "Mint", bg: "#effbf6", dots: "#cdeee4", line: "#1f3a36", text: "#1f3a36", sub: "#4b6b66", card: "#ffffff", hard: "#1f3a36", btn: "#86e3c8", btnText: "#1f3a36", bubble: "#86e3c8", drop: "#b6efdd", shade: "#cdeee4", body: "#f6fdfa", on: "#1f3a36" },
-    { id: "night", name: "Night", bg: "#1b1830", dots: "#2c2850", line: "#0b0a16", text: "#f4f0ff", sub: "#c9c2ea", card: "#2a2648", hard: "#4a4380", btn: "#74d7f2", btnText: "#0b0a16", bubble: "#ff9dca", drop: "#74d7f2", shade: "#c9bfff", body: "#f4f0ff", on: "#0b0a16" }
-  ];
+// ── Scroll reveal ──
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.08});
+['thesis','pc1','pc2','pc3','manifesto','about','ft'].forEach(id=>{const el=document.getElementById(id);if(el)io.observe(el)});
 
-  /* ---------- config ----------
-     AI reply lines (optional). The dice still decides; the AI only writes the one-line
-     reaction under the answer, in the current tone. Leave empty to use the built-in lines.
-     Netlify: deploy netlify/functions/tossy-line.mjs and set this to "/.netlify/functions/tossy-line". */
-  var CONFIG = {
-    site: "tossy.me",
-    aiLineEndpoint: "/api/tossy-line", aiLineTimeout: 6000,
-    soundDefault: true,
-    /* PostHog: paste the project API key (starts with "phc_"). EU projects use https://eu.i.posthog.com */
-    posthogKey: "phc_xFUbsWUUwPpyY5GodRKzLbTa9WVwxpviQmPo7t2LnhZV", posthogHost: "https://us.i.posthog.com",
-    /* events are only sent from these hosts, so local testing never pollutes the data.
-       Open the page with ?debug to print every event in the browser console instead. */
-    analyticsHosts: ["tossy.me", "www.tossy.me"]
-  };
-  /* AI lines need the Netlify function, so they only run on a real http(s) site, not a local file */
-  if (!/^https?:$/.test(location.protocol)) CONFIG.aiLineEndpoint = "";
+// ── Hero ink background ──
+const heroEl=document.getElementById('hero');
+const heroCV=document.getElementById('heroCanvas');
+let HW,HH,hmx=0.5,hmy=0.5,tmx=0.5,tmy=0.5;
+const PINK='#F5307C',GOLD='#C9A87C';
 
-  /* ---------- copy (EN / 中文) ---------- */
-  var COLORS = { bestie: "#ff9dca", savage: "#a88cf7", rational: "#74d7f2", gentle: "#ffd463" };
-  var COPY = {
-    en: {
-      modes: {
-        bestie:   { label: "Bestie",   listen: "OMG YES, TELL ME MORE...", greeting: "OKAY SPILL. WHAT ARE WE DECIDING TODAY?", nudge: "BABE, ASK ME SOMETHING FIRST.", idea: ["TRUST ME ON THIS ONE.", "THIS ONE HAS YOUR NAME ON IT.", "GO WITH IT, BABE. NO REGRETS.", "I HAVE A GOOD FEELING ABOUT THIS."],
-          yes: [["YES!", "DO IT. I AM ALREADY PROUD OF YOU."], ["100% YES", "YOU HAVE WANTED THIS FOR A WHILE. GO."], ["YES YES YES", "DO IT FOR THE STORY."], ["GO FOR IT, BABE", "FUTURE YOU SAYS THANK YOU."]],
-          no:  [["NOT YET!", "LET IT BREATHE. YOU DESERVE THE EFFORT."], ["NOPE, BABE", "THIS ONE IS NOT WORTH YOUR ENERGY."], ["SKIP IT, BABE", "SAVE THAT ENERGY FOR SOMETHING BETTER."], ["NOT THIS ONE", "SOMETHING BETTER IS COMING. TRUST."]],
-          third: "BABE. TOSS #3. YOU WANT THE OTHER ONE.", thirdOpen: "BABE. TOSS #3. YOU ALREADY HAVE ONE IN MIND." },
-        savage:   { label: "Savage",   listen: "HMM. GO ON...", greeting: "GO ON. IMPRESS ME WITH YOUR INDECISION.", nudge: "I CAN'T READ MINDS. TYPE SOMETHING.", idea: ["DON'T ARGUE WITH THE DICE.", "THERE. DECIDED. YOU'RE WELCOME.", "STOP STARING. GO.", "THE DICE HAS SPOKEN. MOVE."],
-          yes: [["YES. FINALLY.", "STOP OVERTHINKING AND GO."], ["OBVIOUSLY YES", "YOU ASKED A DICE. JUST DO IT."], ["YES. OBVIOUSLY.", "WHY ARE YOU STILL HERE?"], ["DO IT", "THE DICE IS TIRED OF WAITING."]],
-          no:  [["NO.", "YOU ALREADY KNEW. YOU JUST WANTED A WITNESS."], ["ABSOLUTELY NOT", "ASK AGAIN AND THE ANSWER GETS RUDER."], ["NOPE.", "NEXT QUESTION, PLEASE."], ["HARD PASS", "EVEN THE DICE SAID NO THANKS."]],
-          third: "THIRD TIME? YOU JUST DON'T LIKE THE ANSWER.", thirdOpen: "THIRD TIME? YOU ALREADY KNOW WHAT YOU WANT." },
-        rational: { label: "Rational", listen: "NOTED. CONTINUE...", greeting: "STATE THE QUESTION. CHANCE WILL DO THE REST.", nudge: "NO INPUT, NO OUTPUT.", idea: ["PICKED AT RANDOM. ZERO BIAS.", "ONE OPTION, CHOSEN FAIRLY.", "CHANCE HAS DONE ITS JOB.", "DECISION COST: ZERO EFFORT."],
-          yes: [["YES.", "PURE CHANCE SAYS YES. NO NEED TO OVERTHINK IT."], ["YES. NEXT.", "A RANDOM YES IS STILL A DECISION. MOVE ON."], ["AFFIRMATIVE.", "OUTCOME: YES. PROCEED."], ["YES, STATISTICALLY", "TODAY THE ODDS ARE ON YOUR SIDE."]],
-          no:  [["NO.", "THE ODDS LANDED ON NO. NOTHING PERSONAL."], ["NOT TODAY.", "CHANCE SAYS NO. YOU CAN ALWAYS TOSS AGAIN TOMORROW."], ["NEGATIVE.", "OUTCOME: NO. SAVE THE TIME."], ["NOT NOW", "RESULT IS NO. REVISIT LATER IF NEEDED."]],
-          third: "3 TOSSES. YOUR PREFERENCE IS SHOWING.", thirdOpen: "3 TOSSES. YOU ARE FILTERING FOR SOMETHING." },
-        gentle:   { label: "Gentle",   listen: "I'M LISTENING...", greeting: "TAKE YOUR TIME. I AM RIGHT HERE.", nudge: "WHENEVER YOU ARE READY, TYPE YOUR QUESTION.", idea: ["NO PRESSURE. IT'S JUST A NUDGE.", "TRY IT AND SEE HOW IT FEELS.", "A SMALL, EASY CHOICE FOR TODAY.", "YOU CAN ALWAYS CHANGE YOUR MIND."],
-          yes: [["YES, IF IT FEELS RIGHT", "YOU CAN ALWAYS CHANGE YOUR MIND."], ["GO FOR IT", "BE KIND TO YOURSELF EITHER WAY."], ["GENTLY, YES", "ONE SMALL STEP IS ENOUGH."], ["WHY NOT", "YOU DESERVE A LITTLE YES TODAY."]],
-          no:  [["MAYBE LATER", "NO RUSH. REST FIRST."], ["NOT TODAY", "IT IS OKAY TO SAY NO."], ["LET IT GO FOR NOW", "YOU DON'T HAVE TO DO EVERYTHING."], ["REST INSTEAD", "THIS CAN WAIT. TAKE A BREATH."]],
-          third: "STILL TOSSING? MAYBE YOU ALREADY KNOW.", thirdOpen: "STILL TOSSING? IT'S OKAY TO PICK YOUR OWN." }
-      },
-      ideas: {
-        /* open questions get a concrete answer from the matching topic, still picked at random */
-        travel: ["TOKYO", "KYOTO", "SEOUL", "LISBON", "BARCELONA", "PARIS", "ICELAND", "BALI", "BANGKOK", "MEXICO CITY", "ISTANBUL", "NEW ZEALAND", "VANCOUVER", "HOKKAIDO", "MOROCCO"],
-        place: ["THE BEACH", "A BOOKSTORE", "THE PARK", "A NEW CAFE", "THE MOVIES", "A MUSEUM", "THE FARMERS MARKET", "A NIGHT MARKET", "KARAOKE", "THE ARCADE"],
-        food: ["RAMEN", "SUSHI", "PIZZA", "HOT POT", "DUMPLINGS", "TACOS", "BURGERS", "THAI CURRY", "PHO", "KOREAN BBQ", "FRIED CHICKEN", "BIBIMBAP"],
-        drink: ["COFFEE", "MATCHA LATTE", "BUBBLE TEA", "ICED AMERICANO", "HOT CHOCOLATE", "SPARKLING WATER"],
-        watch: ["A ROM-COM", "A HORROR MOVIE", "AN ANIME", "A DOCUMENTARY", "A K-DRAMA", "A SITCOM REWATCH", "A GHIBLI FILM", "A TRUE CRIME SHOW"],
-        music: ["90S POP", "LO-FI BEATS", "JAZZ", "K-POP", "A FILM SOUNDTRACK", "INDIE ROCK"],
-        wear: ["THE COMFY ONE", "THE BOLD ONE", "ALL BLACK", "SOMETHING RED", "JEANS AND A WHITE TEE", "A DRESS"],
-        doing: ["GO FOR A WALK", "CALL A FRIEND", "BAKE SOMETHING", "CLEAN ONE DRAWER", "TAKE A NAP", "TRY A NEW RECIPE", "GO TO THE GYM", "READ 20 PAGES", "START A NEW SHOW"],
-        gift: ["FLOWERS", "A HANDWRITTEN CARD", "A GOOD CANDLE", "THEIR FAVORITE SNACK", "A BOOK", "A CUTE MUG"],
-        sleepTime: ["10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM", "BEFORE MIDNIGHT"],
-        wakeTime: ["6:30 AM", "7:00 AM", "7:30 AM", "8:00 AM", "8:30 AM"],
-        when: ["RIGHT NOW", "IN 10 MINUTES", "IN AN HOUR", "TONIGHT", "TOMORROW", "THIS WEEKEND", "NEXT WEEK"],
-        number: ["1", "2", "3", "4", "5", "7", "10"],
-        who: ["YOUR BEST FRIEND", "YOUR MOM", "WHOEVER TEXTED YOU LAST", "THE FIRST NAME YOU THOUGHT OF", "YOUR SIBLING", "AN OLD FRIEND"],
-        any: ["THE FIRST ONE YOU THOUGHT OF", "THE EASIER ONE", "THE ONE YOU WILL TELL A STORY ABOUT"],
-        other: ["GO FOR A WALK FIRST", "TEXT A FRIEND INSTEAD", "DO THE OPPOSITE", "TAKE A NAP, THEN TOSS AGAIN", "CALL YOUR MOM", "DO NOTHING FOR 10 MINUTES"]
-      },
-      respond: {
-        bestie:   { commit: "ROOTING FOR YOU!", other: "YOUR GUT SPOKE UP. LISTEN TO IT." },
-        savage:   { commit: "DONE. NO TAKEBACKS.", other: "SEE? YOU KNEW ALL ALONG." },
-        rational: { commit: "DECISION MADE. MOVING ON.", other: "YOUR FIRST REACTION WAS THE ANSWER." },
-        gentle:   { commit: "PROUD OF YOU. ONE STEP AT A TIME.", other: "PICKING WHAT YOU WANT IS A GOOD CALL." }
-      },
-      yes: "YES", no: "NO",
-      poke: { bestie: "HEHE, THAT TICKLES!", savage: "STOP POKING. ASK SOMETHING.", rational: "PHYSICAL INPUT DETECTED.", gentle: "HI THERE. I'M HERE." },
-      /* suggestion bank: 3 shown at a time, each from a different category */
-      picks: {
-        love:   ["Should I text him/her back?", "Should I text them?", "Should I reply now?", "First date or stay home?"],
-        life:   ["What should I eat tonight?", "Gym or couch?", "Coffee or tea?", "Go out or stay in?", "Should I go out tonight?"],
-        choice: ["Should I buy it?", "Buy it or skip it?", "Which one should I pick?", "Should I book the trip?", "Should I say yes?"],
-        work:   ["Should I send it now?", "Work or take a break?", "Should I apply?"],
-        gift:   ["What gift for a friend?", "What to get for their birthday?", "What should I gift them?"],
-        fun:    ["What should I watch tonight?", "Where to go this weekend?", "What should I drink?", "What to do this weekend?"]
-      },
-      ui: {
-        recent: "RECENT", tagline: "STUCK ON A SMALL DECISION? LET THE DICE PICK.", qLabel: "Your question", qPh: "WHAT ARE YOU STUCK ON?",
-        toss: "TOSS IT!", charging: "CHARGING", letGo: "LET GO!", easy: "WHOA. EASY THERE...",
-        addOpt: "+ ADD OPTION", addMore: "+ ADD ANOTHER", maxOpt: "MAX 5 OPTIONS", optPh: "OPTION", optLabel: "Option", removeOpt: "Remove option",
-        wildBtn: "+ WILDCARD", wildQ: "What is a wildcard?", wildTip: "TOSSY ADDS ONE SURPRISE OPTION OF ITS OWN. IT HAS THE SAME ODDS AS YOUR OPTIONS, SO SOMETIMES THE DICE PICKS SOMETHING YOU DID NOT LIST.",
-        tossyPick: "?? TOSSY'S PICK", tagAuto: "AUTO", tagWild: "WILDCARD", pickQ: "What is Tossy's pick?", removeWild: "Remove wildcard",
-        tipAuto: "ONLY ONE REAL OPTION? TOSSY ADDS ONE OF ITS OWN SO THERE IS SOMETHING TO PICK FROM. BOTH HAVE THE SAME ODDS. ADD A DIFFERENT OPTION TO REMOVE IT.",
-        tipOn: "TOSSY ADDS ONE SURPRISE OPTION OF ITS OWN, WITH THE SAME ODDS AS YOURS. REMOVE IT WITH ×.",
-        fine: "RANDOM ON PURPOSE. NOT ADVICE. AI WRITES THE REPLY.", privacy: "PRIVACY", privacyTitle: "PRIVACY",
-        pv1: "YOUR QUESTION IS SENT TO GOOGLE GEMINI ONLY TO WRITE THE REPLY LINE. TOSSY DOESN'T STORE IT, BUT GOOGLE MAY USE IT TO IMPROVE ITS PRODUCTS.",
-        pv2: "WE COUNT ANONYMOUS TAPS WITH POSTHOG TO MAKE TOSSY BETTER. NEVER YOUR QUESTION.",
-        pv3: "YOUR HISTORY STAYS ON THIS DEVICE. CLEAR IT ANYTIME IN RECENT.",
-        pv4: "A SHARED LINK ONLY SHOWS YOUR QUESTION IF YOU CHOOSE TO INCLUDE IT.", randomSay: "NOTHING TO ASK? I PICKED ONE.",
-        aiNote: " THE REPLY LINE IS WRITTEN BY AI, SO YOUR QUESTION IS SENT TO WRITE IT. THE ANSWER ITSELF IS STILL RANDOM.",
-        skin: "SKIN", rolling: "ROLLING...", superToss: "SUPER TOSS!!", says: "{m} SAYS", maxPower: " · MAX POWER", q: "Q · ",
-        otherBtn: "WANTED THE OTHER ONE?", shareCard: "SHARE", commit: "LET'S DO IT", again: "TOSS AGAIN", newQ: "NEW QUESTION", seeRecent: "SEE RECENT",
-        otherHear: "SECRETLY HOPING FOR {o}?", otherYes: "SECRETLY HOPING FOR YES?", otherNo: "SECRETLY HOPING FOR NO?", otherOne: "RATHER HAVE {o}?", otherMany: "RATHER HAVE ANOTHER ONE?",
-        copyLink: "COPY LINK", copied: "COPIED!", tossOwn: "TOSS YOUR OWN", sharedSay: "A FRIEND ASKED. I DECIDED.", sharedNoQ: "Q · (TOP SECRET)",
-        whichOne: "WHICH ONE DID YOU ACTUALLY WANT?", actually: "ACTUALLY, {o}", yourPick: "YOUR PICK", tossySaid: "THE DICE SAID {a}. ", alreadyKnow: "THEN YOU ALREADY KNOW.",
-        wildSub: "WILDCARD! TOSSY SNUCK THIS ONE IN.", stampDone: "DECIDED", stampSwitch: "MY CALL",
-        recentTitle: "RECENT DECISIONS", recentNote: "YOUR HISTORY IS SAVED ON THIS DEVICE ONLY. NO ACCOUNT.", clearAll: "CLEAR ALL", close: "Close",
-        tally: "THE DICE HAS SETTLED {n} DECISIONS FOR YOU", tallyOne: "THE DICE HAS SETTLED {n} DECISION FOR YOU",
-        empty: "NO DECISIONS YET. TOSS SOMETHING AND IT WILL SHOW UP HERE.", stDone: "DECIDED", stSwitch: "WENT WITH MY GUT", stOpen: "UNDECIDED",
-        histSwitch: "THE DICE SAID {a}. YOU PICKED {f}.", tossed: "TOSSED {n}×", del: "Delete this decision",
-        justNow: "JUST NOW", minAgo: "{n} MIN AGO", hAgo: "{n} H AGO", dAgo: "{n} D AGO",
-        shareTitle: "SHARE YOUR RESULT", showQ: "SHOW MY QUESTION ON THE CARD", download: "DOWNLOAD PNG", shareNative: "SHARE…", cardFail: "Could not draw the card. Try again.",
-        cardQ: "Q: ", cardFoot: "TOSSY.ME · STUCK? TOSS IT.", shareText: "Tossy decided for me:",
-        soundLabel: "Sound and vibration", ptrPull: "PULL TO REFRESH", ptrRelease: "RELEASE TO REFRESH", docTitle: "Tossy — stuck? toss it.", langLabel: "切换到中文", langShort: "中"
-      }
-    },
-    zh: {
-      modes: {
-        bestie:   { label: "闺蜜", listen: "天哪快说快说……", greeting: "来，说吧。今天要纠结什么？", nudge: "宝，先问我点什么嘛。", idea: ["信我这一次。", "这个跟你超配的！", "就它了宝，不会后悔。", "我对这个很有感觉！"],
-          yes: [["冲！", "去吧，我已经替你骄傲了！"], ["100% 要！", "你想这件事很久了吧，去吧。"], ["冲冲冲！", "就当是为了以后的故事。"], ["去吧宝", "未来的你会谢谢现在的你。"]],
-          no:  [["先别！", "先放一放，不急。"], ["不要啦宝", "这件事不值得你花力气。"], ["算了宝", "把力气留给更好的事。"], ["不是这个", "更好的在后面，信我。"]],
-          third: "宝，第三次了。你其实想要另一个吧。", thirdOpen: "宝，第三次了。你心里已经有人选了吧。" },
-        savage:   { label: "毒舌", listen: "嗯，继续……", greeting: "说吧，让我见识下你有多纠结。", nudge: "我不会读心，打字。", idea: ["别跟骰子顶嘴。", "好了，定了，不用谢。", "别盯着看了，去吧。", "骰子发话了，照办。"],
-          yes: [["要。早该这样。", "别想了，去。"], ["当然要", "你都来问骰子了，直接干吧。"], ["要。显然。", "你怎么还在这儿？"], ["干就完了", "骰子都等不耐烦了。"]],
-          no:  [["不。", "你心里早知道，只是想找个见证人。"], ["想都别想", "再问一次，答案会更难听。"], ["不行。", "下一个问题。"], ["免了", "骰子都替你说不了。"]],
-          third: "第三次了？你就是不喜欢这个答案。", thirdOpen: "第三次了？你明明知道自己想要什么。" },
-        rational: { label: "理性", listen: "已记录，继续……", greeting: "说出问题，剩下的交给概率。", nudge: "没有输入，就没有输出。", idea: ["随机抽取，零偏见。", "公平抽中的一个。", "概率已经完成它的工作。", "决策成本：零。"],
-          yes: [["是。", "随机结果是「是」，别再想了。"], ["是。下一个。", "随机的「是」也算数，往前走吧。"], ["确认。", "结果：是。请执行。"], ["是，概率站你这边", "今天的运气偏向你。"]],
-          no:  [["否。", "概率落在了「否」，不针对你。"], ["今天不行。", "概率说不，明天可以再掷一次。"], ["否定。", "结果：否。节省时间。"], ["现在不行", "结果为否，之后可以再评估。"]],
-          third: "掷了 3 次，你的偏好已经暴露了。", thirdOpen: "掷了 3 次，你在筛选某个答案。" },
-        gentle:   { label: "温柔", listen: "我在听……", greeting: "慢慢来，我一直在这儿。", nudge: "准备好了，就告诉我你的问题。", idea: ["没有压力，只是轻轻推你一下。", "试试看，感受一下。", "今天就选个简单的吧。", "随时都可以改主意的。"],
-          yes: [["感觉对就去吧", "你随时都可以改主意。"], ["去试试吧", "不管怎样，都对自己好一点。"], ["轻轻说声要", "迈出一小步就够了。"], ["为什么不呢", "今天值得一个小小的「要」。"]],
-          no:  [["晚点再说吧", "不着急，先休息。"], ["今天先不", "说不也没关系。"], ["先放下吧", "你不需要每件事都做。"], ["休息一下", "这件事可以等，先喘口气。"]],
-          third: "还在掷吗？也许你心里已经知道了。", thirdOpen: "还在掷吗？自己选一个也没关系。" }
-      },
-      ideas: {
-        travel: ["东京", "京都", "大理", "成都", "厦门", "青岛", "首尔", "曼谷", "清迈", "巴厘岛", "北海道", "冰岛", "里斯本", "巴黎", "伊斯坦布尔"],
-        place: ["海边", "书店", "公园", "一家新咖啡馆", "电影院", "博物馆", "夜市", "KTV", "菜市场", "电玩城"],
-        food: ["火锅", "麻辣烫", "拉面", "寿司", "烧烤", "饺子", "螺蛳粉", "披萨", "汉堡", "泰国菜", "韩式炸鸡", "石锅拌饭"],
-        drink: ["咖啡", "抹茶拿铁", "奶茶", "冰美式", "热可可", "气泡水"],
-        watch: ["一部喜剧", "一部恐怖片", "一部动漫", "一部纪录片", "一部韩剧", "重刷老剧", "宫崎骏的电影", "综艺"],
-        music: ["90年代老歌", "LO-FI", "爵士", "K-POP", "电影原声", "独立摇滚"],
-        wear: ["最舒服的那件", "最大胆的那件", "全身黑", "来点红色", "白T加牛仔裤", "一条裙子"],
-        doing: ["出去走走", "给朋友打个电话", "烤点东西", "收拾一个抽屉", "睡个午觉", "试个新菜谱", "去健身", "看20页书", "开一部新剧"],
-        gift: ["一束花", "手写卡片", "香薰蜡烛", "TA 爱吃的零食", "一本书", "可爱的杯子"],
-        sleepTime: ["10点", "10点半", "11点", "11点半", "12点前"],
-        wakeTime: ["6点半", "7点", "7点半", "8点", "8点半"],
-        when: ["现在", "10分钟后", "一小时后", "今晚", "明天", "这周末", "下周"],
-        number: ["1", "2", "3", "4", "5", "7", "10"],
-        who: ["你最好的朋友", "你妈妈", "最后给你发消息的人", "你第一个想到的人", "你的兄弟姐妹", "一个很久没联系的老朋友"],
-        any: ["你第一个想到的那个", "更轻松的那个", "以后能拿来讲故事的那个"],
-        other: ["先出去走走", "改成找朋友聊聊", "反着来", "先睡一觉再掷", "给妈妈打个电话", "发呆十分钟"]
-      },
-      respond: {
-        bestie:   { commit: "为你加油！", other: "听你自己的，准没错！" },
-        savage:   { commit: "定了，不许反悔。", other: "看吧，你心里早就知道。" },
-        rational: { commit: "定了，下一个。", other: "你的第一反应，就是答案。" },
-        gentle:   { commit: "为你骄傲，一步一步来。", other: "选你想要的，就很好。" }
-      },
-      yes: "要", no: "不要",
-      poke: { bestie: "嘻嘻，好痒！", savage: "别戳了，快问。", rational: "检测到物理输入。", gentle: "你好呀，我在呢。" },
-      picks: {
-        love:   ["要不要回 TA 的消息？", "要不要主动找 TA？", "现在就回吗？", "去约会还是宅家？"],
-        life:   ["今晚吃什么？", "健身还是躺平？", "咖啡还是茶？", "出门还是宅家？", "今晚要不要出门？"],
-        choice: ["要不要买？", "买还是不买？", "选哪一个？", "要不要订这趟旅行？", "要不要答应？"],
-        work:   ["现在就发吗？", "继续干还是歇会儿？", "要不要投简历？"],
-        gift:   ["给朋友送什么礼物？", "生日送什么好？", "给 TA 送什么礼物？"],
-        fun:    ["今晚看什么？", "周末去哪玩？", "奶茶喝什么？", "周末做什么？"]
-      },
-      ui: {
-        recent: "记录", tagline: "小事纠结？让骰子帮你选。", qLabel: "你的问题", qPh: "你在纠结什么？",
-        toss: "掷一下！", charging: "蓄力中", letGo: "松手！", easy: "哇，悠着点……",
-        addOpt: "+ 添加选项", addMore: "+ 再加一个", maxOpt: "最多 5 个选项", optPh: "选项", optLabel: "选项", removeOpt: "删除选项",
-        wildBtn: "+ 神秘选项", wildQ: "什么是神秘选项？", wildTip: "TOSSY 会自己塞进一个神秘选项，和你的选项概率一样。所以骰子有时会选中你没写的东西。",
-        tossyPick: "?? 神秘选项", tagAuto: "自动", tagWild: "惊喜", pickQ: "什么是神秘选项？", removeWild: "删除神秘选项",
-        tipAuto: "只有一个选项？TOSSY 会自己加一个，好让骰子有得选，两个概率一样。再加一个不同的选项就会移除它。",
-        tipOn: "TOSSY 会加一个自己的神秘选项，概率和你的一样。点 × 可以删除。",
-        fine: "结果全凭随机，别太当真。台词由 AI 生成。", privacy: "隐私", privacyTitle: "隐私说明",
-        pv1: "你的问题会发送给 Google Gemini，只用来写那句台词。Tossy 不保存它，但 Google 可能用它来改进自己的产品。",
-        pv2: "我们用 PostHog 匿名统计点击，用来改进 Tossy，不包含你的问题。",
-        pv3: "记录只保存在这台设备上，随时可以在「记录」里清除。",
-        pv4: "分享链接只有在你选择时，才会带上你的问题。", randomSay: "没想好问什么？我帮你出了一个。",
-        aiNote: "回应那句话由 AI 撰写，所以你的问题会被发送出去；答案本身仍然是随机的。",
-        skin: "皮肤", rolling: "转转转……", superToss: "超级一掷！！", says: "{m}说", maxPower: " · 满力", q: "问 · ",
-        otherBtn: "其实想要另一个？", shareCard: "分享", commit: "就这么办", again: "再掷一次", newQ: "新问题", seeRecent: "看记录",
-        otherHear: "其实想听「{o}」？", otherYes: "其实想听「要」？", otherNo: "其实想听「不要」？", otherOne: "其实更想要「{o}」？", otherMany: "其实想要别的？",
-        copyLink: "复制链接", copied: "已复制！", tossOwn: "你也来掷一个", sharedSay: "朋友问的，我定的。", sharedNoQ: "问 · （保密）",
-        whichOne: "你其实想要哪个？", actually: "其实，{o}", yourPick: "你的选择", tossySaid: "骰子说「{a}」。", alreadyKnow: "你心里早有答案了。",
-        wildSub: "神秘选项！这个是 TOSSY 偷偷塞进来的。", stampDone: "定了", stampSwitch: "我说了算",
-        recentTitle: "最近的决定", recentNote: "记录只保存在这台设备上，无需账号。", clearAll: "全部清除", close: "关闭",
-        tally: "骰子已经帮你定了 {n} 件事", tallyOne: "骰子已经帮你定了 {n} 件事",
-        empty: "还没有记录。掷一次就会出现在这里。", stDone: "已决定", stSwitch: "听从直觉", stOpen: "未决定",
-        histSwitch: "骰子说「{a}」，你选了「{f}」。", tossed: "掷了 {n} 次", del: "删除这条记录",
-        justNow: "刚刚", minAgo: "{n} 分钟前", hAgo: "{n} 小时前", dAgo: "{n} 天前",
-        shareTitle: "分享结果", showQ: "在卡片上显示我的问题", download: "下载图片", shareNative: "分享…", cardFail: "卡片生成失败，请再试一次。",
-        cardQ: "问：", cardFoot: "TOSSY.ME · 纠结的时候，掷一下", shareText: "Tossy 帮我做了决定：",
-        soundLabel: "音效与震动", ptrPull: "下拉刷新", ptrRelease: "松手刷新", docTitle: "Tossy — 纠结？掷一下", langLabel: "Switch to English", langShort: "EN"
-      }
-    }
-  };
-  function pickLang() {
-    var saved = load("lang", "");
-    if (COPY[saved]) return saved;
-    return /^zh/i.test(navigator.language || "") ? "zh" : "en";
-  }
-  var LANG = "en", MODES, IDEAS, RESPOND, UI;
-  function T(key, vars) {
-    var s = UI[key]; if (s == null) s = COPY.en.ui[key] || key;
-    if (vars) Object.keys(vars).forEach(function (k) { s = s.split("{" + k + "}").join(vars[k]); });
-    return s;
-  }
-  function useLang(l) {
-    LANG = COPY[l] ? l : "en";
-    var c = COPY[LANG];
-    MODES = {};
-    Object.keys(c.modes).forEach(function (id) { var m = Object.assign({ color: COLORS[id] }, c.modes[id]); MODES[id] = m; });
-    IDEAS = c.ideas; RESPOND = c.respond; UI = c.ui;
-  }
-  var MODE_ORDER = ["bestie", "savage", "rational", "gentle"];
-  var TIMELINE = [["launch", 300], ["hang", 800], ["drop", 1600], ["impact", 1950], ["settle", 2300], ["reveal", 2600]];
-  var FACE_CYCLE = ["savage", "bestie", "rational", "gentle", "listen", "dizzy"];
+function resizeHero(){HW=heroEl.clientWidth;HH=heroEl.clientHeight;heroCV.width=HW;heroCV.height=HH}
+resizeHero();
+window.addEventListener('resize',resizeHero);
+heroEl.addEventListener('mousemove',e=>{const r=heroEl.getBoundingClientRect();tmx=(e.clientX-r.left)/HW;tmy=(e.clientY-r.top)/HH});
 
-  /* ---------- state ---------- */
-  function load(k, d) { try { var v = localStorage.getItem("tossy." + k); return v || d; } catch (e) { return d; } }
-  function save(k, v) { try { localStorage.setItem("tossy." + k, v); } catch (e) {} }
-  useLang(pickLang());
-  var state = {
-    mode: MODES[load("mode", "")] ? load("mode", "") : "savage",
-    skin: load("skin", "aqua"),
-    sound: load("sound", CONFIG.soundDefault ? "on" : "off") === "on",
-    options: [], wildcard: false, busy: false, timers: []
-  };
+const ambientBlobs=[
+  {x:0.82,y:0.12,r:0.42,color:[245,48,124],phase:0,speed:0.00035},
+  {x:0.08,y:0.78,r:0.32,color:[201,168,124],phase:2.3,speed:0.00027},
+  {x:0.55,y:0.88,r:0.25,color:[245,48,124],phase:4.1,speed:0.00042},
+  {x:0.3,y:0.05,r:0.2,color:[201,168,124],phase:1.1,speed:0.00031},
+];
 
-  /* ---------- 8-bit sound + haptics (off by default; one toggle for both) ---------- */
-  var audio = null;
-  function ac() {
-    if (!audio) { var A = window.AudioContext || window.webkitAudioContext; if (!A) return null; audio = new A(); }
-    if (audio.state === "suspended") audio.resume();
-    return audio;
+(function drawHero(t){
+  const ctx=heroCV.getContext('2d');
+  ctx.clearRect(0,0,HW,HH);
+  hmx+=(tmx-hmx)*0.04;hmy+=(tmy-hmy)*0.04;
+  ambientBlobs.forEach(b=>{
+    const drift=0.07;
+    const gx=(b.x+Math.sin(t*b.speed+b.phase)*drift)*HW;
+    const gy=(b.y+Math.cos(t*b.speed*0.8+b.phase)*drift)*HH;
+    const r=Math.min(HW,HH)*b.r*(0.88+0.12*Math.sin(t*b.speed*1.4+b.phase));
+    const pulse=0.045+0.022*Math.sin(t*b.speed+b.phase);
+    const [cr,cg,cb]=b.color;
+    const g=ctx.createRadialGradient(gx,gy,0,gx,gy,r);
+    g.addColorStop(0,`rgba(${cr},${cg},${cb},${pulse})`);
+    g.addColorStop(0.5,`rgba(${cr},${cg},${cb},${pulse*0.35})`);
+    g.addColorStop(1,`rgba(${cr},${cg},${cb},0)`);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(gx,gy,r,0,Math.PI*2);ctx.fill();
+  });
+  const mgx=hmx*HW,mgy=hmy*HH;
+  const mr=Math.min(HW,HH)*0.28;
+  const mouseA=0.06+0.02*Math.sin(t*0.0008);
+  const mg=ctx.createRadialGradient(mgx,mgy,0,mgx,mgy,mr);
+  mg.addColorStop(0,`rgba(245,48,124,${mouseA})`);
+  mg.addColorStop(0.4,`rgba(245,48,124,${mouseA*0.4})`);
+  mg.addColorStop(1,`rgba(245,48,124,0)`);
+  ctx.fillStyle=mg;ctx.beginPath();ctx.arc(mgx,mgy,mr,0,Math.PI*2);ctx.fill();
+  if(Math.random()<0.08){
+    const angle=Math.random()*Math.PI*2,dist=20+Math.random()*60;
+    ctx.globalAlpha=0.15+Math.random()*0.2;
+    ctx.fillStyle=Math.random()>0.5?PINK:GOLD;
+    ctx.beginPath();ctx.arc(mgx+Math.cos(angle)*dist,mgy+Math.sin(angle)*dist,0.8+Math.random()*1.2,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
   }
-  function tone(type, f0, f1, t0, dur, vol) {
-    var a = ac(); if (!a) return;
-    var o = a.createOscillator(), g = a.createGain(), t = a.currentTime + t0;
-    o.type = type; o.frequency.setValueAtTime(f0, t);
-    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
-  }
-  function noise(t0, dur, vol) {
-    var a = ac(); if (!a) return;
-    var n = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
-    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-    var s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
-    f.type = "lowpass"; f.frequency.value = 900; g.gain.value = vol;
-    s.buffer = buf; s.connect(f); f.connect(g); g.connect(a.destination); s.start(a.currentTime + t0);
-  }
-  var SFX = {
-    launch: function () { tone("square", 180, 900, 0, 0.22, 0.05); },
-    land:   function () { tone("square", 140, 50, 0, 0.16, 0.08); noise(0, 0.12, 0.12); },
-    reveal: function () { tone("square", 660, 660, 0, 0.07, 0.04); tone("square", 990, 990, 0.08, 0.1, 0.04); },
-    stamp:  function () { noise(0, 0.06, 0.14); tone("square", 110, 70, 0, 0.1, 0.07); tone("square", 523, 523, 0.12, 0.07, 0.04); tone("square", 659, 659, 0.19, 0.07, 0.04); tone("square", 784, 784, 0.26, 0.14, 0.04); },
-    nudge:  function () { tone("square", 220, 160, 0, 0.12, 0.05); },
-    poke:   function () { tone("square", 520, 820, 0, 0.09, 0.04); tone("square", 980, 980, 0.1, 0.05, 0.03); },
-    charge: function () { tone("square", 200, 420, 0, 0.9, 0.025); },
-    full:   function () { tone("square", 880, 880, 0, 0.06, 0.04); tone("square", 1175, 1175, 0.07, 0.08, 0.04); }
-  };
-  var BUZZ = { poke: 12, charge: 10, full: [15, 40, 15], launch: 12, land: 35, stamp: [18, 40, 28], nudge: [20, 30, 20] };
-  function fx(name) {
-    if (!state.sound) return;
-    try { if (SFX[name]) SFX[name](); } catch (e) {}
-    try { if (BUZZ[name] && navigator.vibrate) navigator.vibrate(BUZZ[name]); } catch (e) {}
-  }
-  function applySound() { $("soundBtn").setAttribute("aria-pressed", String(state.sound)); }
+  requestAnimationFrame(drawHero);
+})(0);
 
-  /* ---------- analytics (PostHog capture API, anonymous, no question text ever sent) ----------
-     Funnel to watch:  toss (toss_n = 1)  →  decide { outcome: accepted | switched }  or  abandon.
-     The design hypothesis lives in: decide.outcome, decide.toss_n, other_opened. */
-  var DEBUG = /[?&]debug\b/.test(location.search);
-  var ANALYTICS_ON = !!CONFIG.posthogKey && CONFIG.analyticsHosts.indexOf(location.hostname) >= 0;
-  function anonId() {
-    var id = load("aid", "");
-    if (!id) { id = "t_" + Math.random().toString(36).slice(2) + Date.now().toString(36); save("aid", id); }
-    return id;
-  }
-  function track(event, props) {
-    var p = Object.assign({ lang: LANG, mode: state.mode, skin: state.skin, $current_url: location.origin + location.pathname, $process_person_profile: false, $lib: "tossy-web" }, props || {});
-    if (DEBUG) console.log("[tossy]", event, p);
-    if (!ANALYTICS_ON || !window.fetch) return;
-    try {
-      fetch(CONFIG.posthogHost.replace(/\/$/, "") + "/i/v0/e/", {
-        method: "POST", keepalive: true, headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: CONFIG.posthogKey, event: event, distinct_id: anonId(), properties: p, timestamp: new Date().toISOString() })
-      }).catch(function () {});
-    } catch (e) {}
-  }
-  function roundProps(extra) {
-    return Object.assign(current ? { kind: current.kind, toss_n: current.tosses } : {}, extra || {});
-  }
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var $ = function (id) { return document.getElementById(id); };
+// ── Sesame rail ──
+const rail=document.getElementById('rail');
+const body=document.body;
+let nodes=[],particles=[],scrollProgress=0,totalH=0;
 
-  /* ---------- pixel die ---------- */
-  var R = function (x, y, w, h, c) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" class="' + c + '"/>'; };
-  var FACES = {
-    savage: R(52,76,28,8,"d-line") + R(96,76,28,8,"d-line") + R(60,84,12,8,"d-line") + R(104,84,12,8,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(76,112,24,8,"d-line") + R(100,104,8,8,"d-line"),
-    bestie: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,8,8,"d-line") + R(104,72,8,8,"d-line") + R(112,80,8,8,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(64,100,8,8,"d-line") + R(104,100,8,8,"d-line") + R(72,108,32,8,"d-line"),
-    rational: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(62,80,8,8,"d-line") + R(106,80,8,8,"d-line") + R(76,112,24,8,"d-line"),
-    gentle: R(60,80,8,12,"d-line") + R(108,80,8,12,"d-line") + R(60,80,4,4,"d-hi") + R(108,80,4,4,"d-hi") + R(40,100,20,8,"d-blush") + R(116,100,20,8,"d-blush") + R(76,108,4,4,"d-line") + R(96,108,4,4,"d-line") + R(80,112,16,4,"d-line"),
-    listen: R(60,76,12,16,"d-line") + R(104,76,12,16,"d-line") + R(60,76,4,4,"d-hi") + R(104,76,4,4,"d-hi") + R(44,104,12,8,"d-blush") + R(120,104,12,8,"d-blush") + R(84,108,8,8,"d-line"),
-    bestie_yes: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,8,8,"d-line") + R(104,72,8,8,"d-line") + R(112,80,8,8,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(68,100,40,4,"d-line") + R(72,104,32,8,"d-line") + R(80,112,16,4,"d-line") + R(84,108,8,4,"d-blush"),
-    bestie_other: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,24,6,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(64,100,8,8,"d-line") + R(104,100,8,8,"d-line") + R(72,108,32,6,"d-line"),
-    savage_yes: R(56,84,24,6,"d-line") + R(96,84,24,6,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(72,112,32,6,"d-line") + R(104,104,8,8,"d-line") + R(112,100,4,4,"d-line"),
-    savage_other: R(52,72,28,6,"d-line") + R(96,66,12,6,"d-line") + R(108,60,16,6,"d-line") + R(60,82,12,10,"d-line") + R(104,78,12,10,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(76,112,24,6,"d-line") + R(100,106,8,6,"d-line"),
-    rational_yes: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(62,80,8,8,"d-line") + R(106,80,8,8,"d-line") + R(68,108,8,4,"d-line") + R(76,112,24,4,"d-line") + R(100,108,8,4,"d-line"),
-    rational_other: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(66,80,8,8,"d-line") + R(110,80,8,8,"d-line") + R(98,62,24,4,"d-line") + R(84,112,20,4,"d-line"),
-    gentle_yes: R(56,84,4,4,"d-line") + R(60,80,8,4,"d-line") + R(68,84,4,4,"d-line") + R(104,84,4,4,"d-line") + R(108,80,8,4,"d-line") + R(116,84,4,4,"d-line") + R(40,98,20,8,"d-blush") + R(116,98,20,8,"d-blush") + R(76,108,4,4,"d-line") + R(96,108,4,4,"d-line") + R(80,112,16,4,"d-line") + R(124,44,4,4,"d-blush") + R(132,44,4,4,"d-blush") + R(120,48,20,4,"d-blush") + R(124,52,12,4,"d-blush") + R(128,56,4,4,"d-blush"),
-    gentle_other: R(60,80,8,12,"d-line") + R(108,80,8,12,"d-line") + R(60,80,4,4,"d-hi") + R(108,80,4,4,"d-hi") + R(40,100,20,8,"d-blush") + R(116,100,20,8,"d-blush") + R(72,104,4,4,"d-line") + R(100,104,4,4,"d-line") + R(76,108,24,4,"d-line"),
-    dizzy: [[56,72],[72,72],[64,80],[56,88],[72,88],[96,72],[112,72],[104,80],[96,88],[112,88]].map(function (p) { return R(p[0], p[1], 8, 8, "d-line"); }).join("") + R(68,112,8,4,"d-line") + R(76,108,8,4,"d-line") + R(84,112,8,4,"d-line") + R(92,108,8,4,"d-line") + R(100,112,8,4,"d-line")
-  };
-  function die(face, size) {
-    return '<svg viewBox="0 0 176 176" width="' + (size || "100%") + '" height="' + (size || "100%") + '" shape-rendering="crispEdges" aria-hidden="true">' +
-      '<path class="d-drop" d="M32 24h128v8h8v128h-8v8H32v-8h-8V32h8Z"/>' +
-      '<path class="d-line" d="M24 16h128v8h8v128h-8v8H24v-8h-8V24h8Z"/>' +
-      '<path class="d-body" d="M32 24h112v8h8v112h-8v8H32v-8h-8V32h8Z"/>' +
-      R(32,136,112,8,"d-shade") + R(136,40,8,96,"d-shade") + R(32,40,8,16,"d-hi") + R(40,32,16,8,"d-hi") +
-      '<g class="face">' + FACES[face] + "</g></svg>";
+function isDesktop(){return window.innerWidth>=1024}
+function buildNodes(H){
+  nodes=[];
+  const sp=isDesktop()?76:52;
+  const count=Math.floor((H-40)/sp);
+  for(let i=0;i<count;i++){
+    const y=40+i*sp,t=y/H;
+    const variety=Math.floor(Math.random()*5);
+    // size arc: grows from bottom to ~60% then shrinks back down — like a real plant tapering at top
+    const sizeArc=t<0.6 ? t/0.6 : 1-(t-0.6)/0.4;
+    const baseLen=isDesktop()?(4+sizeArc*9):(3+sizeArc*6);
+    const lenScale=variety===1||variety===2?1.3+Math.random()*0.5:0.45+Math.random()*0.55;
+    nodes.push({y,t,variety,side:i%2===0?1:-1,len:baseLen*lenScale,
+      color:i%3===0?PINK:i%3===1?GOLD:PINK,
+      wobblePhase:Math.random()*Math.PI*2,
+      wobbleSpeed:0.25+Math.random()*0.45,
+      wobbleAmp:isDesktop()?(0.8+sizeArc*2.5+Math.random()*1.5):(0.6+sizeArc*1.8+Math.random()*1),
+      swayPhase:Math.random()*Math.PI*2,
+      swaySpeed:0.18+Math.random()*0.35,
+      swayAmp:0.04+sizeArc*0.09+Math.random()*0.05,
+      bloomed:false});
   }
-
-  /* ---------- render ---------- */
-  function applySkin() {
-    var s = SKINS.filter(function (x) { return x.id === state.skin; })[0] || SKINS[1];
-    state.skin = s.id;
-    var root = document.documentElement.style;
-    ["bg","dots","line","text","sub","card","hard","btn","btnText","bubble","drop","shade","body","on"].forEach(function (k) { root.setProperty("--" + k, s[k]); });
-    var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.setAttribute("content", s.bg); /* Safari bars match the skin */
-    document.querySelectorAll("[data-skins]").forEach(function (box) {
-      box.innerHTML = SKINS.map(function (x) {
-        return '<button type="button" class="skin" data-skin="' + x.id + '" aria-label="' + x.name + ' skin" aria-pressed="' + (x.id === s.id) + '" style="background:' + x.bg + '"><span style="background:' + x.btn + '"></span></button>';
-      }).join("");
-    });
+}
+function spawnParticles(n,sx){
+  if(n.variety===4)return;
+  for(let p=0;p<3+Math.floor(Math.random()*4);p++){
+    const ang=n.side*(Math.PI*0.38)+(Math.random()-0.5)*1.4,spd=0.25+Math.random()*0.6;
+    particles.push({x:sx+Math.cos(ang)*n.len*1.1,y:n.y+Math.sin(ang)*n.len*0.3,
+      vx:Math.cos(ang+(Math.random()-0.5)*0.7)*spd,vy:-0.4-Math.random()*0.5,
+      life:1,decay:0.005+Math.random()*0.006,r:0.8+Math.random()*2,
+      color:Math.random()>0.5?PINK:GOLD});
   }
-  function applyMode() {
-    var m = MODES[state.mode];
-    document.documentElement.style.setProperty("--mode", m.color);
-    $("modes").innerHTML = MODE_ORDER.map(function (id) {
-      var x = MODES[id];
-      return '<button type="button" class="mode" data-mode="' + id + '" aria-pressed="' + (id === state.mode) + '" style="--c:' + x.color + '">' + die(id, 36) + '<span>' + x.label.toUpperCase() + '</span></button>';
-    }).join("");
-    $("askDie").innerHTML = die(state.mode);
-    $("greeting").textContent = m.greeting;
-  }
-  function applyLang() {
-    document.documentElement.lang = LANG === "zh" ? "zh-CN" : "en";
-    document.title = T("docTitle");
-    document.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = T(el.getAttribute("data-i18n")); });
-    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) { el.placeholder = T(el.getAttribute("data-i18n-ph")); });
-    if (typeof phShown !== "undefined") { phShown = null; rotatePh(); }
-    document.querySelectorAll("[data-i18n-label]").forEach(function (el) { el.setAttribute("aria-label", T(el.getAttribute("data-i18n-label"))); });
-    $("langText").textContent = T("langShort"); $("langBtn").setAttribute("aria-label", T("langLabel"));
-    $("tossLabel").textContent = T("toss");
-    $("wildSlot") && $("wildSlot").removeAttribute("data-mode");
-    applyMode(); renderOptions(); renderRecentNum(); rotatePicks();
-  }
-  var listenTimer = null;
-  function onTyping() {
-    var d = $("askDie"), m = MODES[state.mode];
-    clearTimeout(listenTimer);
-    if (!$("q").value.trim()) { stopListening(); return; }
-    if (!d.classList.contains("listen") && !d.classList.contains("charging")) {
-      d.innerHTML = die("listen");
-      d.classList.remove("bob"); d.classList.add("listen");
-      $("greeting").textContent = m.listen;
-    }
-    listenTimer = setTimeout(stopListening, 1200);
-  }
-  function stopListening() {
-    var d = $("askDie");
-    clearTimeout(listenTimer);
-    if (d.classList.contains("listen")) {
-      d.classList.remove("listen"); d.classList.add("bob");
-      d.innerHTML = die(state.mode);
-      $("greeting").textContent = MODES[state.mode].greeting;
-    }
-  }
-  function renderOptions() {
-    var box = $("options");
-    var html = state.options.map(function (v, i) {
-      var letter = String.fromCharCode(65 + i);
-      return '<div class="opt"><label class="sr" for="opt' + i + '">' + T("optLabel") + ' ' + letter + '</label><input id="opt' + i + '" data-opt="' + i + '" maxlength="60" placeholder="' + letter + ' · ' + T("optPh") + '" value="' + v.replace(/"/g, "&quot;") + '">' +
-        '<button type="button" data-remove="' + i + '" aria-label="' + T("removeOpt") + ' ' + letter + '">×</button></div>';
-    }).join("");
-    html += '<div id="wildSlot" style="display:contents"></div>';
-    box.innerHTML = html;
-    var n = state.options.length;
-    box.hidden = n === 0; $("picks").hidden = n > 0;
-    var btn = $("optToggle");
-    btn.disabled = n >= 5;
-    btn.textContent = n >= 5 ? T("maxOpt") : n ? T("addMore") : T("addOpt");
-    updateWild();
-  }
-  function updateWild() {
-    var w = wildMode($("q").value), slot = $("wildSlot"), html = "";
-    $("wildWrap").hidden = w !== "off";
-    if (!slot) return;
-    if (w === "auto" || w === "on") {
-      var auto = w === "auto";
-      var tipText = auto ? T("tipAuto") : T("tipOn");
-      html += '<div class="opt wild"><span>' + esc(T("tossyPick")) + '</span><span class="tag">' + (auto ? T("tagAuto") : T("tagWild")) + '</span>' +
-        '<span class="tipwrap"><button class="tip-q" type="button" aria-label="' + esc(T("pickQ")) + '" aria-expanded="false" aria-describedby="wildCardTip">?</button><span class="tip" role="tooltip" id="wildCardTip">' + tipText + '</span></span>' +
-        (auto ? "" : '<button type="button" data-wild-remove="1" aria-label="' + esc(T("removeWild")) + '">×</button>') + '</div>';
-    }
-    if (slot.getAttribute("data-mode") !== String(w)) { slot.innerHTML = html; slot.setAttribute("data-mode", String(w)); }
-  }
-
-  /* ---------- deciding: Tossy is a playful random picker by design ---------- */
-  function rnd(a) { return a[Math.floor(Math.random() * a.length)]; }
-  var lastPick = {};
-  function fresh(key, a) { /* random, but never the same line twice in a row */
-    var pool = a.length > 1 ? a.filter(function (x) { return String(x) !== lastPick[key]; }) : a, v = rnd(pool);
-    lastPick[key] = String(v); return v;
-  }
-  /* topic of an open question → which answer list to draw from (order matters) */
-  var TOPICS = [
-    ["sleepTime", /(几点|什么时候|what time|when).*(睡|sleep|bed)|(睡|sleep|bed).*(几点|什么时候|what time|when)/i],
-    ["wakeTime", /(几点|什么时候|what time|when).*(起床|起来|wake|get up)|(起床|wake|get up).*(几点|什么时候|what time|when)/i],
-    ["when", /几点|什么时候|何时|哪天|啥时候|what time|\bwhen\b/i],
-    ["number", /多少|几个|几杯|几次|几天|几件|how many|how much/i],
-    ["who", /\bwho\b|谁/i],
-    ["gift", /gift|present|礼物|送什么|送(他|她|TA)/i],
-    ["travel", /travel|trip|vacation|holiday|visit|旅行|旅游|度假|出去玩|去哪玩/i],
-    ["food", /eat|food|dinner|lunch|breakfast|brunch|snack|吃|饭|餐|下酒/i],
-    ["drink", /drink|coffee|tea\b|boba|喝/i],
-    ["watch", /watch|movie|show|film|series|看什么|追剧|电影/i],
-    ["music", /listen|music|song|playlist|听|歌/i],
-    ["wear", /wear|outfit|穿/i],
-    ["place", /where|哪里|哪儿|去哪/i],
-    ["doing", /\bdo\b|weekend|today|tonight|free time|bored|\bhow\b|做什么|干什么|干嘛|周末|今天|今晚|无聊|怎么|如何/i]
-  ];
-  function topicPool(text) {
-    for (var i = 0; i < TOPICS.length; i++) if (TOPICS[i][1].test(text)) return IDEAS[TOPICS[i][0]];
-    return null;
-  }
-  function wildPick(text, taken) {
-    var pool = topicPool(text) || IDEAS.other;
-    var fresh = pool.filter(function (x) { return taken.indexOf(x) < 0; });
-    return rnd(fresh.length ? fresh : pool);
-  }
-  function splitQuestion(q) {
-    /* "him/her", "he/she", "s/he" are one word, not two options */
-    var text = String(q || "").replace(/\b(him|he|his|she|her|s)\s*\/\s*(her|she|his|him|he|hers|they|them)\b/gi, "$1\u2044$2");
-    var parts = text.split(/\s+or\s+|还是|或者|\s*\/\s*/i).map(function (s) { return s.replace(/^(should i|do i|shall i)\s+/i, "").replace(/[?？!.]+$/, "").trim(); }).filter(Boolean);
-    if (parts.length === 2 && /^(no|not|nope|nah|not really|不|不要|不了|算了)$/i.test(parts[1])) return [];
-    return parts.length >= 2 && parts.length <= 5 ? parts : [];
-  }
-  function effectiveOptions(q) {
-    var seen = {}, out = [];
-    splitQuestion(q).concat(state.options.map(function (o) { return o.trim(); })).forEach(function (o) {
-      var k = o.toUpperCase().replace(/\s+/g, " ");
-      if (o && !seen[k]) { seen[k] = 1; out.push(k); }
-    });
-    return out;
-  }
-  function wildMode(q) {
-    if (!state.options.length) return null;
-    var n = effectiveOptions(q).length;
-    if (n <= 1) return "auto";
-    return state.wildcard ? "on" : "off";
-  }
-  function useWildcard(q) { var w = wildMode(q); return w === "auto" || w === "on"; }
-  /* Is this a "should I do it" question (null) or a "is it so" question ({y, n} = the words to answer with)? */
-  var ZH_WORDS = ["喜欢","可以","值得","愿意","知道","需要","合适","适合","靠谱","在乎","介意","后悔","生气","开心","舒服","好看","好吃","好玩","讨厌","相信","记得","明白","认识","同意","方便","正常","可能","可爱","聪明","漂亮","重要","有用","有趣","容易","无聊","过分","高兴","难过","担心","清楚","确定","满意","习惯","了解"];
-  var ZH_MA = [["喜欢", "喜欢", "不喜欢"], ["可以", "可以", "不可以"], ["会", "会", "不会"], ["是", "是", "不是"], ["能", "能", "不能"], ["有", "有", "没有"], ["想", "想", "不想"], ["爱", "爱", "不爱"]];
-  function askForm(q) {
-    q = String(q || "").trim();
-    var m = /([\u4e00-\u9fff])(不|没)\1([\u4e00-\u9fff]?)/.exec(q);
-    if (m) {
-      if (/^[要该应]$/.test(m[1])) return null;
-      var w = m[3] && ZH_WORDS.indexOf(m[1] + m[3]) >= 0 ? m[1] + m[3] : m[1];
-      return { y: w, n: m[2] + w };
-    }
-    if (/[吗嘛么][?？!！。.\s]*$/.test(q)) {
-      if (/^(那|所以)?(我|我们|咱|咱们)?(现在|今天|今晚|明天|还|到底)?(要|该|应该|需要|得)/.test(q)) return null;
-      var t = q.replace(/机会|会议|约会|聚会|开会|但是|可是|总是|老是|只是|要是|可能|能力|所有|可爱|恋爱|爱好|想法|有点|有些/g, "");
-      for (var i = 0; i < ZH_MA.length; i++) if (t.indexOf(ZH_MA[i][0]) >= 0) return { y: ZH_MA[i][1], n: ZH_MA[i][2] };
-      if (/[他她它你这那]|ta\b/i.test(q)) return { y: "是的", n: "不是" };
-      return null;
-    }
-    if (/^(is|are|am|was|were|does|did|will|would|has|have|had|isn't|aren't|doesn't|didn't|won't)\b/i.test(q) || /^(do|can|could)\s+(?!(i|we)\b)/i.test(q)) return { y: "YES", n: "NO" };
-    return null;
-  }
-  var FACT = {
-    en: {
-      wrap: {
-        bestie: [function () { return "YES, BABE!"; }, function () { return "NOPE, BABE"; }],
-        savage: [function () { return "YES. OBVIOUSLY."; }, function () { return "NO."; }],
-        rational: [function () { return "YES."; }, function () { return "NO."; }],
-        gentle: [function () { return "I THINK SO"; }, function () { return "PROBABLY NOT"; }]
-      },
-      lines: {
-        bestie: ["THAT'S WHAT THE DICE SAYS, BABE.", "EITHER WAY, I'M ON YOUR SIDE.", "DON'T OVERTHINK IT, BABE."],
-        savage: ["THE DICE SAID IT, NOT ME.", "DON'T LIKE IT? TOSS AGAIN.", "BELIEVE IT OR NOT. I'M DONE ROLLING."],
-        rational: ["PURELY RANDOM. NOT EVIDENCE.", "SAMPLE SIZE: ONE. FOR REFERENCE ONLY.", "A COIN FLIP. IT LANDED HERE THIS TIME."],
-        gentle: ["IT'S ONLY A DICE. HOLD IT LIGHTLY.", "WHATEVER THE ANSWER, YOU'RE OKAY.", "NO RUSH TO KNOW FOR SURE."]
-      }
-    },
-    zh: {
-      wrap: {
-        bestie: [function (y) { return y + "！"; }, function (n) { return n + "啦宝"; }],
-        savage: [function (y) { return y + "。显然。"; }, function (n) { return n + "。"; }],
-        rational: [function (y) { return y + "。"; }, function (n) { return n + "。"; }],
-        gentle: [function (y) { return "嗯，" + y; }, function (n) { return "应该" + n; }]
-      },
-      lines: {
-        bestie: ["骰子是这么说的，宝！", "不管怎样我都站你这边。", "别想太多啦宝。"],
-        savage: ["骰子说的，别瞪我。", "不服就再掷一次。", "信不信由你，反正我掷完了。"],
-        rational: ["纯随机结果，不构成证据。", "样本量为一，仅供参考。", "概率各半，这次落在这边。"],
-        gentle: ["只是骰子说的，别太放在心上。", "不管答案是什么，你都很好。", "慢慢来，不用急着知道。"]
-      }
-    }
-  };
-  function decide(q, mode) {
-    var m = MODES[mode];
-    var up = function (x) { return x.toUpperCase(); };
-    var mine = state.options.map(function (o) { return o.trim(); }).filter(Boolean);
-    var opts = effectiveOptions(q);
-    if (mine.length && useWildcard(q)) {
-      var pick = Math.floor(Math.random() * (opts.length + 1));
-      if (pick === opts.length) {
-        return { a: wildPick(q + " " + mine.join(" "), opts), s: T("wildSub"), kind: "options", others: opts.slice() };
-      }
-      return { a: opts[pick], s: fresh("idea" + mode, m.idea), kind: "options", others: opts.filter(function (o, i) { return i !== pick; }) };
-    }
-    if (opts.length >= 2) {
-      var k = Math.floor(Math.random() * opts.length);
-      return { a: opts[k], s: fresh("idea" + mode, m.idea), kind: "options", others: opts.filter(function (o, i) { return i !== k; }) };
-    }
-    if (/^\s*(what|which|where|who|how|when)\b/i.test(q) || /什么|啥|哪|谁|怎么|干嘛|几|多少|如何/.test(q)) {
-      var pool = topicPool(q) || IDEAS.any;
-      return { a: rnd(pool), s: fresh("idea" + mode, m.idea), kind: "idea", others: [] };
-    }
-    var isYes = Math.random() < 0.5, f = askForm(q);
-    if (f) { /* "is he / 有没有 / 是不是": answer in the question's own words, not "go for it" */
-      var F = FACT[LANG], pair = F.wrap[mode] || F.wrap.savage;
-      return { a: isYes ? pair[0](f.y) : pair[1](f.n), s: fresh("fact" + mode, F.lines[mode] || F.lines.savage), kind: "yesno", verdict: isYes ? "yes" : "no", others: [isYes ? f.n : f.y] };
-    }
-    var r = fresh((isYes ? "yes" : "no") + mode, isYes ? m.yes : m.no);
-    return { a: r[0], s: r[1], kind: "yesno", verdict: isYes ? "yes" : "no", others: [isYes ? COPY[LANG].no : COPY[LANG].yes] };
-  }
-
-  /* ---------- history (this device only) ---------- */
-  function loadHist() { try { var h = JSON.parse(localStorage.getItem("tossy.history") || "[]"); return Array.isArray(h) ? h : []; } catch (e) { return []; } }
-  var history = loadHist();
-  function saveHist() { try { localStorage.setItem("tossy.history", JSON.stringify(history.slice(0, 20))); } catch (e) {} renderRecentNum(); }
-  function renderRecentNum() { $("recentNum").textContent = history.length; }
-  function ago(t) {
-    var m = Math.round((Date.now() - t) / 60000);
-    if (m < 1) return T("justNow"); if (m < 60) return T("minAgo", { n: m });
-    var h = Math.round(m / 60); if (h < 24) return T("hAgo", { n: h });
-    return T("dAgo", { n: Math.round(h / 24) });
-  }
-  function trimEnd(a) { return String(a).replace(/[.!。！]+$/, ""); }
-  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  /* how many decisions the dice has settled on this device (history only keeps the last 20, so count separately) */
-  function settledCount() {
-    var v = parseInt(load("settled", ""), 10);
-    return v >= 0 ? v : history.filter(function (h) { return h.status === "done" || h.status === "switch"; }).length;
-  }
-  function renderHist() {
-    var list = $("histList"), n = settledCount(), tally = $("tally");
-    tally.hidden = !n;
-    if (n) tally.innerHTML = esc(T(n === 1 ? "tallyOne" : "tally", { n: "\u0001" })).replace("\u0001", "<b>" + n + "</b>");
-    if (!history.length) { list.innerHTML = '<li class="empty">' + esc(T("empty")) + '</li>'; $("clearHist").hidden = true; return; }
-    $("clearHist").hidden = false;
-    list.innerHTML = history.map(function (h) {
-      var status = h.status === "done" ? '<span class="st done">' + T("stDone") + '</span>' : h.status === "switch" ? '<span class="st switch">' + T("stSwitch") + '</span>' : '<span class="st">' + T("stOpen") + '</span>';
-      var main = h.status === "switch" ? esc(T("histSwitch", { a: trimEnd(h.answer), f: h.final })) : esc(h.answer);
-      return '<li><div class="hq">' + esc(h.q) + '</div><div class="ha">' + main + '</div><div class="hm">' + status + '<span>' + esc(MODES[h.mode] ? MODES[h.mode].label.toUpperCase() : "") + '</span>' + (h.tosses > 1 ? "<span>" + esc(T("tossed", { n: h.tosses })) + "</span>" : "") + '<span>' + ago(h.t) + '</span></div>' +
-        '<button class="del" type="button" data-del="' + h.id + '" aria-label="' + esc(T("del")) + '">×</button></li>';
-    }).join("");
-  }
-
-  /* ---------- dialogs ---------- */
-  var lastFocus = null;
-  function setInert(on) {
-    ["header", "main"].forEach(function (sel) { var el = document.querySelector(sel); if (el) { el.inert = on; if (on) el.setAttribute("aria-hidden", "true"); else el.removeAttribute("aria-hidden"); } });
-  }
-  function openDialog(id) {
-    lastFocus = document.activeElement;
-    $(id).hidden = false; setInert(true);
-    var f = $(id).querySelector("[data-close]"); if (f) f.focus();
-  }
-  function closeDialog(el) {
-    el.hidden = true; setInert(false);
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-
-  /* ---------- share card ---------- */
-  function dieSvgExplicit(face, sk) {
-    var map = { "d-drop": sk.drop, "d-line": sk.line, "d-body": sk.body, "d-shade": sk.shade, "d-hi": "#ffffff", "d-blush": "#ff9dca" };
-    return die(face).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')
-      .replace(/class="d-ring"/g, 'fill="none" stroke="' + sk.line + '" stroke-width="4"')
-      .replace(/class="(d-[a-z]+)"/g, function (m0, c) { return 'fill="' + map[c] + '"'; })
-      .replace('width="100%" height="100%"', 'width="176" height="176"');
-  }
-  function drawDie(x, face, sk, ox, oy, size) {
-    var k = size / 176;
-    var fill = function (c, a, b, w, h) { x.fillStyle = c; x.fillRect(ox + a * k, oy + b * k, w * k, h * k); };
-    fill(sk.drop, 32, 24, 128, 144); fill(sk.drop, 24, 32, 144, 128);
-    fill(sk.line, 24, 16, 128, 144); fill(sk.line, 16, 24, 144, 128);
-    fill(sk.body, 32, 24, 112, 128); fill(sk.body, 24, 32, 128, 112);
-    fill(sk.shade, 32, 136, 112, 8); fill(sk.shade, 136, 40, 8, 96); fill("#ffffff", 32, 40, 8, 16); fill("#ffffff", 40, 32, 16, 8);
-    var colors = { "d-line": sk.line, "d-hi": "#ffffff", "d-blush": "#ff9dca" };
-    var re = /<rect x="(\d+)" y="(\d+)" width="(\d+)" height="(\d+)" class="(d-[a-z]+)"\/>/g, m;
-    while ((m = re.exec(FACES[face]))) {
-      if (m[5] === "d-ring") { x.strokeStyle = sk.line; x.lineWidth = 4 * k; x.strokeRect(ox + +m[1] * k, oy + +m[2] * k, +m[3] * k, +m[4] * k); }
-      else fill(colors[m[5]], +m[1], +m[2], +m[3], +m[4]);
-    }
-  }
-  function tokens(text) {
-    return String(text).match(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]|[^\s\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]+|\s+/g) || [];
-  }
-  function wrap(ctx, text, max) {
-    var lines = [], line = "";
-    tokens(text).forEach(function (t) {
-      if (/^\s+$/.test(t)) { if (line) line += " "; return; }
-      if (ctx.measureText(t).width > max) {
-        Array.from(t).forEach(function (ch) {
-          if (ctx.measureText(line + ch).width > max && line) { lines.push(line.trim()); line = ""; }
-          line += ch;
-        });
-        return;
-      }
-      if (ctx.measureText(line + t).width > max && line.trim()) { lines.push(line.trim()); line = t; } else line += t;
-    });
-    if (line.trim()) lines.push(line.trim());
-    return lines;
-  }
-  function fitBlock(ctx, text, family, sizes, max, maxLines) {
-    for (var i = 0; i < sizes.length; i++) {
-      ctx.font = family.replace("{s}", sizes[i]);
-      var ls = wrap(ctx, text, max);
-      if (ls.length <= maxLines) return { size: sizes[i], lines: ls };
-    }
-    var size = sizes[sizes.length - 1];
-    ctx.font = family.replace("{s}", size);
-    var ls2 = wrap(ctx, text, max).slice(0, maxLines), last = ls2[maxLines - 1];
-    while (last.length && ctx.measureText(last + "…").width > max) last = Array.from(last).slice(0, -1).join("");
-    ls2[maxLines - 1] = last.replace(/\s+$/, "") + "…";
-    return { size: size, lines: ls2 };
-  }
-  function renderCard(showQ) {
-    var sk = SKINS.filter(function (x) { return x.id === state.skin; })[0];
-    var m = MODES[current.mode];
-    var W = 1080, H = 1350, c = document.createElement("canvas"), x = c.getContext("2d");
-    c.width = W; c.height = H;
-    var cjkSample = [current.q, current.a, current.s, current.final, T("cardFoot"), T("says", { m: m.label })].join("");
-    var fontsReady = document.fonts && document.fonts.load ? Promise.all([document.fonts.load("56px 'Press Start 2P'"), document.fonts.load("bold 32px 'Silkscreen'"), document.fonts.load("36px 'Tossy CJK'", cjkSample)]).catch(function () {}) : Promise.resolve();
-    return fontsReady.then(function () {
-      x.imageSmoothingEnabled = false;
-      x.fillStyle = sk.bg; x.fillRect(0, 0, W, H);
-      x.fillStyle = sk.dots;
-      for (var yy = 16; yy < H; yy += 32) for (var xx = 16; xx < W; xx += 32) x.fillRect(xx - 2, yy - 2, 4, 4);
-      x.fillStyle = sk.bubble; x.fillRect(96, 136, 920, 1080);
-      x.fillStyle = sk.line; x.fillRect(80, 120, 920, 1080);
-      x.fillStyle = sk.card; x.fillRect(88, 128, 904, 1064);
-      x.fillStyle = sk.line; x.fillRect(128, 168, 40, 40); x.fillStyle = sk.btn; x.fillRect(134, 174, 28, 28); x.fillStyle = sk.line; x.fillRect(140, 180, 6, 6); x.fillRect(150, 190, 6, 6);
-      x.fillStyle = sk.text; x.font = "28px 'Press Start 2P', monospace"; x.textBaseline = "middle"; x.textAlign = "left"; x.fillText("TOSSY", 186, 190);
-      if (current.status) {
-        x.save(); x.translate(820, 190); x.rotate(-0.1);
-        x.font = "20px 'Press Start 2P', 'Tossy CJK', monospace"; var st = current.status === "done" ? T("stampDone") : T("stampSwitch"), sw = x.measureText(st).width + 36;
-        x.fillStyle = sk.line; x.fillRect(-sw / 2 - 4, -28, sw + 8, 56); x.fillStyle = m.color; x.fillRect(-sw / 2, -24, sw, 48);
-        x.fillStyle = sk.on; x.textAlign = "center"; x.fillText(st, 0, 2); x.restore();
-      }
-      drawDie(x, current.status === "switch" ? current.mode + "_other" : current.status === "done" ? current.mode + "_yes" : current.mode, sk, 540 - 170, 250, 340);
-      x.textAlign = "center";
-      x.font = (LANG === "zh" ? "" : "bold ") + "30px 'Silkscreen', 'Tossy CJK', monospace";
-      var tag = T("says", { m: m.label.toUpperCase() }), tw = x.measureText(tag).width + 40;
-      x.fillStyle = sk.line; x.fillRect(540 - tw / 2 - 4, 640 - 4, tw + 8, 60); x.fillStyle = m.color; x.fillRect(540 - tw / 2, 640, tw, 52);
-      x.fillStyle = sk.on; x.fillText(tag, 540, 668);
-      var PX = "{s}px 'Press Start 2P', 'Tossy CJK', 'PingFang SC', 'Microsoft YaHei', monospace", SK = "{s}px 'Silkscreen', 'Tossy CJK', 'PingFang SC', 'Microsoft YaHei', monospace";
-      var rv = resultView(current), ans = rv.ans, sub = rv.sub;
-      var bottom = 1150;
-      if (showQ && current.q) {
-        var qb = fitBlock(x, T("cardQ") + current.q.toUpperCase(), SK, [26, 22], 780, 2);
-        x.font = SK.replace("{s}", qb.size); x.fillStyle = sk.sub;
-        var qy = 1160 - (qb.lines.length - 1) * qb.size * 1.4;
-        bottom = qy - qb.size - 30;
-        qb.lines.forEach(function (l) { x.fillText(l, 540, qy); qy += qb.size * 1.4; });
-      }
-      var ab = fitBlock(x, ans, PX, [60, 50, 42, 34, 28], 800, 3);
-      x.font = PX.replace("{s}", ab.size); x.fillStyle = sk.text;
-      var y = 740 + ab.size / 2;
-      ab.lines.forEach(function (l) { x.fillText(l, 540, y); y += ab.size * 1.35; });
-      var room = Math.max(1, Math.min(3, Math.floor((bottom - y) / 42)));
-      var sb = fitBlock(x, sub, SK, [30, 26, 22], 800, room);
-      x.font = SK.replace("{s}", sb.size); x.fillStyle = sk.sub; y += 10;
-      sb.lines.forEach(function (l) { x.fillText(l, 540, y); y += sb.size * 1.4; });
-      x.font = "24px 'Silkscreen', 'Tossy CJK', monospace"; x.fillStyle = sk.text; x.fillText(T("cardFoot"), 540, 1285);
-      return c;
-    });
-  }
-  /* what the result says, as shown on the card and on a shared link */
-  function resultView(c) {
-    return {
-      ans: c.status === "switch" ? c.final : c.a,
-      sub: c.status === "switch" ? T("tossySaid", { a: trimEnd(c.a) }) + RESPOND[c.mode].other : c.status === "done" ? RESPOND[c.mode].commit : c.s
-    };
-  }
-  /* result link: everything lives in the #hash, so nothing is stored on a server.
-     The question is only included when "show my question" is ticked. */
-  function b64url(str) { var b = new TextEncoder().encode(str), s = ""; b.forEach(function (x) { s += String.fromCharCode(x); }); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
-  function unb64url(str) { var s = atob(str.replace(/-/g, "+").replace(/_/g, "/")), b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return new TextDecoder().decode(b); }
-  function resultLink(withQ) {
-    var rv = resultView(current);
-    var p = { v: 1, l: LANG, m: current.mode, st: current.status || "", a: rv.ans, s: rv.sub };
-    if (withQ && current.q) p.q = current.q;
-    return "https://" + CONFIG.site + "/#r=" + b64url(JSON.stringify(p));
-  }
-  function readShared() {
-    var m = /^#r=([A-Za-z0-9_-]+)$/.exec(location.hash || ""); if (!m) return null;
-    try {
-      var p = JSON.parse(unb64url(m[1])), cap = function (x, n) { x = String(x || "").trim(); return Array.from(x).slice(0, n).join(""); };
-      if (!p || !MODES[p.m] || !p.a) return null;
-      return { l: COPY[p.l] ? p.l : "", m: p.m, st: p.st === "done" || p.st === "switch" ? p.st : "", a: cap(p.a, 80), s: cap(p.s, 140), q: cap(p.q, 140) };
-    } catch (e) { return null; }
-  }
-  function showShared(p) {
-    state.shared = true; state.sharedMode = p.m;
-    /* show the whole page in the sender's language, so the card isn't half English, half Chinese */
-    if (p.l && p.l !== LANG) { state.sharedPrevLang = LANG; useLang(p.l); applyLang(); }
-    document.documentElement.style.setProperty("--mode", MODES[p.m].color);
-    $("qtag").textContent = p.q ? T("q") + p.q : T("sharedNoQ");
-    $("says").textContent = T("says", { m: MODES[p.m].label.toUpperCase() });
-    $("answerText").textContent = p.a; $("answerSub").textContent = p.s;
-    $("stamp").hidden = !p.st; $("stamp").textContent = p.st === "done" ? T("stampDone") : T("stampSwitch");
-    document.querySelector(".answer .foot").hidden = true; $("chooser").hidden = true;
-    $("preActs").hidden = true; $("postActs").hidden = true; $("sharedActs").hidden = false;
-    $("ask").hidden = true; $("stage").hidden = false;
-    document.documentElement.setAttribute("data-screen", "stage");
-    setFace(p.st === "switch" ? p.m + "_other" : p.st === "done" ? p.m + "_yes" : p.m);
-    $("answer").classList.add("on");
-    $("say").textContent = T("sharedSay"); $("say").classList.add("on");
-    track("shared_open", { has_question: !!p.q, status: p.st || "open", from_mode: p.m });
-  }
-  function leaveShared() {
-    if (!state.shared) return;
-    state.shared = false;
-    try { window.history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-    document.querySelector(".answer .foot").hidden = false; $("sharedActs").hidden = true;
-    $("say").classList.remove("on"); $("answer").classList.remove("on");
-    if (state.sharedPrevLang) { useLang(state.sharedPrevLang); state.sharedPrevLang = null; applyLang(); }
-    applyMode();
-  }
-  var shareBlob = null;
-  function refreshShare() {
-    renderCard($("shareQ").checked).then(function (c) {
-      var url = c.toDataURL("image/png");
-      $("shareImg").src = url; $("shareDl").href = url;
-      shareBlob = null; $("shareNative").hidden = true; $("shareDl").hidden = false;
-      if (c.toBlob && navigator.canShare) c.toBlob(function (b) {
-        if (!b) return;
-        shareBlob = b;
-        try {
-          var ok = navigator.canShare({ files: [new File([b], "tossy-result.png", { type: "image/png" })] });
-          /* phones: the share sheet can also save the image, so SHARE… replaces DOWNLOAD */
-          $("shareNative").hidden = !ok; $("shareDl").hidden = ok;
-        } catch (e) {}
-      }, "image/png");
-    }).catch(function () { $("shareImg").alt = T("cardFail"); });
-  }
-  /* Direct share: tap → the system share sheet (iMessage, WeChat, AirDrop…) with the card + link.
-     The PNG is prepared ahead of time, because Safari only opens the sheet straight from the tap. */
-  var prepared = null;
-  function shareKey() { return current ? [current.id, current.tosses, current.status, current.final, current.s, LANG, state.skin].join("|") : ""; }
-  function prepareShare() {
-    if (!current || !navigator.share) return;
-    var key = shareKey(); if (prepared && prepared.key === key) return;
-    var slot = { key: key, file: null }; prepared = slot;
-    renderCard(false).then(function (c) {
-      if (c.toBlob) c.toBlob(function (b) { if (b) slot.file = new File([b], "tossy-result.png", { type: "image/png" }); }, "image/png");
-    }).catch(function () {});
-  }
-  function quickShare() {
-    if (!current) return;
-    if (!navigator.share) { openShare(); return; }
-    var data = { title: "Tossy", text: T("shareText") + " " + resultLink(false) };
-    var f = prepared && prepared.key === shareKey() ? prepared.file : null;
-    try { if (f && navigator.canShare && navigator.canShare({ files: [f] })) data.files = [f]; } catch (e) {}
-    track("share_sent", roundProps({ via: "direct", with_image: !!data.files }));
-    navigator.share(data).catch(function (e) { if (!e || e.name !== "AbortError") openShare(); });
-  }
-  function openShare() { $("shareQ").checked = false; refreshShare(); openDialog("share"); track("share_open", roundProps({ status: current && current.status || "open" })); }
-
-  /* ---------- deciding what to do with the answer ---------- */
-  var current = null, revealedAt = 0;
-
-  /* ---------- AI reply line (optional) ----------
-     The dice has already picked res.a at random. The endpoint only writes the one-line
-     reaction in the current tone. It is requested at toss start, so the ~2.6s animation
-     hides the latency; if it is late, slow or fails, the built-in line stays. */
-  function cleanLine(t) {
-    t = String(t || "").replace(/[\r\n]+/g, " ").replace(/^["'“”「『\s]+|["'“”」』\s]+$/g, "").trim();
-    if (!t) return null;
-    var max = LANG === "zh" ? 40 : 90;
-    if (Array.from(t).length > max) return null;
-    return LANG === "zh" ? t : t.toUpperCase();
-  }
-  function requestLine(cur, res) {
-    if (!CONFIG.aiLineEndpoint || !window.fetch || res.s === T("wildSub")) return null;
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, CONFIG.aiLineTimeout), t0 = Date.now();
-    return fetch(CONFIG.aiLineEndpoint, {
-      method: "POST", headers: { "Content-Type": "application/json" }, signal: ctrl ? ctrl.signal : undefined,
-      body: JSON.stringify({ question: cur.q, answer: res.a, kind: res.kind, verdict: res.verdict || null, mode: cur.mode, lang: LANG, toss: cur.tosses })
-    }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { return cleanLine(d && d.line); })
-      .catch(function () { return null; })
-      .then(function (t) { clearTimeout(timer); track("ai_line", { ok: !!t, ms: Date.now() - t0 }); return t; });
-  }
-  /* any question without options: the AI reads it first, decides whether it is a yes/no question or an
-     open one, and words the possible answers so they fit THIS question (each with its own line).
-     The dice still picks at random among them, so Tossy stays random but never off-topic.
-     If the AI is late or fails, the built-in answers below are used instead. */
-  function requestIdeas(cur) {
-    if (!CONFIG.aiLineEndpoint || !window.fetch) return null;
-    var ctrl = window.AbortController ? new AbortController() : null, t0 = Date.now();
-    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 4200);
-    var p = fetch(CONFIG.aiLineEndpoint, {
-      method: "POST", headers: { "Content-Type": "application/json" }, signal: ctrl ? ctrl.signal : undefined,
-      body: JSON.stringify({ type: "ideas", question: cur.q, mode: cur.mode, lang: LANG, toss: cur.tosses })
-    }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        var list = (d && d.ideas || []).map(function (x) {
-          var a = String(x.a || "").trim(); if (!a || Array.from(a).length > (LANG === "zh" ? 12 : 30)) return null;
-          return { a: LANG === "zh" ? a : a.toUpperCase(), line: cleanLine(x.line), v: x.v === "yes" || x.v === "no" ? x.v : "" };
-        }).filter(Boolean);
-        /* the AI read the question and says what kind it is: a yes/no one needs both sides to toss between */
-        p.kind = d && d.kind === "yesno" && list.some(function (x) { return x.v === "yes"; }) && list.some(function (x) { return x.v === "no"; }) ? "yesno" : "open";
-        return list.length ? list : null;
-      })
-      .catch(function () { return null; })
-      .then(function (list) { clearTimeout(timer); p.done = true; p.list = list; track("ai_ideas", { ok: !!list, n: list ? list.length : 0, ms: Date.now() - t0 }); return list; });
-    return p;
-  }
-  function useIdea(cur) {
-    var list = cur.ideas && cur.ideas.list; if (!list || current !== cur) return false;
-    var it;
-    if (cur.ideas.kind === "yesno") { /* the coin is still flipped here, 50/50; the AI only worded both sides */
-      var v = cur.kind === "yesno" && cur.verdict ? cur.verdict : (Math.random() < 0.5 ? "yes" : "no");
-      var side = list.filter(function (x) { return x.v === v; }), fresh1 = side.filter(function (x) { return x.a !== cur.prevA; });
-      it = rnd(fresh1.length ? fresh1 : side);
-      cur.kind = "yesno"; cur.verdict = v; cur.others = [list.filter(function (x) { return x.v && x.v !== v; })[0].a];
+}
+function setupRail(){
+  totalH=body.scrollHeight;
+  const W=isDesktop()?64:36;
+  rail.width=W;rail.height=totalH;rail.style.width=W+'px';rail.style.height=totalH+'px';
+  buildNodes(totalH);
+}
+function drawRail(now){
+  const ctx=rail.getContext('2d');
+  const W=rail.width,H=totalH;
+  ctx.clearRect(0,0,W,H);
+  const sx=W/2,revealY=H*scrollProgress;
+  ctx.strokeStyle=`rgba(237,232,223,${0.035+0.012*Math.sin(now*0.0009)})`;
+  ctx.lineWidth=isDesktop()?1.2:0.8;
+  ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke();
+  nodes.forEach(n=>{
+    if(n.y>revealY+28)return;
+    const fade=Math.min(1,(revealY-n.y+28)/40);if(fade<=0)return;
+    if(!n.bloomed&&fade>0.9){n.bloomed=true;spawnParticles(n,sx);}
+    const wx=Math.sin(now*0.001*n.wobbleSpeed+n.wobblePhase)*n.wobbleAmp*(1-n.t*0.25);
+    const ang=n.side*(Math.PI*0.38)+Math.sin(now*0.001*n.swaySpeed+n.swayPhase)*n.swayAmp;
+    const ex=sx+wx+Math.cos(ang)*n.len,ey=n.y+Math.sin(ang)*n.len*0.28;
+    ctx.globalAlpha=(0.08+n.t*0.1)*fade;ctx.strokeStyle=n.color;ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(sx+wx*0.35,n.y);ctx.lineTo(ex,ey);ctx.stroke();
+    const bs=1+0.07*Math.sin(now*0.0014*n.wobbleSpeed+n.wobblePhase);
+    if(n.variety===4){
+      ctx.globalAlpha=(0.18+n.t*0.15)*fade;ctx.strokeStyle=n.color;ctx.lineWidth=0.6;
+      const ex2=sx+wx+Math.cos(ang)*n.len*1.6,ey2=n.y+Math.sin(ang)*n.len*1.6*0.28;
+      ctx.beginPath();ctx.moveTo(sx+wx*0.35,n.y);ctx.lineTo(ex2,ey2);ctx.stroke();
+    } else if(n.variety===1||n.variety===3){
+      ctx.globalAlpha=(0.35+n.t*0.35)*fade;ctx.strokeStyle=n.color;ctx.lineWidth=0.75;
+      ctx.save();ctx.translate(ex,ey);ctx.rotate(ang);
+      ctx.beginPath();ctx.ellipse(0,0,n.len*0.82*bs,n.len*0.42*bs,0,0,Math.PI*2);ctx.stroke();
+      ctx.restore();
     } else {
-      var pool = list.filter(function (x) { return x.a !== cur.prevA; });
-      it = rnd(pool.length ? pool : list);
-      cur.kind = "idea"; cur.verdict = null; cur.others = [];
+      ctx.globalAlpha=(0.5+n.t*0.42)*fade;ctx.fillStyle=n.color;
+      ctx.save();ctx.translate(ex,ey);ctx.rotate(ang);
+      ctx.beginPath();ctx.ellipse(0,0,n.len*0.78*bs,n.len*0.4*bs,0,0,Math.PI*2);ctx.fill();
+      ctx.restore();
     }
-    cur.a = it.a; cur.s = it.line || (cur.kind === "yesno" ? fresh("fact" + cur.mode, FACT[LANG].lines[cur.mode] || FACT[LANG].lines.savage) : cur.s);
-    $("answerText").textContent = cur.a; $("answerSub").textContent = cur.s; setOtherBtn();
-    var h = history.filter(function (x) { return x.id === cur.id; })[0]; if (h) { h.answer = cur.a; saveHist(); }
-    return true;
-  }
-  function applyLine(cur) {
-    if (!cur || !cur.line) return;
-    cur.line.then(function (t) {
-      if (!t || current !== cur || cur.status) return;
-      cur.s = t; $("answerSub").textContent = t; prepareShare();
-      if (Date.now() - revealedAt > 120) bump($("answerSub"), "swap");
-    });
-  }
-  function respond(text, face) {
-    setFace(face);
-    $("say").textContent = text;
-    bump($("say"), "on");
-    bump($("stageDie"), "cheer");
-  }
-  function finish(status, final) {
-    if (!current.status) save("settled", String(settledCount() + 1));
-    current.status = status; current.final = final;
-    var h = history.filter(function (x) { return x.id === current.id; })[0];
-    if (h) { h.status = status; h.final = final; saveHist(); }
-    $("stamp").textContent = status === "done" ? T("stampDone") : T("stampSwitch");
-    $("stamp").hidden = false; bump($("stamp"), "on"); fx("stamp");
-    $("otherBtn").hidden = true; $("chooser").hidden = true; $("shareBtn").hidden = true;
-    $("preActs").hidden = true; $("postActs").hidden = false;
-    $("newQ2").focus({ preventScroll: true });
-    prepareShare();
-  }
-  function commit() {
-    if (!current || current.status) return;
-    respond(RESPOND[current.mode].commit, current.mode + "_yes");
-    track("decide", roundProps({ outcome: "accepted" }));
-    finish("done", current.a);
-  }
-  function chooseOther(val) {
-    val = String(val || "").trim().toUpperCase();
-    if (!val) return;
-    respond(T("alreadyKnow"), current.mode + "_other");
-    track("decide", roundProps({ outcome: "switched" }));
-    $("answerText").textContent = val;
-    $("says").textContent = T("yourPick");
-    $("answerSub").textContent = T("tossySaid", { a: trimEnd(current.a) }) + RESPOND[current.mode].other;
-    finish("switch", val);
-  }
-  function setOtherBtn() {
-    /* open question: nothing to pick from — hide the link, TOSS AGAIN covers it.
-       Otherwise name the alternative, so the link reads naturally for every kind of question. */
-    var b = $("otherBtn"), o = current ? current.others : [];
-    b.hidden = !o.length;
-    if (!o.length) return;
-    var short = function (x) { var c = Array.from(x); return c.length > 18 ? c.slice(0, 17).join("") + "…" : x; };
-    if (current.kind === "yesno") b.textContent = T("otherHear", { o: o[0] });
-    else b.textContent = o.length === 1 ? T("otherOne", { o: short(o[0]) }) : T("otherMany");
-    if (o.length === 1) { b.removeAttribute("aria-controls"); b.removeAttribute("aria-expanded"); }
-    else { b.setAttribute("aria-controls", "chooser"); b.setAttribute("aria-expanded", "false"); }
-  }
-  function openChooser() {
-    if (state.busy || !current || !current.others.length) return;
-    /* only one alternative: the link already names it, so one tap switches */
-    if (current.others.length === 1) { track("other_opened", roundProps({ nudged: current.tosses >= 3 })); chooseOther(current.others[0]); return; }
-    var ch = $("chooser"), open = ch.hidden;
-    ch.hidden = !open; $("otherBtn").setAttribute("aria-expanded", String(open));
-    if (!open) return;
-    track("other_opened", roundProps({ nudged: current.tosses >= 3 }));
-    ch.innerHTML = '<p>' + esc(T("whichOne")) + '</p><div class="chips">' + current.others.map(function (o) {
-      var label = current.kind === "yesno" ? T("actually", { o: o }) : o;
-      return '<button class="chip" type="button" data-other="' + esc(o) + '">' + esc(label) + "</button>";
-    }).join("") + "</div>";
-    ch.querySelector(".chip").focus({ preventScroll: true });
-    ch.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
-  }
-
-  /* ---------- toss sequence ---------- */
-  function bump(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-  var cycleTimer = null;
-  function setFace(f) { $("stageFace").innerHTML = die(f); }
-  function startCycle() {
-    var i = 0;
-    clearInterval(cycleTimer);
-    cycleTimer = setInterval(function () { i = (i + 1 + Math.floor(Math.random() * 3)) % FACE_CYCLE.length; setFace(FACE_CYCLE[i]); }, 115);
-  }
-  function stopCycle() { clearInterval(cycleTimer); cycleTimer = null; }
-  function setPhase(p) {
-    var d = $("stageDie"), g = $("ground");
-    if (p === "start") {
-      stopCycle(); setFace(state.mode);
-      d.classList.remove("go", "up", "down"); g.classList.remove("go");
-      $("fx").classList.remove("on"); $("rolling").classList.remove("on"); $("answer").classList.remove("on");
-      void d.offsetWidth;
-      if (!reduce) { d.classList.add("go"); g.classList.add("go"); }
-    }
-    if (p === "launch") { d.classList.add("up"); startCycle(); fx("launch"); }
-    if (p === "hang") { d.classList.remove("up"); $("rolling").classList.add("on"); }
-    if (p === "drop") { $("rolling").classList.remove("on"); d.classList.add("down"); }
-    if (p === "impact") {
-      d.classList.remove("down"); stopCycle(); setFace("dizzy");
-      bump($("fx"), "on"); bump(document.querySelector(".arena"), "quake"); fx("land");
-    }
-    if (p === "settle") setFace(state.mode);
-    if (p === "reveal") {
-      stopCycle(); setFace(state.mode);
-      bump($("answer"), "on"); fx("reveal"); revealedAt = Date.now();
-      state.busy = false;
-      ["commit", "again", "newQ"].forEach(function (id) { $(id).disabled = false; });
-      $("commit").focus({ preventScroll: true });
-      applyLine(current); prepareShare();
-      /* 3rd toss of the same question: re-tossing is itself a preference signal */
-      if (current.randomQ && current.tosses === 1) { $("say").textContent = T("randomSay"); bump($("say"), "on"); }
-      if (current.tosses >= 3) {
-        var m = MODES[current.mode];
-        setFace(current.mode + "_other");
-        $("say").textContent = current.others.length ? m.third : m.thirdOpen;
-        bump($("say"), "on");
-        if (current.others.length) $("otherBtn").classList.add("hot");
+    if(n.t>0.3&&n.variety!==4&&fade>0.75){
+      const pc=n.variety===2?4:2;
+      for(let p=0;p<pc;p++){
+        const pa=ang+(p-(pc-1)/2)*0.7+Math.sin(now*0.0008+p+n.swayPhase)*0.18;
+        const pd=n.len*(n.variety===1||n.variety===2?1.2:0.9)+p*(isDesktop()?3.5:2);
+        ctx.globalAlpha=0.2*n.t*fade*(0.6+0.4*Math.sin(now*0.002+p+n.wobblePhase));
+        ctx.fillStyle=p%2===0?PINK:GOLD;
+        ctx.beginPath();ctx.arc(ex+Math.cos(pa)*pd,ey+Math.sin(pa)*pd*0.4,isDesktop()?1.3:1,0,Math.PI*2);ctx.fill();
       }
     }
+    const pulse=1+0.18*Math.sin(now*0.002*n.wobbleSpeed+n.wobblePhase);
+    const dotR=(n.variety===2?2.2:n.variety===4?1:1.4)*(isDesktop()?1.2:1)*pulse;
+    ctx.globalAlpha=(0.5+n.t*0.4)*fade;ctx.fillStyle=n.t>0.55?GOLD:PINK;
+    ctx.beginPath();ctx.arc(sx+wx*0.28,n.y,dotR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  });
+  particles=particles.filter(p=>{
+    p.life-=p.decay;if(p.life<=0)return false;
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.007;
+    ctx.globalAlpha=p.life*0.55;ctx.fillStyle=p.color;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;return true;
+  });
+  if(revealY>H*0.88){
+    const a=Math.min(1,(revealY-H*0.88)/(H*0.07))*0.8;
+    const sp=1+0.14*Math.sin(now*0.003);
+    ctx.globalAlpha=a;ctx.fillStyle=GOLD;
+    ctx.font=`${(isDesktop()?17:13)*sp}px serif`;ctx.textAlign='center';
+    ctx.fillText('✦',sx,isDesktop()?22:15);ctx.globalAlpha=1;
   }
-  function toss(power, again) {
-    power = typeof power === "number" ? power : 0;
-    var q = $("q").value.trim();
-    var hasOpts = state.options.filter(function (o) { return o.trim(); }).length >= 1;
-    if (state.busy) return;
-    /* empty box: "I don't know what to ask, just toss me something" → Tossy picks a question */
-    var randomQ = false;
-    if (!q && !hasOpts && !again) {
-      q = phShown || rnd(allPicks()); $("q").value = q; randomQ = true; state.fromPick = "random";
-    }
-    if (window.innerWidth <= 860 && document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    state.busy = true;
-    state.timers.forEach(clearTimeout); state.timers = [];
-    /* asked in Chinese on the English UI → switch the whole page to Chinese so the answer,
-       the reply line and the buttons all match. One direction only: Chinese users often type English. */
-    if (LANG === "en" && /[\u3400-\u9fff]/.test(q + " " + state.options.join(" "))) {
-      useLang("zh"); save("lang", "zh"); applyLang(); track("setting", { name: "lang", value: "zh", auto: true });
-    }
-    var res = decide(q, state.mode), prevA = current ? current.a : null;
-    /* re-toss on an open question: don't hand back the same idea */
-    for (var n = 0; again && current && res.kind === "idea" && res.a === current.a && n < 8; n++) res = decide(q, state.mode);
-    var optsShown = state.options.map(function (o) { return o.trim(); }).filter(Boolean);
-    /* one history entry per decision: TOSS AGAIN continues the open round */
-    var sameRound = again && current && !current.status;
-    var id = sameRound ? current.id : Date.now();
-    current = { id: id, q: q || optsShown.join(" / "), a: res.a, s: res.s, kind: res.kind, verdict: res.verdict || null, others: res.others, mode: state.mode, status: null, final: null, tosses: sameRound ? current.tosses + 1 : 1 };
-    /* no options given → the AI reads the question first and words the possible answers; the dice picks */
-    if ((res.kind === "idea" || res.kind === "yesno") && CONFIG.aiLineEndpoint) { current.prevA = prevA; current.ideas = requestIdeas(current); current.line = null; }
-    else current.line = requestLine(current, res);
-    current.randomQ = randomQ;
-    track("toss", roundProps({ options: optsShown.length, wildcard: optsShown.length > 0 && useWildcard(q), super_toss: power >= 0.95, from_suggestion: state.fromPick || null }));
-    state.fromPick = null;
-    var entry = history.filter(function (h) { return h.id === id; })[0];
-    if (entry) { entry.q = current.q; entry.mode = current.mode; entry.answer = res.a; entry.tosses = current.tosses; entry.t = Date.now(); history = [entry].concat(history.filter(function (h) { return h !== entry; })); }
-    else history.unshift({ id: id, q: current.q, answer: res.a, mode: state.mode, status: "open", final: null, tosses: 1, t: Date.now() });
-    history = history.slice(0, 20); saveHist();
-    stopListening();
-    var small = window.innerWidth <= 860;
-    var stageDie = $("stageDie");
-    var ah = document.querySelector(".arena").clientHeight || (small ? 300 : 440), k = ah / (small ? 300 : 440);
-    stageDie.style.setProperty("--rise", -Math.round(((small ? 150 : 170) + power * (small ? 70 : 110)) * k) + "px");
-    stageDie.classList.remove("t3", "t4", "t5");
-    stageDie.classList.add(power >= 0.95 ? "t5" : power >= 0.45 ? "t4" : "t3");
-    $("rolling").textContent = power >= 0.95 ? T("superToss") : T("rolling");
-    var shown = state.options.map(function (o) { return o.trim(); }).filter(Boolean);
-    if (shown.length && useWildcard(q)) shown.push("??");
-    $("qtag").textContent = T("q") + (q || shown.join(" / "));
-    $("says").textContent = T("says", { m: MODES[state.mode].label.toUpperCase() }) + (power >= 0.95 ? T("maxPower") : "");
-    $("answerText").textContent = res.a;
-    $("answerSub").textContent = res.s;
-    $("answer").classList.remove("on");
-    $("say").classList.remove("on"); $("stageDie").classList.remove("cheer");
-    $("stamp").hidden = true; $("chooser").hidden = true; $("otherBtn").hidden = false; $("otherBtn").classList.remove("hot"); setOtherBtn(); $("shareBtn").hidden = false;
-    $("preActs").hidden = false; $("postActs").hidden = true;
-    ["commit", "again", "newQ"].forEach(function (id) { $(id).disabled = true; });
-    $("ask").hidden = true; $("stage").hidden = false;
-    document.documentElement.setAttribute("data-screen", "stage");
-    if (!(window.history.state && window.history.state.tossy)) { try { window.history.pushState({ tossy: "stage" }, ""); } catch (e) {} }
-    setPhase("start");
-    var cur = current, ideas = cur.ideas;
-    if (reduce) {
-      var go = function () { if (ideas) useIdea(cur); setPhase("reveal"); };
-      if (ideas) { var waited = setTimeout(go, 3000); state.timers.push(waited); ideas.then(function () { if (current === cur && state.busy) { clearTimeout(waited); go(); } }); }
-      else state.timers.push(setTimeout(go, 150));
-      return;
-    }
-    var GATE = 1150;
-    var runFrom = function (offset) {
-      TIMELINE.forEach(function (t) { if (t[1] > offset) state.timers.push(setTimeout(function () { setPhase(t[0]); }, t[1] - offset)); });
-    };
-    if (!ideas) { runFrom(0); return; }
-    TIMELINE.forEach(function (t) { if (t[1] <= GATE) state.timers.push(setTimeout(function () { setPhase(t[0]); }, t[1])); });
-    state.timers.push(setTimeout(function () {
-      if (current !== cur) return;
-      if (ideas.done) { useIdea(cur); runFrom(GATE); return; }
-      /* not back yet: freeze the dice in the air (it keeps flipping faces) until the ideas land */
-      var d = $("stageDie"), g = $("ground"), released = false;
-      d.classList.add("hold"); g.classList.add("hold");
-      var release = function () {
-        if (released || current !== cur) return; released = true;
-        d.classList.remove("hold"); g.classList.remove("hold");
-        useIdea(cur); runFrom(GATE);
-      };
-      state.timers.push(setTimeout(release, 2500));
-      ideas.then(release);
-    }, GATE));
-  }
-  /* rotate the suggested questions: 3 picks from 3 different categories, never the exact same set twice */
-  var lastPicks = "";
-  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-  function rotatePicks() {
-    var bank = COPY[LANG].picks, set, key, tries = 0;
-    do {
-      set = shuffle(Object.keys(bank)).slice(0, 3).map(function (c) { return [c, rnd(bank[c])]; });
-      key = set.map(function (x) { return x[1]; }).join("|");
-    } while (key === lastPicks && ++tries < 10);
-    lastPicks = key;
-    $("picks").innerHTML = set.map(function (q) { return '<button class="pick" type="button" data-cat="' + q[0] + '">' + esc(q[1]) + "</button>"; }).join("");
-  }
-  var skipPop = false;
-  function backToAsk(clear) {
-    if (state.busy) return;
-    if (window.history.state && window.history.state.tossy) { skipPop = true; try { window.history.back(); } catch (e) {} }
-    leaveShared();
-    if (current && !current.status && !current.left) { current.left = true; track("abandon", roundProps()); }
-    rotatePicks();
-    if (clear === true) {
-      $("q").value = ""; state.options = []; state.wildcard = false;
-      renderOptions(); stopListening();
-      $("askDie").innerHTML = die(state.mode);
-    }
-    $("stage").hidden = true; $("ask").hidden = false;
-    document.documentElement.setAttribute("data-screen", "ask");
-    if (!$("q").value) rotatePh();
-    $("greeting").textContent = MODES[state.mode].greeting;
-    $("q").focus();
-  }
+  requestAnimationFrame(drawRail);
+}
 
-  /* ---------- events ---------- */
-  function closeTips() {
-    document.querySelectorAll(".tipwrap.open").forEach(function (w) { w.classList.remove("open"); var q = w.querySelector(".tip-q"); if (q) q.setAttribute("aria-expanded", "false"); });
-  }
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeTips(); });
-  document.addEventListener("click", function (e) {
-    var t = e.target.closest("button");
-    if (!t || !t.classList.contains("tip-q")) closeTips();
-    if (!t) return;
-    if (t.dataset.skin) { state.skin = t.dataset.skin; save("skin", state.skin); applySkin(); tapNew('[data-skin="' + state.skin + '"]'); track("setting", { name: "skin", value: state.skin }); return; }
-    if (t.dataset.mode) { state.mode = t.dataset.mode; save("mode", state.mode); applyMode(); tapNew('[data-mode="' + state.mode + '"]'); track("setting", { name: "mode", value: state.mode }); return; }
-    if (t.classList.contains("tip-q")) {
-      var w = t.parentNode, open = !w.classList.contains("open");
-      closeTips(); w.classList.toggle("open", open); t.setAttribute("aria-expanded", String(open));
-      return;
-    }
-    if (t.dataset.wildRemove) { state.wildcard = false; renderOptions(); $("wildBtn").focus(); return; }
-    if (t.dataset.remove) { state.options.splice(+t.dataset.remove, 1); if (!state.options.length) state.wildcard = false; renderOptions(); $("optToggle").focus(); return; }
-    if (t.classList.contains("pick")) {
-      $("q").value = t.textContent;
-      /* "coffee or tea?" → also lay the two sides out as options, so new users see how options work */
-      var sides = splitQuestion(t.textContent);
-      if (sides.length >= 2) { state.options = sides.slice(0, 5); state.wildcard = false; renderOptions(); }
-      onTyping(); $("q").focus(); state.fromPick = t.dataset.cat; track("suggestion_click", { category: t.dataset.cat }); return; }
-  });
-  $("options").addEventListener("input", function (e) { if (e.target.dataset.opt) { state.options[+e.target.dataset.opt] = e.target.value; updateWild(); } });
-  $("optToggle").addEventListener("click", function () {
-    if (state.options.length >= 5) return;
-    state.options.push("");
-    renderOptions();
-    $("opt" + (state.options.length - 1)).focus();
-  });
-  $("wildBtn").addEventListener("click", function () {
-    state.wildcard = true;
-    renderOptions();
-    $("optToggle").focus();
-  });
-  $("q").addEventListener("input", function () { onTyping(); updateWild(); });
-  /* long-press easter egg: hold TOSS IT! to charge */
-  var charge = { start: 0, raf: 0, active: false, fired: false, value: 0 };
-  var HOLD = 350, FULL = 1500;
-  function chargeTick() {
-    var held = performance.now() - charge.start;
-    if (held >= HOLD) {
-      if (!charge.active) {
-        charge.active = true;
-        stopListening();
-        $("tossBtn").classList.add("charging");
-        $("askDie").classList.remove("bob", "listen");
-        $("askDie").classList.add("charging");
-        $("tossLabel").textContent = T("charging");
-        $("greeting").textContent = T("easy"); fx("charge");
-      }
-      var v = Math.min(1, (held - HOLD) / (FULL - HOLD));
-      v = Math.round(v * 10) / 10;
-      charge.value = v;
-      [$("tossBtn"), $("askDie")].forEach(function (el) { el.style.setProperty("--charge", v); el.classList.toggle("max", v >= 1); });
-      if (v >= 1) { $("tossLabel").textContent = T("letGo"); if (!charge.buzzed) { charge.buzzed = true; fx("full"); } }
-    }
-    charge.raf = requestAnimationFrame(chargeTick);
-  }
-  function resetCharge() {
-    cancelAnimationFrame(charge.raf);
-    var wasActive = charge.active;
-    charge.active = false; charge.start = 0;
-    [$("tossBtn"), $("askDie")].forEach(function (el) { el.style.setProperty("--charge", 0); el.classList.remove("max", "charging"); });
-    $("tossLabel").textContent = T("toss");
-    if (wasActive) { $("askDie").classList.add("bob"); $("askDie").innerHTML = die(state.mode); $("greeting").textContent = MODES[state.mode].greeting; }
-    return wasActive;
-  }
-  $("tossBtn").addEventListener("pointerdown", function (e) {
-    if (e.pointerType === "touch" || e.button !== 0 || state.busy) return;
-    startCharge();
-    try { this.setPointerCapture(e.pointerId); } catch (err) {}
-  });
-  function startCharge() { charge.start = performance.now(); charge.fired = false; charge.value = 0; charge.buzzed = false; charge.raf = requestAnimationFrame(chargeTick); }
-  function releaseCharge() {
-    if (!charge.start) return false;
-    var v = charge.value, charged = resetCharge();
-    if (charged) { charge.fired = true; toss(Math.max(0.1, v)); }
-    return charged;
-  }
-  $("tossBtn").addEventListener("pointerup", function (e) { if (e.pointerType !== "touch") releaseCharge(); });
-  $("tossBtn").addEventListener("pointercancel", function (e) { if (e.pointerType !== "touch") resetCharge(); });
-  /* phones: own the touch so a long press is never turned into scrolling, text selection or a callout */
-  $("tossBtn").addEventListener("touchstart", function (e) {
-    if (state.busy) return;
-    e.preventDefault(); this.classList.add("pressed"); startCharge();
-  }, { passive: false });
-  $("tossBtn").addEventListener("touchend", function (e) {
-    e.preventDefault(); this.classList.remove("pressed");
-    if (!charge.start) return;
-    if (!releaseCharge()) toss(0);
-  }, { passive: false });
-  $("tossBtn").addEventListener("touchcancel", function () { this.classList.remove("pressed"); resetCharge(); });
-  $("tossBtn").addEventListener("contextmenu", function (e) { e.preventDefault(); });
-  $("tossBtn").addEventListener("click", function () {
-    if (charge.fired) { charge.fired = false; return; }
-    toss(0);
-  });
-  $("q").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); toss(0); } });
-  $("again").addEventListener("click", function () { if (!state.busy) { $("ask").hidden = true; toss(0, true); } });
-  $("newQ").addEventListener("click", function () { backToAsk(true); });
-  $("newQ2").addEventListener("click", function () { backToAsk(true); });
-  $("commit").addEventListener("click", commit);
-  $("otherBtn").addEventListener("click", openChooser);
-  $("chooser").addEventListener("click", function (e) {
-    var b = e.target.closest("button"); if (!b) return;
-    if (b.dataset.other) chooseOther(b.dataset.other);
-  });
-  $("shareBtn").addEventListener("click", quickShare);
-  $("shareBtn2").addEventListener("click", quickShare);
-  $("shareQ").addEventListener("change", refreshShare);
-  $("shareDl").addEventListener("click", function () { track("share_sent", roundProps({ via: "download", with_question: $("shareQ").checked })); });
-  $("shareNative").addEventListener("click", function () {
-    if (!shareBlob) return;
-    var file = new File([shareBlob], "tossy-result.png", { type: "image/png" });
-    track("share_sent", roundProps({ via: "native", with_question: $("shareQ").checked }));
-    navigator.share({ files: [file], title: "Tossy", text: T("shareText") + " " + resultLink($("shareQ").checked) }).catch(function () {});
-  });
-  $("shareLink").addEventListener("click", function () {
-    var url = resultLink($("shareQ").checked), btn = this;
-    track("share_sent", roundProps({ via: "link", with_question: $("shareQ").checked }));
-    var done = function () { btn.textContent = T("copied"); setTimeout(function () { btn.textContent = T("copyLink"); }, 1600); };
-    var legacy = function () {
-      var t = document.createElement("textarea"); t.value = url; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
-      $("share").appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (e) {} t.remove();
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, legacy); else legacy();
-  });
-  $("tossOwn").addEventListener("click", function () { track("shared_cta"); backToAsk(true); });
-  $("privacyBtn").addEventListener("click", function () { openDialog("privacy"); track("privacy_open"); });
-  function openRecent() { renderHist(); openDialog("recent"); }
-  $("recentBtn").addEventListener("click", openRecent);
-  $("histList").addEventListener("click", function (e) {
-    var b = e.target.closest("[data-del]"); if (!b) return;
-    history = history.filter(function (h) { return String(h.id) !== b.dataset.del; }); saveHist(); renderHist();
-    var next = $("histList").querySelector(".del"); (next || $("recent").querySelector("[data-close]")).focus();
-  });
-  $("clearHist").addEventListener("click", function () { history = []; saveHist(); save("settled", "0"); renderHist(); $("recent").querySelector("[data-close]").focus(); });
-  document.querySelectorAll(".overlay").forEach(function (o) {
-    o.addEventListener("click", function (e) { if (e.target === o || e.target.closest("[data-close]")) closeDialog(o); });
-  });
-  document.addEventListener("keydown", function (e) {
-    var open = Array.prototype.filter.call(document.querySelectorAll(".overlay"), function (o) { return !o.hidden; })[0];
-    if (open && e.key === "Tab") {
-      var f = Array.prototype.filter.call(open.querySelectorAll("button, a[href], input, [tabindex]:not([tabindex='-1'])"), function (el) { return !el.hidden && !el.disabled && el.offsetParent !== null; });
-      if (!f.length) return;
-      var first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      else if (!open.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
-      return;
-    }
-    if (e.key !== "Escape") return;
-    document.querySelectorAll(".overlay").forEach(function (o) { if (!o.hidden) closeDialog(o); });
-  });
-
-  /* ---------- placeholder shows a rotating example question; an empty toss uses the one on screen ---------- */
-  var phShown = null;
-  function allPicks() { var bank = COPY[LANG].picks, all = []; Object.keys(bank).forEach(function (c) { all = all.concat(bank[c]); }); return all; }
-  function rotatePh() {
-    if ($("ask").hidden || $("q").value) return;
-    var list = allPicks().filter(function (x) { return x !== phShown; });
-    phShown = rnd(list); $("q").placeholder = phShown;
-  }
-  setInterval(rotatePh, 4500);
-
-  /* ---------- mouse: pixel particle trail + confetti on click (desktop only) ---------- */
-  var burst = function () {};
-  (function () {
-    if (reduce) return;
-    var cv = document.createElement("canvas"), cx = cv.getContext("2d"), parts = [], raf = 0, last = null, dpr = 1;
-    cv.className = "fx-canvas"; cv.setAttribute("aria-hidden", "true"); document.body.appendChild(cv);
-    var COLS = ["#ff9dca", "#a88cf7", "#74d7f2", "#ffd463"];
-    function size() { dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
-    size(); addEventListener("resize", size);
-    function add(x, y, vx, vy, s, life) { if (parts.length > 160) parts.shift(); parts.push({ x: x, y: y, vx: vx, vy: vy, s: s, life: life, max: life, c: rnd(COLS) }); if (!raf) raf = requestAnimationFrame(tick); }
-    function tick() {
-      cx.clearRect(0, 0, cv.width, cv.height);
-      for (var i = parts.length - 1; i >= 0; i--) {
-        var p = parts[i]; p.life--; if (p.life <= 0) { parts.splice(i, 1); continue; }
-        p.vy += 0.14; p.vx *= 0.98; p.x += p.vx; p.y += p.vy;
-        cx.globalAlpha = Math.min(1, p.life / (p.max * 0.5));
-        cx.fillStyle = "#292544"; cx.fillRect(Math.round(p.x - 1) * dpr, Math.round(p.y - 1) * dpr, (p.s + 2) * dpr, (p.s + 2) * dpr);
-        cx.fillStyle = p.c; cx.fillRect(Math.round(p.x) * dpr, Math.round(p.y) * dpr, p.s * dpr, p.s * dpr);
-      }
-      cx.globalAlpha = 1;
-      raf = parts.length ? requestAnimationFrame(tick) : 0;
-    }
-    burst = function (x, y, n) { for (var i = 0; i < (n || 14); i++) { var a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 3.5; add(x, y, Math.cos(a) * v, Math.sin(a) * v - 2.5, 4 + Math.round(Math.random() * 2), 40 + Math.random() * 20); } };
-    document.addEventListener("pointermove", function (e) {
-      if (e.pointerType !== "mouse") return;
-      if (last && Math.hypot(e.clientX - last.x, e.clientY - last.y) < 18) return;
-      last = { x: e.clientX, y: e.clientY };
-      add(e.clientX + 6, e.clientY + 10, (Math.random() - 0.5) * 1.6, -0.6 - Math.random(), 3 + Math.round(Math.random() * 2), 26 + Math.random() * 14);
-    });
-    document.addEventListener("pointerdown", function (e) { if (e.button === 0) burst(e.clientX, e.clientY, e.pointerType === "mouse" ? 10 : 8); });
-  })();
-
-  /* ---------- dice: eyes follow the mouse, hop on hover, poke on click (ask + reveal) ---------- */
-  (function () {
-    var ask = $("askDie"), stage = $("stageDie"), mouse = null, pending = false;
-    function live(el) { return el === ask ? !$("ask").hidden : (!$("stage").hidden && !state.busy); }
-    function look() {
-      pending = false; if (!mouse) return;
-      [[ask, ask], [stage, $("stageFace")]].forEach(function (d) {
-        var g = d[1].querySelector(".face"); if (!g) return;
-        if (!live(d[0])) { g.style.transform = ""; return; }
-        var r = d[1].getBoundingClientRect(); if (!r.width) return;
-        var nx = (mouse.x - (r.left + r.width / 2)) / r.width, ny = (mouse.y - (r.top + r.height / 2)) / r.height;
-        var dx = Math.max(-1, Math.min(1, Math.round(nx * 1.4))) * 4, dy = Math.max(-1, Math.min(1, Math.round(ny * 1.4))) * 4;
-        g.style.transform = "translate(" + dx + "px," + dy + "px)";
-      });
-    }
-    var lastMove = 0, touchTimer = null;
-    document.addEventListener("pointermove", function (e) {
-      if (e.pointerType !== "mouse") return;
-      mouse = { x: e.clientX, y: e.clientY }; lastMove = Date.now();
-      if (!pending) { pending = true; requestAnimationFrame(look); }
-    });
-    /* phones: the dice looks at where you tapped, then back to you */
-    document.addEventListener("pointerdown", function (e) {
-      if (e.pointerType === "mouse") return;
-      mouse = { x: e.clientX, y: e.clientY }; lastMove = Date.now(); look();
-      clearTimeout(touchTimer);
-      touchTimer = setTimeout(function () { mouse = null; gaze(0, 0); }, 1600);
-    });
-    function gaze(dx, dy) {
-      [[ask, ask], [stage, $("stageFace")]].forEach(function (d) {
-        var g = d[1].querySelector(".face"); if (!g || !live(d[0])) return;
-        g.style.transform = "translate(" + dx * 4 + "px," + dy * 4 + "px)";
-      });
-    }
-    /* idle: every few seconds it glances somewhere, then looks back */
-    setInterval(function () {
-      if (reduce || document.hidden || Date.now() - lastMove < 3000) return;
-      var dirs = [[-1, 0], [1, 0], [0, -1], [-1, -1], [1, -1]], d = dirs[Math.floor(Math.random() * dirs.length)];
-      gaze(d[0], d[1]);
-      setTimeout(function () { if (Date.now() - lastMove >= 3000) gaze(0, 0); }, 900);
-    }, 3200);
-    function busyFace() { return ask.classList.contains("listen") || ask.classList.contains("charging"); }
-    function replay(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-    [ask, stage].forEach(function (el) { el.addEventListener("animationend", function (e) { if (e.animationName === "hop") el.classList.remove("hovering"); if (e.animationName === "poke") el.classList.remove("poked"); }); });
-    ask.addEventListener("mouseenter", function () {
-      if (busyFace() || ask.dataset.hover) return;
-      ask.dataset.hover = "1"; ask.innerHTML = die(state.mode + "_yes"); replay(ask, "hovering"); look();
-    });
-    ask.addEventListener("mouseleave", function () { delete ask.dataset.hover; if (!busyFace()) { ask.innerHTML = die(state.mode); look(); } });
-    stage.addEventListener("mouseenter", function () { if (live(stage)) replay(stage, "hovering"); });
-    var pokeTimer = null;
-    function poke(el, e) {
-      if (!live(el)) return;
-      replay(el, "poked"); fx("poke");
-      var r = (el === ask ? ask : $("stageFace")).getBoundingClientRect();
-      burst(r.left + r.width / 2, r.top + r.height * 0.3, 18);
-      var line = COPY[LANG].poke[state.shared ? state.sharedMode : (el === ask ? state.mode : current ? current.mode : state.mode)];
-      if (el === ask && !busyFace()) {
-        $("greeting").textContent = line; clearTimeout(pokeTimer);
-        pokeTimer = setTimeout(function () { if (!busyFace()) $("greeting").textContent = MODES[state.mode].greeting; }, 2200);
-      } else if (el === stage && !$("say").classList.contains("on")) {
-        $("say").textContent = line; bump($("say"), "on"); clearTimeout(pokeTimer);
-        pokeTimer = setTimeout(function () { if ($("say").textContent === line) $("say").classList.remove("on"); }, 2000);
-      }
-    }
-    ask.addEventListener("click", function (e) { poke(ask, e); });
-    stage.addEventListener("click", function (e) { poke(stage, e); });
-  })();
-
-  /* ---------- pull to refresh (own version) ----------
-     The native bounce is off (html,body{overscroll-behavior:none}) because iPhone Safari paints
-     the bounce area as a flat color. Here the content slides down over the dotted background
-     and a tiny dice shows up; pull far enough and release to reload. */
-  (function () {
-    if (!("ontouchstart" in window)) return;
-    var ptr = document.createElement("div"), TH = 70, MAX = 120, y0 = null, x0 = 0, pull = 0;
-    ptr.className = "ptr"; ptr.setAttribute("aria-hidden", "true");
-    ptr.innerHTML = '<div class="ptr-die"></div><span class="ptr-t"></span>';
-    document.body.appendChild(ptr);
-    var moving = function () { return [document.querySelector(".top"), document.querySelector("main"), document.querySelector(".copy")].filter(Boolean); };
-    function setPull(p, animate) {
-      pull = p;
-      moving().forEach(function (el) { el.style.transition = animate ? "transform .22s ease-out" : "none"; el.style.transform = p ? "translateY(" + p + "px)" : ""; });
-      ptr.style.transition = animate ? "transform .22s ease-out, opacity .22s" : "none";
-      ptr.style.transform = "translate(-50%," + (p - 64) + "px)";
-      ptr.style.opacity = p > 8 ? 1 : 0;
-      var ready = p >= TH;
-      if (ready !== ptr.classList.contains("ready")) { ptr.classList.toggle("ready", ready); ptr.querySelector(".ptr-t").textContent = ready ? T("ptrRelease") : T("ptrPull"); if (ready) fx("charge"); }
-    }
-    document.addEventListener("touchstart", function (e) {
-      y0 = null;
-      if (e.touches.length !== 1 || window.scrollY > 0 || state.busy) return;
-      if (Array.prototype.some.call(document.querySelectorAll(".overlay"), function (o) { return !o.hidden; })) return;
-      if (e.target.closest("#tossBtn, input")) return;
-      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX;
-      ptr.querySelector(".ptr-die").innerHTML = die(state.mode);
-      ptr.querySelector(".ptr-t").textContent = T("ptrPull"); ptr.classList.remove("ready", "go");
-    }, { passive: true });
-    document.addEventListener("touchmove", function (e) {
-      if (y0 === null) return;
-      var dy = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
-      if (window.scrollY > 0 || (pull === 0 && dx > dy)) { y0 = null; if (pull) setPull(0, true); return; }
-      setPull(dy > 0 ? Math.min(MAX, dy * 0.45) : 0, false);
-    }, { passive: true });
-    function end() {
-      if (y0 === null && !pull) return;
-      y0 = null;
-      if (pull >= TH) {
-        ptr.classList.add("go"); setPull(TH, true); fx("launch"); track("pull_refresh");
-        setTimeout(function () { location.reload(); }, 450);
-      } else if (pull) setPull(0, true);
-    }
-    document.addEventListener("touchend", end, { passive: true });
-    document.addEventListener("touchcancel", end, { passive: true });
-  })();
-
-  /* ---------- boot ---------- */
-  $("brand").addEventListener("click", function (e) {
-    e.preventDefault();
-    if (!$("ask").hidden) { $("q").focus(); return; }
-    /* leaving mid-toss: stop the animation cleanly */
-    state.timers.forEach(clearTimeout); state.timers = []; stopCycle(); state.busy = false;
-    backToAsk(true);
-  });
-  /* phone back gesture / browser back: stage → ask page (question kept), not out of the site */
-  addEventListener("popstate", function () {
-    if (skipPop) { skipPop = false; return; }
-    if ($("stage").hidden) return;
-    state.timers.forEach(clearTimeout); state.timers = []; stopCycle(); state.busy = false;
-    track("back_gesture", roundProps());
-    backToAsk(false);
-  });
-  /* tone/skin buttons are redrawn on tap, so the pop goes on the new button */
-  function tapNew(sel) { if (lastPointer === "mouse") return; document.querySelectorAll(sel).forEach(function (b) { b.classList.add("tap"); }); }
-  /* touch screens have no hover: every tap gets a little pop instead */
-  var lastPointer = "mouse";
-  document.addEventListener("pointerdown", function (e) { lastPointer = e.pointerType; }, true);
-  document.addEventListener("touchstart", function () {}, { passive: true }); /* enables :active on iOS */
-  document.addEventListener("click", function (e) {
-    if (lastPointer === "mouse") return;
-    var t = e.target.closest("button, .pick, .skin, a.act"); if (!t || t.id === "tossBtn") return;
-    t.classList.remove("tap"); void t.offsetWidth; t.classList.add("tap");
-  }, true);
-  document.addEventListener("animationend", function (e) { if (e.animationName === "tapPop" && e.target.classList) e.target.classList.remove("tap"); });
-  $("langBtn").addEventListener("click", function () {
-    useLang(LANG === "zh" ? "en" : "zh"); save("lang", LANG); applyLang(); track("setting", { name: "lang", value: LANG });
-    stopListening(); $("greeting").textContent = MODES[state.mode].greeting;
-  });
-  $("soundBtn").addEventListener("click", function () {
-    state.sound = !state.sound; save("sound", state.sound ? "on" : "off"); applySound(); track("setting", { name: "sound", value: state.sound ? "on" : "off" });
-    fx("reveal");
-  });
-  applySkin(); applyLang(); applySound();
-  track("$pageview");
-  var sharedResult = readShared();
-  if (sharedResult) showShared(sharedResult);
-})();
+setupRail();
+window.addEventListener('scroll',()=>{scrollProgress=Math.min(1,(window.scrollY+window.innerHeight*0.2)/totalH)});
+window.addEventListener('resize',()=>{setupRail();resizeHero();scrollProgress=Math.min(1,(window.scrollY+window.innerHeight*0.2)/totalH)});
+window.addEventListener('orientationchange',()=>{setTimeout(()=>{setupRail();resizeHero();scrollProgress=Math.min(1,(window.scrollY+window.innerHeight*0.2)/totalH)},300)});
+setTimeout(()=>{setupRail();scrollProgress=0.1;requestAnimationFrame(drawRail)},300);
 </script>
 </body>
 </html>
