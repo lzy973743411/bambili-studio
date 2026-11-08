@@ -1,0 +1,1564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tossy.me Case Study · Zhiyi Li</title>
+<meta name="description" content="How I designed and shipped Tossy, a playful decision tool where the dice decides and AI only speaks.">
+<meta property="og:title" content="Tossy.me Case Study">
+<meta property="og:description" content="A playful decision tool that uses randomness to help people stop over-thinking small choices.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' shape-rendering='crispEdges'%3E%3Crect width='28' height='28' fill='%23292544'/%3E%3Crect x='4' y='4' width='20' height='20' fill='%2374d7f2'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23292544'/%3E%3Crect x='16' y='16' width='4' height='4' fill='%23292544'/%3E%3C/svg%3E">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+/* Tossy.me design tokens, Aqua skin (the site default) */
+:root{
+  color-scheme:light;
+  --bg:#edf9fc;--dots:#cdeef6;--line:#292544;--text:#292544;--sub:#4a4766;--card:#ffffff;--hard:#292544;
+  --btn:#74d7f2;--btnText:#292544;--bubble:#74d7f2;--drop:#a6e3f0;--shade:#cdeef6;--body:#f3fcfe;--on:#292544;
+  --mode:#a88cf7;--pink:#ff9dca;--lav:#a88cf7;--aqua:#74d7f2;--yel:#ffd463;
+  --px:'Press Start 2P','Silkscreen',ui-monospace,'PingFang SC','Microsoft YaHei',monospace;
+  --ui:'Silkscreen',ui-monospace,'PingFang SC','Microsoft YaHei',monospace;
+  --read:'DM Sans',system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;
+  --d:128px;
+}
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:16px 16px;color:var(--text);font:400 17px/1.65 var(--read);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:clamp(16px,4vw,48px)}
+p{margin:0}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+
+/* pixel die parts (same classes as the product) */
+.d-drop{fill:var(--drop)}.d-line{fill:var(--line)}.d-body{fill:var(--body)}.d-shade{fill:var(--shade)}.d-hi{fill:#fff}.d-blush{fill:#ff9dca}
+.d-ring{fill:none;stroke:var(--line);stroke-width:4}
+.die svg{display:block;width:100%;height:100%}
+
+/* ---------- shared product components ---------- */
+.tag{display:inline-flex;align-items:center;gap:8px;padding:5px 10px;background:var(--mode);border:2px solid var(--line);color:var(--on);font:700 12px/1 var(--ui);text-transform:uppercase;letter-spacing:.02em}
+.tag i{width:8px;height:8px;background:var(--on)}
+.act{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:56px;padding:0 22px;border:3px solid var(--line);background:var(--card);box-shadow:5px 5px 0 var(--hard);font:13px/1 var(--px);color:var(--text);text-decoration:none;transition:transform .08s steps(2),box-shadow .08s steps(2)}
+.act.primary{background:var(--btn);color:var(--btnText)}
+.act:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--hard)}
+.act:active{transform:translate(3px,3px);box-shadow:none}
+.act.small{height:42px;font-size:10px;padding:0 14px;box-shadow:3px 3px 0 var(--hard)}
+.todo{display:inline-block;padding:2px 6px;background:var(--yel);border:2px solid var(--line);color:var(--line);font:700 11px/1.2 var(--ui);letter-spacing:.02em;vertical-align:1px;white-space:nowrap}
+.panel{background:var(--card);border:4px solid var(--line);box-shadow:8px 8px 0 var(--hard)}
+.card{background:var(--card);border:2px solid var(--line);box-shadow:3px 3px 0 var(--hard)}
+.label{font:700 12px/1.3 var(--ui);letter-spacing:.04em;text-transform:uppercase;color:var(--sub)}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:28px}
+.brand{display:flex;align-items:center;gap:12px;font:14px/1 var(--px);text-decoration:none}
+.top-right{display:flex;align-items:center;gap:12px}
+.top .tog{height:40px;padding:0 12px;display:flex;align-items:center;background:var(--card);border:2px solid var(--line);box-shadow:2px 2px 0 var(--hard);font:700 13px/1 var(--ui);text-decoration:none}
+.top .tog.live{background:var(--btn)}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(20px,4vw,48px) clamp(48px,6vw,72px)}
+.hero h1{margin-top:22px;font:clamp(30px,5vw,56px)/1.25 var(--px);letter-spacing:0}
+.hero .sub{margin-top:22px;font-size:clamp(18px,2vw,21px);line-height:1.5;color:var(--sub);max-width:32ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:32px}
+
+.demo{padding:18px;display:grid;gap:14px}
+.demo-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mbtn{height:52px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:3px solid var(--line);background:var(--card);box-shadow:3px 3px 0 var(--hard);font:8px/1 var(--px);text-transform:uppercase;transition:transform .1s steps(2)}
+.mbtn .die{width:22px;height:22px}
+.mbtn[aria-pressed="true"]{background:var(--c);box-shadow:4px 4px 0 var(--hard);transform:translate(-1px,-2px)}
+.qbar{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border:3px solid var(--line);box-shadow:4px 4px 0 var(--hard);background:var(--card)}
+.qbar span{flex:1;min-width:0;font:15px/1.3 var(--ui);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cta{height:44px;padding:0 16px;flex-shrink:0;border:3px solid var(--line);background:var(--btn);box-shadow:3px 3px 0 var(--line);color:var(--btnText);font:12px/1 var(--px)}
+.cta:active{transform:translate(3px,3px);box-shadow:none}
+.cta:disabled{opacity:.6;cursor:default}
+
+.arena{position:relative;height:250px;overflow:visible}
+.arena .die-wrap{position:absolute;left:calc(50% - var(--d) / 2);top:calc(50% - var(--d) / 2 + 14px);width:var(--d);height:var(--d);transform-origin:50% 60%}
+.arena .die-wrap svg{width:100%;height:100%;display:block}
+.arena{--T:2600ms;--rise:-110px}
+.flyer,.tumble,.squash{position:absolute;inset:0}
+.squash{transform-origin:50% 100%}
+.tumble{transform-origin:50% 55%}
+.trail{position:absolute;left:50%;width:30px;margin-left:-15px;height:22px;display:flex;justify-content:space-between;visibility:hidden}
+.trail i{width:5px;height:100%;background:var(--line);opacity:.35}
+.trail i:nth-child(2){height:70%;align-self:flex-end;background:var(--bubble);opacity:.9}
+.die-wrap.up .trail{visibility:visible;top:calc(100% + 6px);animation:blink .18s steps(2) infinite}
+.die-wrap.down .trail{visibility:visible;bottom:calc(100% + 6px);animation:blink .18s steps(2) infinite}
+.die-wrap.go .flyer{animation:fly var(--T) linear forwards}
+.die-wrap.go .squash{animation:squash var(--T) linear forwards}
+.die-wrap.go .tumble{animation:tumble3 var(--T) linear forwards}
+.ground{position:absolute;left:calc(50% - var(--d) * .32);top:calc(50% + var(--d) / 2 + 26px);width:calc(var(--d) * .64);height:10px;background:var(--drop)}
+.ground.go{animation:shadowT var(--T) linear forwards}
+.arena.quake{animation:quake .28s steps(4)}
+.rolling{position:absolute;left:0;right:0;top:calc(50% + 30px);z-index:3;margin:0;text-align:center;font:12px/1 var(--px);visibility:hidden}
+.rolling.on{visibility:visible;animation:blink .6s steps(2) infinite}
+.fx{position:absolute;inset:0;pointer-events:none;visibility:hidden}
+.fx .ring{position:absolute;left:calc(50% - var(--d) * .64);top:calc(50% + var(--d) / 2 + 10px);width:calc(var(--d) * 1.28);height:40px;border:3px solid var(--line)}
+.fx .ring.b{border-color:var(--bubble)}
+.fx .dust{position:absolute;top:calc(50% + var(--d) / 2 + 16px);width:8px;height:8px;background:var(--line)}
+.fx .dust.l{left:calc(50% - var(--d) * .5)}.fx .dust.r{left:calc(50% + var(--d) * .5 - 8px)}
+.fx .spark{position:absolute;top:calc(50% + var(--d) / 2 - 4px);left:calc(50% - 4px);width:8px;height:8px;background:#ffd463;outline:2px solid var(--line)}
+.fx.on{visibility:visible}
+.fx.on .ring{animation:ripple .6s steps(5) forwards}
+.fx.on .ring.b{opacity:0;animation-delay:.15s}
+.fx.on .dust.l{animation:dustL .5s steps(4) forwards}
+.fx.on .dust.r{animation:dustR .5s steps(4) forwards}
+.fx.on .spark.a{animation:sparkA .45s cubic-bezier(.2,.8,.4,1) forwards}
+.fx.on .spark.b{animation:sparkB .45s cubic-bezier(.2,.8,.4,1) forwards}
+.fx.on .spark.c{animation:sparkC .5s cubic-bezier(.2,.8,.4,1) forwards}
+.fx.on .spark.d{animation:sparkD .5s cubic-bezier(.2,.8,.4,1) forwards}
+.bob{animation:bob 1.2s steps(2) infinite}
+
+.answer{position:relative;padding:18px 20px;background:var(--card);border:4px solid var(--line);box-shadow:7px 7px 0 var(--bubble);display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.answer .says{padding:5px 10px;background:var(--mode);border:2px solid var(--line);color:var(--on);font:700 12px/1 var(--ui);text-transform:uppercase}
+.answer h3,.answer .big{font:26px/1.3 var(--px);overflow-wrap:anywhere}
+.answer p{font:15px/1.45 var(--ui);color:var(--sub);text-transform:uppercase}
+.demo .answer{min-height:150px;margin-right:7px;margin-bottom:7px}
+.demo .answer.wait{justify-content:center;align-items:center;box-shadow:7px 7px 0 var(--shade);border-style:dashed}
+.demo .answer.wait p{font-size:12px}
+.answer.on{animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both}
+
+/* snapshot strip */
+.snapshot{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.1fr .8fr;margin-bottom:clamp(64px,9vw,112px)}
+.snapshot > div{padding:18px 20px;border-right:2px solid var(--line);display:grid;gap:8px;align-content:start}
+.snapshot > div:last-child{border-right:0}
+.snapshot dt{font:700 12px/1 var(--ui);text-transform:uppercase;color:var(--sub)}
+.snapshot dd{margin:0;font-size:15px;line-height:1.5}
+
+/* ---------- sections ---------- */
+section.cs{padding-block:clamp(56px,8vw,104px);border-top:3px dashed var(--line);display:grid;gap:36px}
+.head{display:grid;gap:18px}
+.eyebrow{display:flex;align-items:center;gap:12px}
+.num{min-width:34px;height:30px;padding:0 6px;display:grid;place-items:center;background:var(--btn);border:2px solid var(--line);font:11px/1 var(--px)}
+h2{font:clamp(20px,2.9vw,32px)/1.45 var(--px);text-transform:uppercase;max-width:26ch}
+.prose{max-width:62ch;display:grid;gap:18px;color:var(--sub)}
+.prose strong{color:var(--text);font-weight:700}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:start}
+
+/* pull quote = the die talking, like the ask screen */
+.quote{display:flex;align-items:flex-start;gap:18px;margin:0}
+.quote .die{width:72px;height:72px;flex-shrink:0}
+.quote .bubble{position:relative;padding:16px 18px;background:var(--card);border:3px solid var(--line);box-shadow:4px 4px 0 var(--bubble);font:clamp(13px,1.5vw,16px)/1.75 var(--px);text-transform:uppercase}
+.quote .bubble svg{position:absolute;left:-12px;top:20px}
+
+/* big quote = answer card */
+.bigq{max-width:760px;padding:clamp(20px,3vw,32px) clamp(20px,3vw,36px);gap:16px}
+.bigq .big{font-size:clamp(18px,2.8vw,30px);line-height:1.55;text-transform:uppercase}
+.bigq .big em{font-style:normal;background:var(--btn);padding:0 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+.ph{border:3px dashed var(--line);background:rgba(255,255,255,.55);padding:18px;display:grid;gap:6px;align-content:end;min-height:150px}
+.ph .label{color:var(--lav)}
+.ph p{font-size:14px;color:var(--sub)}
+
+/* 02 scenes */
+.scenes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.scene{padding:16px;display:grid;gap:10px;align-content:start}
+.scene .b{font-size:15px;line-height:1.45}
+.chat{display:inline-block;padding:4px 8px;margin:0 4px 6px 0;border:2px dashed var(--line);font:700 12px/1.2 var(--ui);text-transform:uppercase;color:var(--sub)}
+
+/* 03 */
+.nos{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.nos li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.nos .x{height:28px;padding:0 8px;display:grid;place-items:center;border:2px dashed var(--line);font:9px/1 var(--px);color:var(--sub);white-space:nowrap}
+.nos b{display:block;color:var(--text)}
+.isnt{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.isnt > div{padding:16px;display:grid;gap:12px;align-content:start}
+.isnt .no{border:3px dashed var(--line);background:rgba(255,255,255,.55)}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;color:var(--sub)}
+.pc span{border:1px solid #c9c6d8;padding:4px 6px;background:#fff}
+.pc span:nth-child(-n+2){font:700 11px/1.3 var(--ui)}
+.mini-ask{display:flex;gap:8px;align-items:center;padding:5px 5px 5px 10px;border:3px solid var(--line);box-shadow:4px 4px 0 var(--hard);background:#fff}
+.mini-ask span{flex:1;font:12px/1.2 var(--ui);text-transform:uppercase}
+.mini-ask b{padding:8px 8px;background:var(--btn);border:2px solid var(--line);font:8px/1 var(--px);font-weight:400}
+.isnt .yes .die{width:64px;height:64px;justify-self:center}
+
+.evo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.evo figure{margin:0;display:grid;gap:12px}
+.frame{aspect-ratio:4/3;max-width:100%;border:3px solid var(--line);box-shadow:4px 4px 0 var(--hard);display:grid;place-items:center;position:relative;overflow:hidden}
+.f1{background:radial-gradient(circle at 50% 45%,#5a3e1b,#1a120a 70%)}
+.f1 i{width:32%;aspect-ratio:1;border:2px solid #d8b25a;transform:rotate(45deg);box-shadow:0 0 30px rgba(216,178,90,.5)}
+.f1 b{position:absolute;bottom:12%;font:italic 400 13px/1 Georgia,serif;color:#d8b25a;letter-spacing:.2em}
+.f2{background:radial-gradient(circle at 50% 45%,#1e2050,#07070f 70%)}
+.f2 i{width:30%;aspect-ratio:1;border-radius:22%;background:linear-gradient(145deg,rgba(255,255,255,.35),rgba(124,138,255,.4) 50%,rgba(158,122,255,.35));border:1px solid rgba(255,255,255,.4);box-shadow:0 0 40px rgba(124,138,255,.5)}
+.f2 b{position:absolute;bottom:12%;font:200 15px/1 var(--read);color:#fff;letter-spacing:.02em}
+.f3{background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:12px 12px}
+.f3 .die{width:34%;aspect-ratio:1}
+.f3 b{position:absolute;bottom:10%;font:11px/1 var(--px);font-weight:400}
+.evo figcaption{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.evo figcaption b{font:12px/1 var(--px);font-weight:400;text-transform:uppercase}
+.caption{font-size:15px;color:var(--sub);max-width:70ch}
+
+/* 04 */
+.loop{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.loop span{padding:10px 12px;border:3px solid var(--line);background:var(--card);box-shadow:3px 3px 0 var(--hard);font:11px/1 var(--px)}
+.loop span.hl{background:var(--btn)}
+.loop em{font:11px/1 var(--px);font-style:normal}
+.beats-scroll{overflow-x:auto;padding:4px 8px 12px 0}
+.beats{display:grid;grid-template-columns:repeat(6,minmax(138px,1fr));gap:14px;min-width:880px}
+.beat{padding:12px;display:grid;gap:8px;align-content:start}
+.beat .cell{position:relative;aspect-ratio:1;max-width:100%;background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:10px 10px;border:2px solid var(--line);overflow:hidden}
+.beat .cell .die{position:absolute;left:50%;width:44%;aspect-ratio:1;transform:translateX(-50%)}
+.beat .cell .gnd{position:absolute;left:34%;right:34%;bottom:12%;height:5px;background:var(--drop)}
+.beat .cell .rg{position:absolute;left:14%;right:14%;bottom:6%;height:18%;border:2px solid var(--line)}
+.beat .cell .tr{position:absolute;left:50%;width:14px;margin-left:-7px;height:12px;display:flex;justify-content:space-between}
+.beat .cell .tr i{width:3px;height:100%;background:var(--line);opacity:.4}
+.beat .cell .tr i:nth-child(2){background:var(--bubble);opacity:1;height:70%;align-self:flex-end}
+.beat .cell .txt{position:absolute;left:0;right:0;text-align:center;font:8px/1 var(--px)}
+.beat .n{font:700 11px/1 var(--ui);color:var(--sub)}
+.beat b{font:11px/1.3 var(--px);font-weight:400;text-transform:uppercase}
+.beat .ms{font:700 13px/1.2 var(--ui);font-variant-numeric:tabular-nums}
+.beat .ms small{display:block;font:400 12px/1.35 var(--read);color:var(--sub);margin-top:4px}
+.reveals{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.reveals .answer{margin:0 7px 7px 0}
+.reveals .qq{font:700 12px/1.3 var(--ui);color:var(--sub);text-transform:uppercase}
+
+/* 05 fork */
+.fork{display:grid;grid-template-columns:minmax(0,260px) 40px minmax(0,1fr);align-items:center}
+.fork .root{margin:0 7px 7px 0}
+.fork .root .big{font-size:22px}
+.fork .rail{align-self:stretch;position:relative}
+.fork .rail::before{content:"";position:absolute;left:0;right:50%;top:50%;border-top:3px solid var(--line)}
+.fork .rail::after{content:"";position:absolute;left:50%;top:11%;bottom:11%;border-left:3px solid var(--line)}
+.branches{display:grid;gap:14px}
+.br{position:relative;display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:18px;align-items:center;padding:14px 16px;background:var(--card);border:2px solid var(--line)}
+.br::before{content:"";position:absolute;right:100%;top:50%;width:20px;border-top:3px solid var(--line)}
+.br .act{width:100%;cursor:default}
+.br .act:hover{transform:none;box-shadow:5px 5px 0 var(--hard)}
+.br .act.small:hover{box-shadow:3px 3px 0 var(--hard)}
+.br .t{font-size:15px;line-height:1.5;color:var(--sub)}
+.br .t b{color:var(--text)}
+.br.hl{background:#f3eeff;border:3px solid var(--line);box-shadow:5px 5px 0 var(--lav)}
+.hot{height:40px;padding:0 14px;display:inline-flex;align-items:center;background:var(--lav);border:2px solid var(--line);box-shadow:3px 3px 0 var(--hard);font:700 13px/1 var(--ui);text-transform:uppercase;white-space:nowrap}
+.hot::after{content:" ◀";margin-left:6px}
+.thirds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.third{display:grid;justify-items:center;gap:14px;text-align:center}
+.third .say{position:relative;padding:10px 12px;background:var(--card);border:3px solid var(--line);box-shadow:4px 4px 0 var(--bubble);font:700 13px/1.35 var(--ui);text-transform:uppercase;text-wrap:balance}
+.third .say::after{content:"";position:absolute;left:50%;top:100%;margin-left:-7px;border:7px solid transparent;border-top-color:var(--line)}
+.third .die{width:84px;height:84px}
+.third .tag{font-size:11px}
+
+/* 06 */
+.roles{display:grid;grid-template-columns:minmax(0,1fr) 8px minmax(0,1fr);gap:clamp(16px,3vw,32px)}
+.roles .divider{background:repeating-linear-gradient(var(--line) 0 8px,transparent 8px 16px)}
+.role{padding:20px;display:grid;gap:14px;align-content:start}
+.role h3{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font:14px/1.4 var(--px);text-transform:uppercase}
+.role ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.role li{padding:12px 14px;border:2px solid var(--line);background:#fff;display:grid;gap:2px}
+.role li b{font:700 14px/1.3 var(--ui);text-transform:uppercase}
+.role li span{font-size:15px;color:var(--sub)}
+.role li.never{border-style:dashed;background:transparent}
+.voices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.voice{margin:0 7px 7px 0;padding:14px 14px 16px}
+.voice .top-row{display:flex;justify-content:space-between;align-items:center;width:100%}
+.voice .die{width:40px;height:40px}
+.voice .big{font-size:17px}
+.voice p{font-size:13px}
+.voice .hope{font:700 11px/1.3 var(--ui);text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;margin-top:2px}
+.note{font:700 12px/1.5 var(--ui);color:var(--sub);text-transform:uppercase;max-width:80ch}
+
+/* 07 details */
+.details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.det{display:grid;gap:12px;align-content:start}
+.det .show{aspect-ratio:4/3;max-width:100%;border:3px solid var(--line);box-shadow:4px 4px 0 var(--hard);background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:12px 12px;display:grid;place-items:center;padding:14px;position:relative;overflow:hidden}
+.det h3{font:13px/1.3 var(--px);text-transform:uppercase}
+.det p{font-size:15px;color:var(--sub)}
+.mrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.mrow .die{width:100%;aspect-ratio:1}
+.skinrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.skinrow > div{aspect-ratio:1;background:var(--bg);border:2px solid var(--line);display:grid;place-items:center;padding:14%}
+.skinrow .die{width:100%;aspect-ratio:1}
+.speaker{display:flex;align-items:center;gap:14px}
+.speaker .notes{font:14px/1.6 var(--px);color:var(--sub)}
+.phone{width:38%;aspect-ratio:9/16;border:3px solid var(--line);background:#fff;display:grid;place-items:center;position:relative;box-shadow:3px 3px 0 var(--hard);animation:buzz 1.6s steps(2) infinite}
+.phone .die{width:60%;aspect-ratio:1}
+.phone::before,.phone::after{content:"";position:absolute;top:30%;bottom:30%;width:4px;background:var(--line)}
+.phone::before{left:-14px}.phone::after{right:-14px}
+@keyframes buzz{0%,70%,100%{transform:translateX(0)}75%{transform:translateX(-3px)}85%{transform:translateX(3px)}}
+.zh{display:grid;gap:10px;text-align:center}
+.zh .row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.zh .row span{padding:4px 8px;border:2px solid var(--line);background:var(--c);font:700 14px/1.2 'PingFang SC','Microsoft YaHei',var(--ui)}
+.zh .say{padding:8px 10px;background:#fff;border:3px solid var(--line);box-shadow:3px 3px 0 var(--bubble);font:700 14px/1.5 'PingFang SC','Microsoft YaHei',sans-serif}
+.eggs{list-style:none;margin:0;padding:0;display:grid;gap:6px;width:100%}
+.eggs li{padding:6px 8px;background:#fff;border:2px solid var(--line);font:700 12px/1.3 var(--ui);text-transform:uppercase}
+
+/* 08 */
+.findings{display:grid;gap:18px}
+.find{display:grid;grid-template-columns:130px minmax(0,1fr);gap:22px;padding:22px}
+.find .k{font:10px/1.5 var(--px);text-transform:uppercase}
+.find h3{font:14px/1.6 var(--px);text-transform:uppercase;margin-bottom:10px}
+.find p{color:var(--sub)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.steps div{padding:10px 12px;border:2px dashed var(--line);font-size:14px;color:var(--sub);line-height:1.45}
+.steps i{display:block;font:700 11px/1 var(--ui);font-style:normal;color:var(--text);margin-bottom:6px;text-transform:uppercase}
+.steps .say-in{display:inline-block;margin-top:6px;padding:4px 8px;background:#fff;border:2px solid var(--line);box-shadow:2px 2px 0 var(--bubble);font:700 11px/1.3 var(--ui);color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.stat{padding:14px;display:grid;gap:12px;align-content:space-between;min-height:128px}
+.stat .v{font:22px/1 var(--px);color:var(--sub);font-variant-numeric:tabular-nums}
+.stat .l{font:700 12px/1.35 var(--ui);text-transform:uppercase}
+.framing{font:700 12px/1.5 var(--ui);color:var(--sub);text-transform:uppercase}
+
+/* 09 */
+.lists{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,48px)}
+.lists h3{font:12px/1.4 var(--px);text-transform:uppercase;margin-bottom:14px}
+.lists ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.lists li{position:relative;padding-left:22px;color:var(--sub);font-size:16px}
+.lists li::before{content:"";position:absolute;left:0;top:.55em;width:10px;height:10px;background:var(--mode);border:2px solid var(--line)}
+.lists .next li::before{background:var(--btn)}
+
+.end{display:grid;justify-items:center;text-align:center;gap:22px;padding-block:clamp(72px,10vw,120px);border-top:3px dashed var(--line)}
+.end .die{width:140px;height:140px}
+.end .ground-s{width:90px;height:10px;background:var(--drop);margin-top:-16px}
+.end .label{margin-top:8px}
+footer{padding-block:26px 40px;border-top:2px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font:700 11px/1.4 var(--ui);color:var(--sub);text-transform:uppercase}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .hero,.split{grid-template-columns:1fr}
+  .snapshot{grid-template-columns:1fr 1fr}
+  .snapshot > div:nth-child(1){grid-column:1 / -1;border-right:0}
+  .snapshot > div:nth-child(3),.snapshot > div:nth-child(5){border-right:0}
+  .snapshot > div:nth-child(-n+3){border-bottom:2px solid var(--line)}
+  .snapshot > div:nth-child(5){grid-column:1 / -1;border-top:2px solid var(--line)}
+  .scenes,.voices,.thirds{grid-template-columns:1fr 1fr}
+  .details{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fork{grid-template-columns:1fr}
+  .fork .root{max-width:320px}
+  .fork .rail{height:22px;margin-left:30px;border-left:3px solid var(--line)}
+  .fork .rail::before,.fork .rail::after{display:none}
+  .br::before{display:none}
+}
+@media (max-width:620px){
+  body{font-size:16px}
+  .top .tog.cs-label{display:none}
+  .scenes,.isnt,.reveals,.evo,.details,.lists,.voices{grid-template-columns:1fr}
+  .thirds{grid-template-columns:1fr 1fr;gap:14px}
+  .stats{grid-template-columns:1fr 1fr}
+  .br{grid-template-columns:1fr;gap:10px}
+  .roles{grid-template-columns:1fr}
+  .roles .divider{height:8px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 16px)}
+  .find{grid-template-columns:1fr;gap:8px}
+  .steps{grid-template-columns:1fr}
+  .quote .die{width:52px;height:52px}
+  .mbtn{font-size:7px}
+  .answer h3,.answer .big{font-size:22px}
+}
+
+
+/* ---------- v3 additions ---------- */
+.iters{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;counter-reset:none}
+.iters li{padding:14px;display:grid;gap:8px;align-content:start;position:relative}
+.iters li:not(:last-child)::after{content:"▶";position:absolute;right:-14px;top:50%;transform:translateY(-50%);font:10px/1 var(--px);color:var(--line);z-index:1}
+.iters .lv{justify-self:start;padding:3px 6px;border:2px solid var(--line);font:9px/1 var(--px);background:var(--card)}
+.iters li.now{background:#f3eeff;border-width:3px;box-shadow:5px 5px 0 var(--lav)}
+.iters li.now .lv{background:var(--lav)}
+.iters b{font:700 14px/1.3 var(--ui);text-transform:uppercase}
+.iters p{font-size:14px;color:var(--sub);line-height:1.5}
+.guards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.guard{padding:14px;display:grid;gap:8px;align-content:start}
+.guard b{font:700 14px/1.3 var(--ui);text-transform:uppercase}
+.guard p{font-size:14px;color:var(--sub);line-height:1.5}
+.guard .ex{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.guard .ex span{padding:4px 7px;border:2px solid var(--line);font:700 11px/1.3 var(--ui)}
+.guard .ex .ok{background:var(--btn)}
+.guard .ex .bad{background:#fff;text-decoration:line-through;color:var(--sub);border-style:dashed}
+.details{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ptr{display:grid;justify-items:center;gap:10px}
+.ptr .arrow{font:10px/1 var(--px);color:var(--sub);animation:blink 1s steps(2) infinite}
+.ptr .die{width:72px;height:72px}
+.ptr .spin svg{animation:ptrSpin 1.2s steps(8) infinite}
+@keyframes ptrSpin{to{transform:rotate(360deg)}}
+.count{display:grid;justify-items:center;gap:14px;text-align:center}
+.count .ctr{height:40px;padding:0 12px;display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--line);box-shadow:2px 2px 0 var(--hard);font:700 13px/1 var(--ui)}
+.count .ctr i{font-style:normal;min-width:22px;padding:1px 5px;background:var(--btn);border:2px solid var(--line);font-size:11px;text-align:center}
+.count p{font:700 12px/1.4 var(--ui);max-width:24ch}
+.fresh{display:grid;justify-items:center;gap:6px}
+.fresh .say{padding:8px 10px;background:#fff;border:3px solid var(--line);box-shadow:3px 3px 0 var(--bubble);font:700 12px/1.3 var(--ui)}
+.fresh span{font:14px/1 var(--px)}
+.spot{padding:clamp(18px,3vw,28px);display:grid;gap:22px;box-shadow:8px 8px 0 var(--lav)}
+.spot-head{display:grid;gap:12px;justify-items:start}
+.spot-head h3{font:clamp(15px,2vw,20px)/1.4 var(--px);text-transform:uppercase}
+.spot-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:start}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.find .sub{display:grid;gap:10px;margin-top:16px}
+.find .aside{padding:10px 12px;border:2px dashed var(--line);font-size:15px}
+.find .aside b,.find .sub b{color:var(--text)}
+.chatlog{margin-top:16px;padding:14px;border:2px solid var(--line);background:var(--bg);display:grid;gap:10px}
+.chatlog .q{font:700 12px/1.4 var(--ui);text-transform:uppercase;color:var(--sub)}
+.chatlog .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.chatlog .a{padding:6px 10px;background:#fff;border:3px solid var(--line);box-shadow:3px 3px 0 var(--bubble);font:12px/1.2 var(--px)}
+.chatlog .arrow{font:700 11px/1 var(--ui);color:var(--sub);text-transform:uppercase}
+.chatlog .msg{justify-self:start;padding:6px 10px;background:var(--pink);border:2px solid var(--line);font-size:15px;font-weight:700;color:var(--text)}
+.grids{display:flex;flex-wrap:wrap;gap:28px;margin-top:16px}
+.grids figure{margin:0;display:grid;gap:8px}
+.pxgrid{display:grid;grid-template-columns:repeat(13,14px);gap:4px}
+.pxgrid i{width:14px;height:14px;border:2px solid var(--line);background:var(--btn)}
+.pxgrid i.s{background:var(--lav)}
+.grids figcaption{font:700 12px/1.3 var(--ui);text-transform:uppercase;color:var(--sub)}
+.grids figcaption b{font:14px/1 var(--px);font-weight:400;color:var(--text);margin-right:6px}
+.legend{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font:700 11px/1 var(--ui);text-transform:uppercase;color:var(--sub)}
+.sw{display:inline-block;width:12px;height:12px;border:2px solid var(--line);vertical-align:-2px;margin-right:4px}
+.sw.acc{background:var(--btn)}.sw.swi{background:var(--lav)}
+.bug{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:10px}
+.bug .zero{font:clamp(24px,3.4vw,34px)/1 var(--px);color:var(--text)}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.stat .v{color:var(--text);font-size:clamp(24px,3vw,32px)}
+.stat.hl{background:#f3eeff;box-shadow:4px 4px 0 var(--lav)}
+.sigwrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:start}
+.sig{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--line);font-size:15px}
+.sig th,.sig td{padding:9px 12px;border-bottom:1px solid #d5d3e2;text-align:left;vertical-align:top}
+.sig tr:last-child th,.sig tr:last-child td{border-bottom:0}
+.sig th{font:700 12px/1.4 var(--ui);text-transform:uppercase;color:var(--sub);width:55%}
+.sig td{font-variant-numeric:tabular-nums}
+.mix{display:grid;gap:10px;padding:14px;background:#fff;border:2px solid var(--line)}
+.mix .bar{display:flex;height:26px;border:2px solid var(--line)}
+.mix .bar span+span{border-left:2px solid var(--line)}
+.mix .keys{display:flex;flex-wrap:wrap;gap:6px 14px;font:700 12px/1.3 var(--ui);text-transform:uppercase}
+.mix .keys i{display:inline-block;width:10px;height:10px;border:2px solid var(--line);margin-right:5px;vertical-align:-1px}
+.foot-notes{display:grid;gap:8px;max-width:80ch;font-size:14px;color:var(--sub)}
+.foot-notes b{color:var(--text)}
+.built{display:grid;gap:28px;padding-top:36px;border-top:2px solid var(--line)}
+.loopc{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px 22px}
+.loopc li{position:relative;padding:9px 11px;background:#fff;border:3px solid var(--line);box-shadow:3px 3px 0 var(--hard);font:10px/1.2 var(--px);text-transform:uppercase}
+.loopc li:not(:last-child)::after{content:"→";position:absolute;right:-19px;top:50%;transform:translateY(-50%);font:11px/1 var(--px)}
+.loopc li.ai{background:var(--btn)}
+.loopc li.hot2{background:var(--pink)}
+@media (max-width:900px){
+  .iters,.guards{grid-template-columns:1fr 1fr}
+  .iters li:nth-child(2)::after{display:none}
+  .spot-body,.sigwrap{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+}
+@media (max-width:620px){
+  .iters,.guards,.vs{grid-template-columns:1fr}
+  .iters li::after{display:none}
+  .pxgrid{grid-template-columns:repeat(13,12px);gap:3px}
+  .pxgrid i{width:12px;height:12px}
+}
+
+
+/* ---------- readability pass: pixel type for short labels only, long lines in DM Sans ---------- */
+h2{font:700 clamp(26px,3.4vw,40px)/1.15 var(--read);letter-spacing:-.015em;text-transform:none;max-width:22ch}
+.quote .bubble{font:700 clamp(18px,1.9vw,22px)/1.35 var(--read);letter-spacing:-.01em;text-transform:none}
+.bigq .big{font:700 clamp(24px,3.2vw,38px)/1.2 var(--read);letter-spacing:-.02em;text-transform:none;color:var(--text)}
+.bigq .big em{padding:0 4px}
+.find h3,.spot-head h3{font:700 clamp(19px,2vw,22px)/1.3 var(--read);letter-spacing:-.01em;text-transform:none}
+.role h3{font:700 18px/1.3 var(--read);text-transform:none}
+.role li b,.iters b,.guard b{font:700 16px/1.3 var(--read);text-transform:none}
+.det h3{font:700 17px/1.3 var(--read);text-transform:none}
+.lists h3{font:700 12px/1.4 var(--ui);letter-spacing:.04em}
+.third .say,.fresh .say,.note,.framing{text-transform:none}
+.third .say{font:700 14px/1.4 var(--read)}
+.note,.framing{font:500 14px/1.5 var(--read)}
+
+
+/* ================= EDITORIAL FRAME =================
+   Pixel style belongs to the product only (dice, answer cards, buttons, screens).
+   Everything that tells the story uses this quieter layer. */
+:root{--page:#f7f9fb;--rule:#e2e1ea;--ink:#292544;--muted:#5d5a78;--disp:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;--tint-aqua:#e3f6fb;--tint-lav:#efeafe}
+body{background:var(--page);background-image:none;color:var(--ink)}
+.prose{color:var(--muted)}
+.label{font:600 12px/1.3 var(--read);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kicker{font:600 13px/1.3 var(--read);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.top .cs-label{font:600 13px/1 var(--read);color:var(--muted)}
+.brand span{font:800 18px/1 var(--disp);letter-spacing:-.01em}
+.btn-e{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:999px;border:1px solid var(--rule);background:#fff;color:var(--ink);font:600 15px/1 var(--read);text-decoration:none;transition:background .15s,border-color .15s}
+.btn-e:hover{border-color:var(--ink)}
+.btn-e.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn-e.primary:hover{background:#3b3660}
+.btn-e.small{height:38px;padding:0 14px;font-size:14px}
+.hero h1{font:800 clamp(48px,8vw,96px)/.95 var(--disp);letter-spacing:-.035em;margin-top:18px}
+.hero .sub{color:var(--muted)}
+h2{font:700 clamp(30px,4vw,48px)/1.05 var(--disp);letter-spacing:-.025em;max-width:20ch}
+.find h3,.spot-head h3,.role h3{font-family:var(--disp)}
+.todo{background:#fff3c4;border:1px solid #e9cf6b;color:#6b5200;font:600 11px/1.3 var(--read);border-radius:4px;letter-spacing:.02em}
+
+/* section rhythm */
+section.cs{border-top:1px solid var(--rule)}
+.eyebrow{gap:14px}
+.num{min-width:0;height:auto;padding:0;background:none;border:0;font:700 14px/1 var(--disp);color:var(--aqua-ink,#1c7f99)}
+.num{color:#1c7f99}
+
+/* editorial cards: thin rule, soft radius, no hard shadow */
+.card,.panel{background:#fff;border:1px solid var(--rule);border-radius:14px;box-shadow:none}
+.snapshot{border-radius:14px;overflow:hidden}
+.snapshot > div{border-color:var(--rule)!important}
+.snapshot dt{font:600 12px/1 var(--read);letter-spacing:.08em;color:var(--muted)}
+.ph{border:1px dashed #c9c7d6;border-radius:14px;background:transparent}
+.ph .label{color:#7a5fe0}
+.scene .label{font-size:11px}
+.chat{border:0;background:var(--tint-lav);border-radius:999px;font:500 13px/1.2 var(--read);text-transform:none;color:var(--ink);padding:5px 10px}
+.nos .x{border:1px solid var(--rule);border-radius:6px;font:600 11px/1 var(--read);letter-spacing:.06em;color:var(--muted);height:24px}
+.isnt .no{border:1px dashed #c9c7d6;border-radius:14px;background:#fff}
+.pc span{border-color:var(--rule);border-radius:4px}
+.pc span:nth-child(-n+2){font:600 11px/1.3 var(--read)}
+.frame{border:1px solid var(--rule);box-shadow:none;border-radius:14px}
+.evo figcaption b{font:700 15px/1 var(--disp);text-transform:none}
+.caption{color:var(--muted)}
+
+/* pull quote: big editorial type, small die as signature */
+.quote{align-items:flex-start;gap:16px;padding-left:0}
+.quote .die{width:40px;height:40px;margin-top:4px}
+.quote .bubble{padding:0;background:none;border:0;box-shadow:none;font:700 clamp(22px,2.5vw,30px)/1.2 var(--disp);letter-spacing:-.02em}
+.quote .bubble svg{display:none}
+.bigq{background:none;border:0;box-shadow:none;padding:0;max-width:900px;gap:14px}
+.bigq .says{background:none;border:0;padding:0;font:600 12px/1.3 var(--read);letter-spacing:.08em;color:var(--muted)}
+.bigq .big{font:800 clamp(30px,4.6vw,56px)/1.05 var(--disp);letter-spacing:-.03em}
+.bigq .big em{background:linear-gradient(transparent 58%,#bfeefa 58%);padding:0 2px}
+
+/* loop + beats */
+.loop span{border:1px solid var(--rule);box-shadow:none;border-radius:999px;font:600 13px/1 var(--read);padding:9px 14px;background:#fff}
+.loop span.hl{background:var(--tint-aqua);border-color:#9ddff0}
+.loop em{font:600 14px/1 var(--read);color:var(--muted)}
+.beat .n{font:600 11px/1 var(--read);letter-spacing:.06em;text-transform:uppercase}
+.beat b{font:700 16px/1.2 var(--disp);text-transform:none}
+.beat .ms{font:600 13px/1.2 var(--read)}
+.reveals .qq{font:600 12px/1.3 var(--read);letter-spacing:.04em}
+
+/* fork */
+.fork .rail::before,.fork .rail::after,.br::before{border-color:#c9c7d6!important;border-width:2px!important}
+.br{border:1px solid var(--rule);border-radius:12px}
+.br.hl{background:var(--tint-lav);border:1px solid #cdbff8;box-shadow:none}
+.fork .rail{border-color:#c9c7d6}
+
+/* roles, iterations, guardrails */
+.roles .divider{background:repeating-linear-gradient(#c9c7d6 0 6px,transparent 6px 12px);width:2px;justify-self:center}
+.role li{border:1px solid var(--rule);border-radius:10px;background:var(--page)}
+.role li.never{border:1px dashed #c9c7d6;background:transparent}
+.iters li::after{color:#b5b2c6!important}
+.iters .lv{border:0;background:var(--page);border-radius:999px;font:600 11px/1 var(--read);letter-spacing:.06em;padding:5px 9px}
+.iters li.now{background:var(--tint-lav);border:1px solid #cdbff8;box-shadow:none}
+.iters li.now .lv{background:#fff}
+.note{color:var(--muted)}
+
+/* spotlight */
+.spot{background:#fff;box-shadow:none;border:1px solid var(--rule)}
+.spot-head .tag{background:var(--tint-lav);border:0;border-radius:999px;font:600 12px/1 var(--read);padding:6px 10px}
+.det h3{font-family:var(--disp)}
+
+/* findings + data */
+.find .k{font:600 12px/1.4 var(--read);letter-spacing:.08em;color:#1c7f99}
+.steps div{border:1px solid var(--rule);border-radius:10px;background:var(--page)}
+.steps i{font:600 11px/1 var(--read);letter-spacing:.06em}
+.find .aside{border:0;background:var(--page);border-radius:10px}
+.chatlog{border:1px solid var(--rule);border-radius:12px;background:var(--page)}
+.chatlog .q{font:600 12px/1.4 var(--read);letter-spacing:.04em}
+.chatlog .msg{border:0;border-radius:12px 12px 12px 4px;background:#ffd6e8}
+.pxgrid{gap:4px}
+.pxgrid i{border:0;border-radius:3px;background:#a6e3f0}
+.pxgrid i.s{background:#a88cf7}
+.grids figcaption{font:600 12px/1.3 var(--read);letter-spacing:.04em}
+.grids figcaption b{font:800 20px/1 var(--disp)}
+.legend{font:600 11px/1 var(--read);letter-spacing:.04em}
+.sw{border:0;border-radius:3px}.sw.acc{background:#a6e3f0}
+.bug .zero{font:800 clamp(36px,5vw,56px)/1 var(--disp);letter-spacing:-.03em}
+.stat .v{font:800 clamp(34px,4vw,48px)/1 var(--disp);letter-spacing:-.03em}
+.stat .l{font:600 12px/1.35 var(--read);letter-spacing:.04em;color:var(--muted)}
+.stat.hl{background:var(--tint-lav);border-color:#cdbff8;box-shadow:none}
+.sig{border:1px solid var(--rule);border-radius:12px;border-collapse:separate;border-spacing:0;overflow:hidden}
+.sig th{font:600 12px/1.4 var(--read);letter-spacing:.04em}
+.sig th,.sig td{border-bottom:1px solid var(--rule)}
+.mix{border:1px solid var(--rule);border-radius:12px}
+.mix .bar{border:0;border-radius:6px;overflow:hidden;height:20px}
+.mix .bar span+span{border-left:2px solid #fff}
+.mix .keys{font:600 12px/1.3 var(--read)}
+.mix .keys i{border:0;border-radius:3px}
+.framing{font-weight:600;color:var(--ink)}
+
+/* reflection */
+.lists h3{font:600 12px/1.4 var(--read);letter-spacing:.08em;color:var(--muted)}
+.lists li::before{width:7px;height:7px;border:0;border-radius:50%;top:.7em;background:#a88cf7}
+.lists .next li::before{background:#5cc8e6}
+.built{border-top:1px solid var(--rule)}
+.loopc li{border:1px solid var(--rule);box-shadow:none;border-radius:999px;font:600 13px/1.2 var(--read);text-transform:none;padding:8px 14px}
+.loopc li:not(:last-child)::after{font:600 14px/1 var(--read);color:#b5b2c6}
+.loopc li.ai{background:var(--tint-aqua);border-color:#9ddff0}
+.loopc li.hot2{background:#ffe3ef;border-color:#ffc2dc}
+.end{border-top:0}
+.end.band::after{content:"";position:absolute;left:50%;top:0;width:100vw;transform:translateX(-50%);height:8px;background:repeating-linear-gradient(90deg,#292544 0 8px,transparent 8px 16px)}
+footer{border-top:0}
+.end .label{font-size:12px}
+footer{border-top:1px solid var(--rule);font:500 13px/1.4 var(--read);text-transform:none}
+
+/* ================= PRODUCT EXHIBITS keep the pixel language ================= */
+.demo.panel{border:4px solid var(--line);border-radius:0;box-shadow:8px 8px 0 var(--hard);background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:16px 16px}
+.isnt .yes.product{padding:16px;display:grid;gap:12px;align-content:start;background-color:var(--bg);background-image:radial-gradient(var(--dots) 1.5px,transparent 1.5px);background-size:12px 12px;border:3px solid var(--line);box-shadow:5px 5px 0 var(--hard)}
+.isnt .yes.product .label{font:700 12px/1.3 var(--ui);color:var(--line)}
+.det .show{border:3px solid var(--line);box-shadow:4px 4px 0 var(--hard);border-radius:0}
+.br .hot{white-space:normal;height:auto;min-height:40px;padding:8px 12px;line-height:1.3}
+@media (max-width:620px){.hero h1{font-size:clamp(44px,13vw,64px)}}
+
+
+/* ================= COLOR & CHARACTER PASS ================= */
+body{overflow-x:clip}
+.acc-pink{--acc:#ff9dca;--acc-ink:#c2457f;--acc-tint:#ffe6f1}
+.acc-lav{--acc:#a88cf7;--acc-ink:#6b4fd8;--acc-tint:#eee8ff}
+.acc-aqua{--acc:#74d7f2;--acc-ink:#1c7f99;--acc-tint:#def4fa}
+.acc-yel{--acc:#ffd463;--acc-ink:#8a6400;--acc-tint:#fff2c7}
+/* full-bleed bands */
+.band{position:relative;isolation:isolate}
+.band::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;background:var(--bandc)}
+.band-aqua{--bandc:#eef9fc}
+.band-yel{--bandc:#fffaeb}
+.band-lav{--bandc:#f5f1ff}
+.band-dots::before{background-color:#edf9fc;background-image:radial-gradient(#cdeef6 1.5px,transparent 1.5px);background-size:16px 16px}
+section.cs.band{border-top:0}
+section.cs.band + section.cs{border-top:0}
+.hero.band{padding-bottom:clamp(56px,7vw,88px)}
+.hero.band::after{content:"";position:absolute;left:50%;bottom:0;width:100vw;transform:translateX(-50%);height:8px;background:repeating-linear-gradient(90deg,#292544 0 8px,transparent 8px 16px);opacity:.9}
+.snapshot{margin-top:clamp(40px,5vw,56px)}
+/* section number: short pixel tag in the section's color */
+.num{min-width:38px;height:30px;padding:0 8px;display:grid;place-items:center;background:var(--acc,#74d7f2);border:2px solid var(--line);font:11px/1 var(--px);color:var(--line);box-shadow:3px 3px 0 var(--line)}
+.eyebrow .label{color:var(--acc-ink,#5d5a78)}
+/* marker highlight on the key words of each heading */
+h2 mark{background:linear-gradient(transparent 60%,var(--acc,#74d7f2) 60%, var(--acc,#74d7f2) 92%,transparent 92%);color:inherit;padding:0 .06em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hero h1{background:none}
+.quote .bubble{border-left:0}
+.quote .die{width:48px;height:48px}
+/* accent touches on editorial cards */
+.find .k,.num-ink{color:var(--acc-ink)}
+.stat .v{color:var(--acc-ink,#292544)}
+.stat.hl .v{color:#6b4fd8}
+.scene{border-top:4px solid var(--acc)}
+.iters li.now,.br.hl{background:#fff;border:2px solid #a88cf7;box-shadow:4px 4px 0 #a88cf7}
+.guard{border-top:4px solid var(--acc)}
+.det .show{box-shadow:5px 5px 0 var(--acc,#292544)}
+/* big quotes become color blocks with a peeking die */
+.bigq{position:relative;border-radius:22px;padding:clamp(28px,5vw,56px) clamp(24px,5vw,64px);max-width:none;overflow:visible}
+.bigq.block-yel{background:#ffe7a0}
+.bigq.block-lav{background:#e4dcff}
+.bigq .big em{background:#fff;padding:0 .12em;border-radius:6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.bigq .says{color:var(--line)}
+.bigq .peek{position:absolute;right:clamp(18px,4vw,48px);top:-34px;width:clamp(64px,8vw,96px);height:clamp(64px,8vw,96px);animation:bob 1.2s steps(2) infinite}
+.bigq .big{max-width:20ch}
+@media (max-width:620px){.bigq .peek{top:-28px}}
+
+
+/* ---------- calm unify pass: one accent through the middle ---------- */
+.scene,.guard{border-top:1px solid var(--rule)}
+.det .show{box-shadow:4px 4px 0 var(--hard)}
+.stat .v{color:var(--ink)}
+.stat.hl .v{color:#6b4fd8}
+.find .k{color:#1c7f99}
+.bigq.block{background:#292544}
+.bigq.block .says{color:#a9a5c4}
+.bigq.block .big{color:#fff}
+.bigq.block .big em{background:none;padding:0;border-radius:0;color:#74d7f2}
+section.cs{border-top:0;padding-block:clamp(48px,7vw,88px)}
+section.cs + section.cs{border-top:1px solid var(--rule)}
+
+
+/* no pixel dashed edges between bands */
+.hero.band::after,.end.band::after{display:none}
+/* demo: compact idle state */
+.demo .answer{min-height:0}
+.demo .answer.wait{padding:12px 16px}
+.demo .answer.wait p{font-size:11px}
+.arena{height:230px}
+/* snapshot: role full width, then a clean 2 x 2 */
+@media (max-width:900px){
+  .snapshot > div{grid-column:auto!important;border:0!important;border-bottom:1px solid var(--rule)!important}
+  .snapshot > div:nth-child(1){grid-column:1 / -1!important}
+  .snapshot > div:nth-child(2),.snapshot > div:nth-child(4){border-right:1px solid var(--rule)!important}
+  .snapshot > div:nth-child(4),.snapshot > div:nth-child(5){border-bottom:0!important}
+}
+
+
+/* evolution strip: same visual weight in all three frames */
+.frame > i,.frame > .die{margin-bottom:12%}
+.f1 i{width:22%;border-width:2px;box-shadow:0 0 24px rgba(216,178,90,.45)}
+.f1 b{font-size:12px;letter-spacing:.24em}
+.f1 b,.f2 b,.f3 b{bottom:11%}
+.f2 i{width:28%}
+.f3 .die{width:30%}
+
+
+/* beats 5 & 6: same scale as the other beats */
+.beat .cell .rg{left:16%;right:16%;bottom:10%;height:9%;border:2px solid var(--line);border-radius:0}
+.beat .cell .rg.b{left:6%;right:6%;bottom:8%;height:13%;border-color:var(--bubble)}
+.beat .cell .spk{position:absolute;width:6px;height:6px;background:#ffd463;outline:2px solid var(--line)}
+.mini-ans{width:74%;padding:7px 8px 8px;background:#fff;border:2px solid var(--line);box-shadow:3px 3px 0 var(--bubble);display:grid;gap:5px;justify-items:start}
+.mini-ans i{font:700 7px/1 var(--ui);font-style:normal;padding:2px 4px;background:#ff9dca;border:1px solid var(--line)}
+.mini-ans b{font:400 11px/1 var(--px)}
+.mini-ans u{font:700 7px/1 var(--ui);text-decoration:none;color:var(--sub)}
+/* reveal examples: equal height, lighter frame for the case-study scale */
+.reveals{align-items:stretch}
+.reveals > div{grid-template-rows:auto 1fr}
+.reveals .answer{height:100%;justify-content:flex-start;border-width:3px;box-shadow:5px 5px 0 var(--bubble);padding:16px 18px}
+.reveals .answer .big{font-size:22px}
+.reveals .answer p{font-size:13px}
+
+
+/* recorded product GIFs */
+.gif{margin:0;display:grid;gap:10px;align-content:start}
+.gif img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:14px;background:#edf9fc}
+.gif figcaption{font-size:14px;color:var(--muted)}
+
+
+/* recorded tiles in section 07 */
+.det .show.rec{padding:0;place-items:stretch}
+.det .show.rec img{display:block;width:100%;height:100%;object-fit:cover}
+.det .show.tall img{object-fit:contain;object-position:center top}
+
+
+/* ---------- recreated visuals ---------- */
+.recreated{font-size:13px;color:var(--muted);font-style:italic;margin-top:-18px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ba-col{display:grid;gap:10px;grid-template-rows:auto 1fr auto}
+.ba .screen{background-color:#edf9fc;background-image:radial-gradient(#cdeef6 1.5px,transparent 1.5px);background-size:12px 12px;border:1px solid var(--rule);border-radius:14px;padding:20px 22px 24px;display:grid;gap:14px;align-content:start;min-height:100%}
+.ba .screen .answer{border-width:3px;box-shadow:5px 5px 0 var(--bubble);padding:14px 16px;margin-right:5px}
+.ba .screen .answer .big{font-size:22px}
+.ba .screen .answer p{font-size:12px}
+.ba .screen .act{width:calc(100% - 5px);height:48px;font-size:12px}
+.ba .screen .act.small{width:100%;height:40px;font-size:9px}
+.ba .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-right:5px}
+.answer .hope{font:700 11px/1.3 var(--ui);text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
+.ba-note{font-size:14px;color:var(--muted)}
+.gif.narrow{max-width:720px}
+.vs{grid-template-columns:1fr 1fr;gap:16px}
+.vs-col{border:1px solid var(--rule);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start;background:var(--page)}
+.vs-col.after{background:#fff;border-color:#cdbff8}
+.vs-col .rules{font-size:13px;color:var(--muted);line-height:1.5}
+.vs-col.before .rules{text-decoration:line-through;text-decoration-color:#c9c7d6}
+.vs-col .vq{font:700 12px/1.3 var(--ui);text-transform:uppercase;color:var(--line)}
+.vs-col .lines{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.vs-col .lines li{padding:8px 10px;border:2px solid var(--line);background:#fff;font:700 12px/1.4 var(--ui);text-transform:uppercase}
+.vs-col.before .lines li{border-style:dashed;color:var(--sub)}
+.vs-col.after .lines li{box-shadow:3px 3px 0 #a88cf7}
+.vs-col .verdict{font-size:14px;font-weight:600;color:var(--ink)}
+.chat-ba{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+.phone-chat{background:#fff;border:1px solid var(--rule);border-radius:26px;padding:16px 14px 20px;display:grid;gap:8px;font:400 15px/1.35 -apple-system,system-ui,sans-serif;box-shadow:0 10px 30px -18px rgba(41,37,68,.4)}
+.pc-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--rule);margin-bottom:4px;font-size:14px}
+.av{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#f6c9dd,#c5b6f1);filter:blur(2px)}
+.msg{max-width:82%;padding:8px 12px;border-radius:18px;justify-self:start;background:#efeff4;color:#1d1d1f}
+.msg.out{justify-self:end;background:#3478f6;color:#fff}
+.msg.card{background:#edf9fc;border:2px solid #292544;border-radius:6px;font:700 11px/1.3 var(--ui);color:#292544}
+.msg.card b{font:400 11px/1.3 var(--px)}
+.now-col{display:grid;gap:12px;align-content:start}
+.now-col .answer{margin-right:7px}
+.brief{margin:0;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:#fff}
+.brief-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--page);border-bottom:1px solid var(--rule);font:500 12px/1 ui-monospace,Menlo,monospace;color:var(--muted)}
+.brief-bar i{width:10px;height:10px;border-radius:50%;background:#e2e1ea}
+.brief-bar span{margin-left:8px}
+.brief-body{padding:18px 20px;display:grid;gap:10px;font:400 14px/1.6 ui-monospace,Menlo,monospace;color:var(--ink)}
+.brief figcaption{padding:10px 20px 14px;font-size:13px;color:var(--muted);font-style:italic}
+@media (max-width:760px){.ba,.vs,.chat-ba{grid-template-columns:1fr}.phone-chat{max-width:360px}}
+
+
+/* ================= HOVER LAYER =================
+   Editorial cards lift softly; product exhibits react the pixel way (hard shadow, stepped motion). */
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px) scale(1.03,.97)}70%{transform:translateY(0) scale(1.05,.95)}}
+@media (hover:hover) and (pointer:fine){
+  /* editorial: soft lift */
+  .card,.role li,.iters li,.guard,.vs-col,.scene,.br,.stat,.find,.frame,.brief,.phone-chat,.loopc li,.loop span,.mix,.sig{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+  .scene:hover,.guard:hover,.iters li:not(.now):hover,.stat:not(.hl):hover,.vs-col:hover,.role li:hover,.find:hover{transform:translateY(-3px);box-shadow:0 12px 28px -18px rgba(41,37,68,.45);border-color:#c9c7d6}
+  .stat:hover .v{color:#1c7f99}
+  .iters li.now:hover,.br.hl:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #a88cf7}
+  .br:not(.hl):hover{border-color:#9ddff0;background:#f6fcfe}
+  .br:hover .act{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--hard)}
+  .br:hover .act.small{box-shadow:5px 5px 0 var(--hard)}
+  .loopc li:hover,.loop span:hover{transform:translateY(-2px);border-color:var(--ink)}
+  .brief:hover,.phone-chat:hover{box-shadow:0 16px 36px -20px rgba(41,37,68,.45)}
+  /* evolution frames: tilt in the era's own style */
+  .frame{overflow:hidden}
+  .frame > *{transition:transform .35s ease}
+  .frame:hover{transform:translateY(-3px)}
+  .frame.f1:hover i{transform:rotate(45deg) scale(1.12)}
+  .frame.f2:hover i{transform:scale(1.1)}
+  .frame.f3:hover .die{animation:hop .5s steps(5)}
+  /* product exhibits: pixel hover, stepped */
+  .answer:not(.bigq):not(.wait),.det .show,.third .say,.mini-ask,.ba .screen .act,.chatlog .a{transition:transform .08s steps(2),box-shadow .08s steps(2)}
+  .reveals .answer:hover,.voice:hover,.now-col .answer:hover,.fork .root:hover,.ba .screen .answer:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--bubble)}
+  .det .show:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--hard)}
+  .det:hover h3{color:#1c7f99}
+  .third:hover .say{transform:translateY(-3px)}
+  .ba .screen .act:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--hard)}
+  .ba .screen .act.small:hover{box-shadow:5px 5px 0 var(--hard)}
+  /* every little dice hops when you point at it */
+  .quote .die:hover,.third .die:hover,.voice .die:hover,.beat .cell:hover .die,.isnt .die:hover,.end .die:hover,.bigq .peek:hover{animation:hop .5s steps(5)}
+  .third:hover .die{animation:hop .5s steps(5)}
+  .beat:hover{transform:translateY(-3px);box-shadow:0 12px 28px -18px rgba(41,37,68,.45)}
+  .beat:hover .cell{border-color:#1c7f99}
+  /* data: focus one thing at a time */
+  .grids figure .pxgrid i{transition:opacity .15s,transform .15s}
+  .grids figure:hover .pxgrid i:not(.s){opacity:.3}
+  .grids figure:hover .pxgrid i.s{transform:scale(1.15)}
+  .mix .bar{overflow:visible;position:relative}
+  .mix .bar span{position:relative;transition:opacity .15s}
+  .mix .bar:hover span{opacity:.35}
+  .mix .bar span:hover{opacity:1}
+  .mix .bar span::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;padding:4px 8px;border-radius:6px;background:var(--ink);color:#fff;font:600 12px/1 var(--read);opacity:0;pointer-events:none;transition:opacity .15s}
+  .mix .bar span:hover::after{opacity:1}
+  .sig tr{transition:background .15s}
+  .sig tr:hover{background:#f6fcfe}
+  /* words */
+  h2 mark{background-size:100% 100%;transition:background .25s ease}
+  section.cs:hover h2 mark{background:linear-gradient(transparent 52%,var(--acc,#74d7f2) 52%,var(--acc,#74d7f2) 92%,transparent 92%)}
+  .prose a,.snapshot a,.top a.brand{text-decoration-thickness:1px;text-underline-offset:3px}
+  .snapshot a:hover{color:#1c7f99}
+  .brand:hover svg{animation:hop .5s steps(5)}
+  .btn-e{transition:transform .15s ease,background .15s,border-color .15s}
+  .btn-e:hover{transform:translateY(-2px)}
+  .gif img{transition:box-shadow .2s ease,transform .2s ease}
+  .gif:hover img{box-shadow:0 18px 40px -22px rgba(41,37,68,.5);transform:translateY(-2px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .card:hover,.scene:hover,.guard:hover,.beat:hover,.frame:hover,.gif:hover img{transform:none!important}
+}
+
+
+@keyframes hopc{0%,100%{transform:translateX(-50%)}40%{transform:translateX(-50%) translateY(-8px)}70%{transform:translateX(-50%) translateY(0) scale(1.04,.96)}}
+/* beat 6: same scale as the rest; a small answer tag over the settled dice */
+.beat .cell .ans-tag{position:absolute;left:50%;top:12%;transform:translateX(-50%);padding:5px 7px;background:#fff;border:2px solid var(--line);box-shadow:3px 3px 0 var(--bubble);font:9px/1 var(--px);white-space:nowrap}
+
+/* hover: only real links and buttons lift. Static content gets quiet, non-clickable feedback. */
+@media (hover:hover) and (pointer:fine){
+  .scene:hover,.guard:hover,.iters li:hover,.stat:hover,.vs-col:hover,.role li:hover,.find:hover,.beat:hover,.frame:hover,.loopc li:hover,.loop span:hover{transform:none!important;box-shadow:none!important}
+  .iters li.now:hover,.br.hl:hover{box-shadow:none!important}
+  .iters li.now{box-shadow:none}
+  .br:hover .act,.br:hover .act.small{transform:none!important}
+  .br .act{box-shadow:5px 5px 0 var(--hard)!important}.br .act.small{box-shadow:3px 3px 0 var(--hard)!important}
+  .reveals .answer:hover,.voice:hover,.now-col .answer:hover,.fork .root:hover,.ba .screen .answer:hover,.det .show:hover,.ba .screen .act:hover,.third:hover .say{transform:none!important}
+  .reveals .answer:hover,.voice:hover,.now-col .answer:hover,.fork .root:hover{box-shadow:7px 7px 0 var(--bubble)!important}
+  .ba .screen .answer:hover{box-shadow:5px 5px 0 var(--bubble)!important}
+  .det .show:hover{box-shadow:4px 4px 0 var(--hard)!important}
+  .ba .screen .act:hover{box-shadow:5px 5px 0 var(--hard)!important}.ba .screen .act.small:hover{box-shadow:3px 3px 0 var(--hard)!important}
+  .gif:hover img,.brief:hover,.phone-chat:hover{transform:none!important;box-shadow:none!important}
+  .phone-chat:hover{box-shadow:0 10px 30px -18px rgba(41,37,68,.4)!important}
+  .beat:hover .cell{border-color:var(--line)!important}
+  .stat:hover .v{color:inherit}
+  .det:hover h3{color:inherit}
+  /* what stays: the dice play, data focuses, the beat you point at acts itself out */
+  .beat:hover .cell .die,.beat:hover .cell .ans-tag{animation:hopc .5s steps(5)}
+}
+
+
+/* chat before / after: two equal phones */
+.chat-ba{display:grid;grid-template-columns:minmax(0,360px) 40px minmax(0,360px);justify-content:center;align-items:stretch;gap:16px}
+.cb-col{display:grid;grid-template-rows:auto 1fr;gap:10px}
+.cb-arrow{align-self:center;justify-self:center;font:700 24px/1 var(--disp);color:#b5b2c6;padding-top:24px}
+.phone-chat{height:100%;align-content:start}
+.phone-now{border:1px solid var(--rule);border-radius:26px;padding:22px 18px;display:grid;gap:14px;align-content:center;background-color:#edf9fc;background-image:radial-gradient(#cdeef6 1.5px,transparent 1.5px);background-size:12px 12px}
+.phone-now .qtag{justify-self:start;padding:6px 10px;background:#fff;border:2px solid var(--line);font:700 11px/1.35 var(--ui);text-transform:uppercase}
+.phone-now .answer{margin:0 6px 6px 0;padding:14px 16px;border-width:3px;box-shadow:5px 5px 0 var(--bubble)}
+.phone-now .answer .big{font-size:20px}
+.phone-now .answer p{font-size:12px}
+.phone-now .pn-note{font-size:13px;line-height:1.5;color:var(--muted)}
+.msg.card{font-size:10px}.msg.card b{font-size:10px}
+@media (max-width:760px){.chat-ba{grid-template-columns:1fr}.cb-arrow{transform:rotate(90deg);padding:0}}
+
+.top-left{display:flex;align-items:center;gap:18px}
+.back-link,.foot-link{font:600 14px/1 var(--read);color:var(--ink);text-decoration:none;padding:8px 0;border-bottom:1px solid transparent;transition:border-color .15s,color .15s}
+.back-link:hover,.foot-link:hover{border-color:var(--ink)}
+footer .foot-link{font-size:15px}
+@media (max-width:620px){.top .cs-label{display:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes squashShake{0%,100%{transform:translate(-3px,10px) scale(1.18,.7)}50%{transform:translate(3px,10px) scale(1.18,.7)}}
+@keyframes listen{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+@keyframes fly{
+0%{transform:translate(0,0);animation-timing-function:ease-in-out}
+11.5%{transform:translate(0,6px);animation-timing-function:cubic-bezier(.15,.75,.35,1)}
+30.8%{transform:translate(-26px,var(--rise,-170px));animation-timing-function:ease-in-out}
+46%{transform:translate(-10px,calc(var(--rise,-170px) - 16px));animation-timing-function:ease-in-out}
+61.5%{transform:translate(0,var(--rise,-170px));animation-timing-function:cubic-bezier(.6,0,.95,.55)}
+75%{transform:translate(0,0);animation-timing-function:cubic-bezier(.2,.8,.4,1)}
+82.7%{transform:translate(0,-42px);animation-timing-function:cubic-bezier(.6,0,1,.6)}
+88.5%{transform:translate(0,0);animation-timing-function:cubic-bezier(.2,.8,.4,1)}
+93%{transform:translate(0,-12px);animation-timing-function:cubic-bezier(.6,0,1,.6)}
+97%,100%{transform:translate(0,0)}}
+@keyframes squash{
+0%{transform:scale(1,1);animation-timing-function:ease-in}
+11.5%{transform:scale(1.25,.72);animation-timing-function:ease-out}
+16%{transform:scale(.84,1.22);animation-timing-function:ease-out}
+30.8%,61.5%{transform:scale(.72,.72);animation-timing-function:ease-in}
+72%{transform:scale(.8,1.02)}
+75%{transform:scale(1.32,.66);animation-timing-function:ease-out}
+79%{transform:scale(.92,1.12);animation-timing-function:ease-out}
+82.7%{transform:scale(1,1);animation-timing-function:ease-in}
+88.5%{transform:scale(1.16,.84);animation-timing-function:ease-out}
+92%{transform:scale(.97,1.04)}
+96%{transform:scale(1.04,.97)}
+100%{transform:scale(1,1)}}
+@keyframes shadowT{
+0%{transform:scale(1);opacity:1}
+11.5%{transform:scale(1.2);opacity:1;animation-timing-function:cubic-bezier(.15,.75,.35,1)}
+30.8%,61.5%{transform:scale(.35);opacity:.35;animation-timing-function:cubic-bezier(.6,0,.95,.55)}
+75%{transform:scale(1.3);opacity:1}
+82.7%{transform:scale(.8)}
+88.5%{transform:scale(1.12)}
+93%{transform:scale(.95)}
+100%{transform:scale(1);opacity:1}}
+@keyframes tumble3{0%,11.5%{transform:rotate(0);animation-timing-function:steps(12,end)}75%{transform:rotate(1080deg);animation-timing-function:ease-out}79%{transform:rotate(1071deg)}84%{transform:rotate(1086deg)}90%{transform:rotate(1077deg)}95%{transform:rotate(1081deg)}100%{transform:rotate(1080deg)}}
+@keyframes tumble4{0%,11.5%{transform:rotate(0);animation-timing-function:steps(16,end)}75%{transform:rotate(1440deg);animation-timing-function:ease-out}79%{transform:rotate(1431deg)}84%{transform:rotate(1446deg)}90%{transform:rotate(1437deg)}95%{transform:rotate(1441deg)}100%{transform:rotate(1440deg)}}
+@keyframes tumble5{0%,11.5%{transform:rotate(0);animation-timing-function:steps(20,end)}75%{transform:rotate(1800deg);animation-timing-function:ease-out}79%{transform:rotate(1791deg)}84%{transform:rotate(1806deg)}90%{transform:rotate(1797deg)}95%{transform:rotate(1801deg)}100%{transform:rotate(1800deg)}}
+@keyframes quake{0%{transform:translate(0,0)}25%{transform:translate(-4px,3px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,2px)}100%{transform:translate(0,0)}}
+@keyframes sparkA{from{transform:translate(0,0);opacity:1}to{transform:translate(-70px,-54px);opacity:0}}
+@keyframes sparkB{from{transform:translate(0,0);opacity:1}to{transform:translate(70px,-54px);opacity:0}}
+@keyframes sparkC{from{transform:translate(0,0) scale(.7);opacity:1}to{transform:translate(-38px,-86px) scale(.7);opacity:0}}
+@keyframes sparkD{from{transform:translate(0,0) scale(.7);opacity:1}to{transform:translate(40px,-90px) scale(.7);opacity:0}}
+@keyframes popIn{0%{transform:scale(.6) rotate(-2deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+@keyframes cheer{0%,100%{transform:translateY(0)}25%{transform:translateY(-26px)}50%{transform:translateY(0)}72%{transform:translateY(-10px)}}
+@keyframes sayIn{0%{transform:translateX(-50%) scale(.5);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+@keyframes stampIn{0%{transform:rotate(-6deg) scale(2.2);opacity:0}100%{transform:rotate(-6deg) scale(1);opacity:1}}
+@keyframes ripple{0%{transform:scale(.4);opacity:1}100%{transform:scale(1.8);opacity:0}}
+@keyframes dustL{to{transform:translate(-44px,-20px);opacity:0}}
+@keyframes dustR{to{transform:translate(44px,-20px);opacity:0}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;animation-delay:0s !important;transition:none !important}}
+</style>
+
+<div class="wrap">
+  <header class="top band band-dots">
+    <div class="top-left"><a class="back-link" href="homepage.html">← Back</a>
+    <a class="brand" href="https://tossy.me" target="_blank" rel="noopener" aria-label="Tossy.me">
+      <svg width="32" height="32" viewBox="0 0 28 28" shape-rendering="crispEdges" aria-hidden="true"><rect width="28" height="28" class="d-line"/><rect x="4" y="4" width="20" height="20" style="fill:var(--btn)"/><rect x="8" y="8" width="4" height="4" class="d-line"/><rect x="16" y="16" width="4" height="4" class="d-line"/></svg>
+      <span>TOSSY</span>
+    </a></div>
+    <div class="top-right">
+      <span class="cs-label">Case study</span>
+      <a class="btn-e small" href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a>
+    </div>
+  </header>
+
+  <!-- 01 HERO -->
+  <section class="hero band band-dots" aria-labelledby="h-hero">
+    <div>
+      <span class="kicker">Case study · Product design · 0 → 1</span>
+      <h1 id="h-hero">Let the dice pick.</h1>
+      <p class="sub">A playful decision tool that uses randomness to help people stop over-thinking small choices.</p>
+      <div class="hero-actions">
+        <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Try it live →</a>
+
+      </div>
+    </div>
+    <div class="panel demo" id="demo">
+      <div class="demo-modes" role="group" aria-label="Choose who answers" id="demoModes"></div>
+      <div class="qbar"><span id="demoQ">SHOULD I GET BUBBLE TEA?</span><button class="cta" type="button" id="demoToss">TOSS IT!</button></div>
+      <div class="arena" id="arena">
+        <p class="rolling" id="rolling" aria-hidden="true">ROLLING...</p>
+        <div class="ground" id="ground"></div>
+        <div class="fx" id="fx" aria-hidden="true">
+          <div class="ring"></div><div class="ring b"></div>
+          <div class="dust l"></div><div class="dust r"></div>
+          <div class="spark a"></div><div class="spark b"></div><div class="spark c"></div><div class="spark d"></div>
+        </div>
+        <div class="die-wrap" id="stageDie" aria-hidden="true"><div class="flyer"><div class="trail"><i></i><i></i><i></i></div><div class="tumble"><div class="squash die" id="stageFace"></div></div></div></div>
+      </div>
+      <article class="answer wait" id="demoAnswer" aria-live="polite"><p>PICK A MODE, THEN TOSS.</p></article>
+    </div>
+  </section>
+
+  <dl class="snapshot panel">
+    <div><dt>Role</dt><dd>Solo: product strategy, UX, interaction &amp; motion, AI behavior design. Built end-to-end with AI coding tools.</dd></div>
+    <div><dt>Timeline</dt><dd>Sep – Oct 2026</dd></div>
+    <div><dt>Built with</dt><dd>Claude, Codex (AI-assisted coding)</dd></div>
+    <div><dt>Stack</dt><dd>Gemini API, Cloudflare Workers, PostHog, GitHub</dd></div>
+    <div><dt>Live</dt><dd><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></dd></div>
+  </dl>
+
+  <!-- 02 -->
+  <section class="cs acc-aqua" aria-labelledby="h2a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">02</span><span class="label">Observation</span></div>
+      <h2 id="h2a">Why are small decisions so <mark>hard</mark>?</h2>
+    </div>
+    <div class="split">
+      <div class="prose">
+        <p>What to eat. Which shirt. Whether to text back now or later. None of these matter much, yet they can eat twenty minutes and a surprising amount of energy.</p>
+        <p>I kept noticing the same pattern in myself and people around me: the options are usually close enough that either would be fine. <strong>The hard part isn't choosing well. It's stopping.</strong></p>
+        <p>Most decision tools answer this with more analysis: pros and cons, scores, recommendations. For a choice this small, more thinking is the problem, not the fix.</p>
+      </div>
+      <figure class="quote"><div class="die bob" data-face="savage"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The options were never the problem. Stopping was.</blockquote></figure>
+    </div>
+    <div class="scenes">
+      <div class="scene card"><span class="label">12:41 PM · Lunch</span><div class="b">Scrolling a delivery app for 20 minutes. Still nothing in the cart.</div></div>
+      <div class="scene card"><span class="label">Group chat</span><div><span class="chat">whatever works</span><span class="chat">idk, either</span><span class="chat">up to you</span></div></div>
+      <div class="scene card"><span class="label">8:02 AM · Closet</span><div class="b">Two near-identical shirts. Late for the train.</div></div>
+      <div class="scene card"><span class="label">Unread · 1</span><div class="b">Reply now, or later? The draft just sits there.</div></div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="cs acc-aqua" aria-labelledby="h3a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">03</span><span class="label">Product strategy</span></div>
+      <h2 id="h3a">What if the answer didn't have to be <mark>smart</mark>?</h2>
+    </div>
+    <div class="split">
+      <div class="prose">
+        <p>For small choices, a good-enough answer delivered instantly beats a perfect answer that takes effort. So Tossy doesn't try to make better choices. It helps people stop over-thinking the ones that don't matter.</p>
+        <p>That meant saying no to the obvious features:</p>
+        <ul class="nos">
+          <li><span class="x">NO</span><span><b>Pros/cons analysis</b>Structure invites more deliberation.</span></li>
+          <li><span class="x">NO</span><span><b>AI recommendation by default</b>A "smart" answer asks to be trusted, and questioned.</span></li>
+          <li><span class="x">NO</span><span><b>Required options list</b>Don't make users structure their indecision before helping them escape it.</span></li>
+          <li><span class="x">NO</span><span><b>Pre-toss rituals</b>An earlier prototype had an anxiety "furnace," an indecision slider and a follow-through rate. I kept one idea, a running count of decisions the dice has made, and cut the rest, because every step before the toss breaks "type and toss."</span></li>
+          <li><span class="x">NO</span><span><b>Productivity-tool baggage</b>No login, no dashboard, no history to manage.</span></li>
+        </ul>
+      </div>
+      <div style="display:grid;gap:32px">
+        <figure class="quote"><div class="die bob" data-face="rational"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Don't make users structure their indecision before helping them escape it.</blockquote></figure>
+        <div class="isnt">
+          <div class="no">
+            <span class="label">What Tossy isn't</span>
+            <div class="pc"><span>PROS</span><span>CONS</span><span>Cheaper</span><span>Far away</span><span>Healthier</span><span>Takes longer</span><span>Score 7.2</span><span>Score 6.9</span></div>
+          </div>
+          <div class="yes product">
+            <span class="label">What Tossy is</span>
+            <div class="mini-ask"><span>Pasta or ramen?</span><b>TOSS IT!</b></div>
+            <div class="die" data-face="bestie"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo">
+      <figure><div class="frame f1"><i></i><b>THE ORACLE</b></div><figcaption><b>Mystical</b><span class="tag" style="--mode:#e9d9a6">V1</span></figcaption></figure>
+      <figure><div class="frame f2"><i></i><b>Tossy</b></div><figcaption><b>Calm dark</b><span class="tag" style="--mode:#c9bfff">V4</span></figcaption></figure>
+      <figure><div class="frame f3"><div class="die" data-face="bestie"></div><b>TOSSY</b></div><figcaption><b>Playful pixel</b><span class="tag" style="--mode:var(--btn)">NOW</span></figcaption></figure>
+    </div>
+    <p class="caption">Tossy started as a mystical, tarot-like oracle. But fortune-telling implies the answer means something. As the product moved toward playful, low-stakes decisions, the visual language became lighter, friendlier and deliberately less authoritative.</p>
+  </section>
+
+  <!-- 04 -->
+  <section class="cs acc-aqua" id="toss" aria-labelledby="h4a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">04</span><span class="label">Interaction design</span></div>
+      <h2 id="h4a">Designing the <mark>Toss</mark></h2>
+    </div>
+    <div class="split">
+      <div class="prose">
+        <p>If the answer is random, the moment has to feel like something. The whole product lives in about three seconds, so the toss gets the most care.</p>
+        <p>The core loop is <strong>Question → Toss → Reveal</strong>. As you type, the dice glows and "listens." When you toss, it plays out in six beats. The pause before the answer is intentional: anticipation makes a random result feel like a moment rather than a lookup.</p>
+        <p>Yes/no questions get an answer in the question's own words: "Invest" or "Hold off," not a generic YES/NO. Open questions get one concrete answer. Options are optional: up to five, added one at a time. Tapping an "X or Y" starter question splits it into two options automatically, which quietly teaches new users that options exist.</p>
+        <p><strong>Waiting is part of the toss.</strong> The AI behind the answer usually takes 1–2 seconds. Instead of a spinner, the dice hangs in the air for up to about 6 seconds, so latency becomes suspense. The whole flow fits on one screen, on phone and desktop, so the toss never scrolls out of view.</p>
+      </div>
+      <div style="display:grid;gap:28px">
+        <figure class="quote"><div class="die bob" data-face="gentle"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Anticipation turns a random result into a moment.</blockquote></figure>
+        <div class="loop"><span>QUESTION</span><em>→</em><span class="hl">TOSS</span><em>→</em><span>REVEAL</span></div>
+      </div>
+    </div>
+    <figure class="gif"><img src="gif-toss.gif" width="720" height="456" alt="A full toss: the dice rises, hangs in the air, lands with ripples, and the answer card pops in" loading="lazy"><figcaption>A full toss, in real time. Broken down beat by beat below.</figcaption></figure>
+    <div class="beats-scroll" tabindex="0" aria-label="Six beats of the toss, 2.6 seconds in total">
+      <div class="beats">
+        <div class="beat card"><div class="cell"><div class="die" data-face="bestie" style="top:22%;transform:translateX(-50%) scale(1.15,.8);transform-origin:50% 100%"></div><div class="gnd"></div><div class="tr" style="top:auto;bottom:24%;display:none"></div></div><span class="n">Beat 1</span><b>Rise</b><span class="ms">0 – 800 ms<small>Squash, then launch</small></span></div>
+        <div class="beat card"><div class="cell"><div class="die" data-face="listen" style="top:6%;transform:translateX(-50%) scale(.72)"></div><div class="tr" style="top:52%"><i></i><i></i><i></i></div><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 2</span><b>Vanish</b><span class="ms">~800 ms<small>Shrinks into the air</small></span></div>
+        <div class="beat card"><div class="cell"><div class="die" data-face="dizzy" style="top:6%;transform:translateX(-50%) scale(.72) rotate(90deg)"></div><span class="txt" style="top:62%">ROLLING...</span><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 3</span><b>Suspense</b><span class="ms">800 ms → up to ~6 s<small>Faces cycle mid-air while the AI answers</small></span></div>
+        <div class="beat card"><div class="cell"><div class="tr" style="top:10%"><i></i><i></i><i></i></div><div class="die" data-face="savage" style="top:30%;transform:translateX(-50%) rotate(20deg)"></div><div class="gnd"></div></div><span class="n">Beat 4</span><b>Fall</b><span class="ms">1600 – 1950 ms<small>Drops back down</small></span></div>
+        <div class="beat card"><div class="cell"><div class="rg"></div><div class="rg b"></div><i class="spk" style="left:20%;top:44%"></i><i class="spk" style="right:20%;top:40%"></i><div class="die" data-face="dizzy" style="top:auto;bottom:14%;transform:translateX(-50%) scale(1.12,.86);transform-origin:50% 100%;z-index:1"></div></div><span class="n">Beat 5</span><b>Bounce + ripples</b><span class="ms">1950 – 2600 ms<small>Impact, quake, sparks</small></span></div>
+        <div class="beat card"><div class="cell"><span class="ans-tag">INVEST</span><div class="die" data-face="bestie_yes" style="top:auto;bottom:14%"></div><div class="gnd"></div></div><span class="n">Beat 6</span><b>Reveal</b><span class="ms">2600 ms<small>Answer card pops in</small></span></div>
+      </div>
+    </div>
+    <div class="reveals">
+      <div style="display:grid;gap:10px"><span class="qq">Yes / no · "Should I invest in it?"</span>
+        <article class="answer" style="--mode:var(--aqua)"><span class="says">Rational says</span><span class="big">HOLD OFF</span><p>THE ODDS LANDED ON NO. NOTHING PERSONAL.</p></article></div>
+      <div style="display:grid;gap:10px"><span class="qq">Open · "What should I eat tonight?"</span>
+        <article class="answer" style="--mode:var(--pink)"><span class="says">Bestie says</span><span class="big">RAMEN</span><p>TRUST ME ON THIS ONE.</p></article></div>
+    </div>
+    <div class="split" style="gap:18px">
+      <figure class="gif"><img src="gif-listen.gif" width="780" height="430" alt="Typing a question while the dice listens and its speech bubble changes" loading="lazy"><figcaption>The dice "listens" while you type.</figcaption></figure>
+      <figure class="gif"><img src="gif-split.gif" width="800" height="270" alt="Tapping the Coffee or tea starter question fills two option fields" loading="lazy"><figcaption>An "X or Y" starter splits into two options.</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="cs acc-aqua" aria-labelledby="h5a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">05</span><span class="label">Post-reveal</span></div>
+      <h2 id="h5a">The answer isn't the <mark>interesting</mark> part.</h2>
+    </div>
+    <div class="split">
+      <div class="prose">
+        <p>The first version had one button after the reveal: Toss Again. But people don't react to a random answer in just one way. Some accept it, some want a redo, some realize the dice got it wrong.</p>
+        <p>So the reveal became a fork: <strong>Let's do it</strong>, <strong>Secretly hoping for [the other side]?</strong>, <strong>Toss again</strong> and <strong>New question</strong>. Each one tells Tossy, and the user, something different.</p>
+        <p>If someone immediately wishes the dice had landed on the other option, the random result has already done its job: it revealed a preference. Re-tossing works the same way. By the third toss, Tossy's character calls it out and nudges "Secretly hoping for…?" forward.</p>
+      </div>
+      <figure class="quote"><div class="die bob" data-face="savage_other"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The most interesting reaction wasn't acceptance. It was disappointment.</blockquote></figure>
+    </div>
+    <div style="display:grid;gap:18px">
+      <span class="label">Every reaction after the reveal is a signal</span>
+      <div class="fork">
+        <article class="answer root" style="--mode:var(--pink)"><span class="says">Answer revealed</span><span class="big">SKIP IT</span><p>Should I buy it?</p></article>
+        <div class="rail" aria-hidden="true"></div>
+        <div class="branches">
+          <div class="br"><span class="act primary" aria-hidden="true">LET'S DO IT</span><p class="t"><b>Accepts the result.</b> The dice did its job and the decision is over. The primary action; re-tossing is visually demoted.</p></div>
+          <div class="br hl"><span><span class="hot" aria-hidden="true">Secretly hoping for buy it?</span></span><p class="t"><b>Disappointment reveals a preference the user already had.</b> Yes/no and option questions only: open questions have no "other one", so they just re-toss.</p></div>
+          <div class="br"><span class="act small" aria-hidden="true">TOSS AGAIN</span><p class="t"><b>Repeated re-tossing is a signal too.</b> On the 3rd toss the character reacts, and "Secretly hoping for…?" steps forward.</p></div>
+          <div class="br"><span class="act small" aria-hidden="true">NEW QUESTION</span><p class="t"><b>Starts a different decision.</b></p></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;gap:18px">
+      <span class="label">Toss #3 · each mode calls it out in its own voice</span>
+      <div class="thirds">
+        <div class="third"><p class="say">Babe. Toss #3. You want the other one.</p><div class="die" data-face="bestie_other"></div><span class="tag" style="--mode:#ff9dca">Bestie</span></div>
+        <div class="third"><p class="say">Third time? You just don't like the answer.</p><div class="die" data-face="savage_other"></div><span class="tag" style="--mode:#a88cf7">Savage</span></div>
+        <div class="third"><p class="say">3 tosses. Your preference is showing.</p><div class="die" data-face="rational_other"></div><span class="tag" style="--mode:#74d7f2">Rational</span></div>
+        <div class="third"><p class="say">Still tossing? Maybe you already know.</p><div class="die" data-face="gentle_other"></div><span class="tag" style="--mode:#ffd463">Gentle</span></div>
+      </div>
+    </div>
+    <div class="ba">
+      <div class="ba-col">
+        <span class="label">Before · v1</span>
+        <div class="screen">
+          <article class="answer"><span class="says" style="--mode:#ff9dca">Bestie says</span><span class="big">SKIP IT</span><p>This one is not worth your energy.</p></article>
+          <span class="act" aria-hidden="true">TOSS AGAIN</span>
+        </div>
+        <p class="ba-note">One way out: toss again. Every reaction looked the same.</p>
+      </div>
+      <div class="ba-col">
+        <span class="label">After · now</span>
+        <div class="screen">
+          <article class="answer"><span class="says" style="--mode:#ff9dca">Bestie says</span><span class="big">SKIP IT</span><p>This one is not worth your energy.</p><span class="hope">Secretly hoping for buy it?</span></article>
+          <span class="act primary" aria-hidden="true">LET'S DO IT</span>
+          <div class="row2"><span class="act small" aria-hidden="true">TOSS AGAIN</span><span class="act small" aria-hidden="true">NEW QUESTION</span></div>
+        </div>
+        <p class="ba-note">Four ways out, and each one tells Tossy something.</p>
+      </div>
+    </div>
+    <p class="recreated">Screens recreated for this page.</p>
+    <figure class="gif narrow"><img src="gif-third.gif" width="720" height="456" alt="On the third toss, savage mode says Third time? You just don't like the answer, and the other-side link is highlighted" loading="lazy"><figcaption>Toss #3: the character calls it out and "Secretly hoping for…?" steps forward.</figcaption></figure>
+
+  </section>
+
+  <!-- 06 -->
+  <section class="cs acc-aqua" aria-labelledby="h6a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">06</span><span class="label">AI boundaries</span></div>
+      <h2 id="h6a">AI speaks, <mark>the dice decides.</mark></h2>
+    </div>
+    <div class="prose">
+      <p>It would have been easy to let AI pick the answer. It would also have broken the product: the moment AI decides, the answer sounds smart, and smart answers invite second-guessing. So AI has a clear, limited job.</p>
+    </div>
+    <div class="roles">
+      <div class="role panel">
+        <h3><span class="tag" style="--mode:var(--lav)">AI · Gemini</span>Adds possibility</h3>
+        <ul>
+          <li><b>Reads the question</b><span>Is it yes/no or open?</span></li>
+          <li><b>Writes the options</b><span>Yes/no: both sides in the question's own words. Open: six concrete candidates, each with its own line.</span></li>
+          <li><b>Writes the voice</b><span>Mode changes the tone of the comment, never the answer.</span></li>
+          <li><b>Expands the pool</b><span>Wildcard adds Tossy's own pick. If you give one option, Tossy's pick joins it.</span></li>
+          <li class="never"><b>Never decides</b><span>It has no say in which side or candidate wins.</span></li>
+        </ul>
+      </div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="role panel">
+        <h3><span class="tag" style="--mode:var(--aqua)">Dice · Random</span>Keeps authority</h3>
+        <ul>
+          <li><b>Yes / no</b><span>Still a 50/50 toss between the two sides the AI wrote.</span></li>
+          <li><b>Open questions</b><span>The answer is drawn at random from the six candidates.</span></li>
+          <li><b>Stays neutral</b><span>A random answer makes no claim to be right, so there is nothing to argue with.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:grid;gap:16px">
+      <span class="label">How it got there · 4 iterations</span>
+      <ol class="iters">
+        <li class="card"><span class="lv">LV 1</span><b>AI only commented</b><p>Answers were random locally, so testers often got answers that didn't fit the question at all.</p></li>
+        <li class="card"><span class="lv">LV 2</span><b>AI wrote candidates for open questions</b><p>Six relevant answers; the dice picks one.</p></li>
+        <li class="card"><span class="lv">LV 3</span><b>Local rules for yes/no phrasing</b><p>It worked, but every new kind of question needed a new rule. Not sustainable.</p></li>
+        <li class="card now"><span class="lv">LV 4 · NOW</span><b>AI reads every question first</b><p>It classifies the question and writes both sides. The local rules became the fallback.</p></li>
+      </ol>
+    </div>
+
+    <div style="display:grid;gap:16px">
+      <span class="label">Guardrails that make it feel like a friend</span>
+      <div class="guards">
+        <div class="guard card"><b>Answers must be concrete</b><p>A real place, a real gift, a real dish. No dodges and no jokes in place of an answer.</p><div class="ex"><span class="bad">WHATEVER</span><span class="ok">KYOTO</span></div></div>
+        <div class="guard card"><b>Comment and answer must agree</b><p>A "Hold off" never comes with a line encouraging you to go for it.</p><div class="ex"><span class="ok">HOLD OFF · NOT TODAY. IT CAN WAIT.</span></div></div>
+        <div class="guard card"><b>Some questions aren't decisions</b><p>"Am I fat?" gets no verdict.</p><div class="ex"><span class="ok">THE DICE DOESN'T RATE THAT. YOU'RE FINE.</span></div></div>
+        <div class="guard card"><b>AI can fail; Tossy can't</b><p>Every AI feature has a local fallback, so a timeout never leaves the user stuck.</p><div class="ex"><span class="bad">TIMEOUT</span><span class="ok">LOCAL FALLBACK</span></div></div>
+      </div>
+    </div>
+
+    <article class="answer bigq block"><div class="peek die" data-face="rational"></div><span class="says">Tossy says</span><p class="big">AI adds possibility. <em>Randomness keeps authority.</em></p></article>
+    <div style="display:grid;gap:16px">
+      <span class="label">One question, four voices · real outputs for "Should I invest in it?"</span>
+      <div class="voices">
+        <article class="answer voice" style="--mode:#a88cf7"><div class="top-row"><span class="says">Savage says</span><div class="die" data-face="savage"></div></div><span class="big">WAIT</span><p>Your bank account is crying just looking at this.</p><span class="hope">Secretly hoping for invest?</span></article>
+        <article class="answer voice" style="--mode:#ff9dca"><div class="top-row"><span class="says">Bestie says</span><div class="die" data-face="bestie"></div></div><span class="big">HOLD OFF</span><p>Let us pause and breathe a bit first babe.</p><span class="hope">Secretly hoping for go for it?</span></article>
+        <article class="answer voice" style="--mode:#74d7f2"><div class="top-row"><span class="says">Rational says</span><div class="die" data-face="rational"></div></div><span class="big">HOLD OFF</span><p>Current volatility exceeds your risk tolerance.</p><span class="hope">Secretly hoping for go ahead?</span></article>
+        <article class="answer voice" style="--mode:#ffd463"><div class="top-row"><span class="says">Gentle says</span><div class="die" data-face="gentle"></div></div><span class="big">WAIT A BIT</span><p>There is no need to rush into anything.</p><span class="hope">Secretly hoping for invest?</span></article>
+      </div>
+      <p class="note">Same question, one toss per mode. The AI words both sides in each mode's own voice and writes a matching comment; the dice picks the side. Each card offers the other side right away.</p>
+    </div>
+    <figure class="gif"><img src="gif-wildcard.gif" width="720" height="445" alt="One option, Pizza, is added; Tossy's own pick joins automatically; the dice lands on Tossy's pick, Pho" loading="lazy"><figcaption>Wildcard: give one option and Tossy's own pick joins the pool. Here the dice chose Tossy's pick.</figcaption></figure>
+  </section>
+
+  <!-- 07 -->
+  <section class="cs acc-aqua" aria-labelledby="h7a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">07</span><span class="label">Personality</span></div>
+      <h2 id="h7a">Small details, <mark>same idea.</mark></h2>
+      <div class="prose"><p>If the answer is random, personality is what makes Tossy worth coming back to. Every detail follows the same rule: make a low-stakes moment feel light and a little fun.</p></div>
+    </div>
+    <div class="details">
+      <div class="det"><div class="show rec"><img src="gif-modes.gif" alt="Switching between the four modes changes the dice face and its greeting" loading="lazy"></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
+      <div class="det"><div class="show rec"><img src="gif-skins.gif" alt="Clicking through the six skins recolors the whole page" loading="lazy"></div><h3>Skins</h3><p>Pick a palette before you toss.</p></div>
+      <div class="det"><div class="show"><div class="speaker"><svg width="64" height="64" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" class="d-line"/><rect x="6" y="5" width="2" height="10" class="d-line"/><rect x="8" y="3" width="2" height="14" class="d-line"/><rect x="12" y="7" width="2" height="6" style="fill:var(--btn)"/><rect x="15" y="4" width="2" height="12" style="fill:var(--btn)"/></svg><span class="notes">♪ BLIP<br>♪ BOOP</span></div></div><h3>8-bit sound</h3><p>A tiny sound for a tiny decision. Mutable.</p></div>
+      <div class="det"><div class="show"><div class="phone"><div class="die" data-face="bestie_yes"></div></div></div><h3>Haptics</h3><p>On phones, you feel the dice land.</p></div>
+      <div class="det"><div class="show rec tall"><img src="gif-ptr.gif" alt="On a phone, pulling down shows a small spinning dice and Release to refresh" loading="lazy"></div><h3>Dice pull-to-refresh</h3><p>Pull down and the dice spins. Built because Safari's bounce area broke the polka-dot background.</p></div>
+      <div class="det"><div class="show"><div class="count"><span class="ctr"><svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>RECENT <i>12</i></span><p>THE DICE HAS DECIDED 12 THINGS FOR YOU.</p></div></div><h3>Decision count</h3><p>"The dice has decided N things for you."</p></div>
+      <div class="det"><div class="show"><div class="fresh"><p class="say">DON'T ARGUE WITH THE DICE.</p><span>≠</span><p class="say">STOP STARING. GO.</p></div></div><h3>Fresh lines</h3><p>The same comment never shows up twice in a row.</p></div>
+      <div class="det"><div class="show"><div class="zh"><div class="row"><span style="--c:#ff9dca">闺蜜</span><span style="--c:#a88cf7">毒舌</span><span style="--c:#74d7f2">理性</span><span style="--c:#ffd463">温柔</span></div><p class="say">宝，第三次了。你其实想要另一个吧。</p></div></div><h3>Chinese version</h3><p>Pixel font and copy for Chinese-speaking users.</p></div>
+      <div class="det"><div class="show"><ul class="eggs"><li>Poke the dice → "Hehe, that tickles!"</li><li>Its eyes follow your cursor</li><li>Hold TOSS to charge a super toss</li></ul></div><h3>Easter eggs</h3><p>Small rewards for people who poke around.</p></div>
+    </div>
+
+    <div class="spot panel">
+      <div class="spot-head"><span class="tag" style="--mode:var(--lav)">Spotlight · Savage mode</span><h3>From rules to a character</h3></div>
+      <div class="spot-body">
+        <div class="prose">
+          <p>Savage mode started as a list of things the AI must never say. In testing, friends still got lines that felt mean. So I stopped writing rules and wrote a character instead: <strong>the old friend who talks tough but has your back.</strong> It roasts the situation, the indecision and the dice. Never the person.</p>
+        </div>
+        <figure class="quote"><div class="die bob" data-face="savage"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The user is the hero of the joke, not the punchline.</blockquote></figure>
+      </div>
+      <div class="vs">
+        <div class="vs-col before">
+          <span class="label">Before · rulebook</span>
+          <p class="rules">Never insult the user · never mention weight · never swear · never …</p>
+          <p class="vq">Q · Should I text him back?</p>
+          <ul class="lines">
+            <li>A dice? For a text? No wonder he never texts first.</li>
+            <li>Classic you. An hour to type "hey."</li>
+            <li>Send it or don't. Nobody's waiting on you anyway.</li>
+          </ul>
+          <p class="verdict">Technically allowed. Still aimed at the person.</p>
+        </div>
+        <div class="vs-col after">
+          <span class="label">After · character</span>
+          <p class="rules">The old friend who talks tough but has your back. Roast the situation, the indecision, the dice. Never the person.</p>
+          <p class="vq">Q · Should I text him back?</p>
+          <ul class="lines">
+            <li>That draft has been sitting there longer than your leftovers. Send it.</li>
+            <li>The dice said yes. Your thumbs said yes. Go.</li>
+            <li>Even the dice got nervous for you. Hit send.</li>
+          </ul>
+          <p class="verdict">Same edge, pointed at the moment instead.</p>
+        </div>
+      </div>
+      <p class="recreated">Illustrative lines written for this page, not logged outputs.</p>
+
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="cs acc-aqua" aria-labelledby="h8a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">08</span><span class="label">Testing</span></div>
+      <h2 id="h8a">What users <mark>revealed</mark></h2>
+      <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. A few patterns shaped the product most.</p></div>
+    </div>
+    <div class="findings">
+      <article class="find card">
+        <span class="k">Finding 1</span>
+        <div>
+          <h3>People wanted to toss before typing.</h3>
+          <p>Several testers tapped the dice without entering a question, expecting it to just answer. So I made an empty toss work. It pushed the product principle further than I had: don't even make users write the question down first.</p>
+          <div class="steps">
+            <div><i>Users did</i>Tapped TOSS IT! with an empty box.</div>
+            <div><i>I changed</i>An empty toss now picks a question for you.<br><span class="say-in">NOTHING TO ASK? I PICKED ONE.</span></div>
+            <div><i>It showed</i>Even writing the question down was friction.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="find panel">
+        <span class="k">Finding 2</span>
+        <div>
+          <h3>Answers that missed the question.</h3>
+          <p>A friend asked what to eat while drinking with friends tonight. Tossy said sparkling water. She tossed again: iced Americano. "Why is everything a drink?" A random answer is fine; an irrelevant one breaks trust. This pushed AI from writing comments to reading the question first (→ Section 06). Part of the problem, it turned out, was a bug (Finding 5).</p>
+          <div class="chatlog">
+            <span class="q">Q · What should I eat while drinking with friends tonight?</span>
+            <div class="row"><span class="a">SPARKLING WATER</span><span class="arrow">→ toss again →</span><span class="a">ICED AMERICANO</span></div>
+            <p class="msg">"Why is everything a drink?"</p>
+          </div>
+          <div class="sub">
+            <p><b>2b · Too few words.</b> Another note from the same friend: the replies felt a bit short. I kept them short on purpose: Tossy exists to save mental effort, and a longer reply is one more thing to read. Instead I made them fresher, with far more variety and more creative lines, so the same comment doesn't keep coming back.</p>
+            <p class="aside"><b>Side note.</b> Her first question was "Which AI is this, ChatGPT?" People noticed the AI right away, which is exactly why it matters that the AI never decides.</p>
+          </div>
+        </div>
+      </article>
+      <div class="chat-ba">
+        <div class="cb-col">
+          <span class="label">Then · the original chat</span>
+          <div class="phone-chat">
+            <div class="pc-head"><i class="av"></i><b>Friend</b></div>
+            <div class="msg in">what should I eat while drinking w friends tonight</div>
+            <div class="msg in card">TOSSY · <b>SPARKLING WATER</b></div>
+            <div class="msg in card">TOSSY · <b>ICED AMERICANO</b></div>
+            <div class="msg in">why is everything a drink??</div>
+            <div class="msg in">wait which AI is this, chatgpt?</div>
+            <div class="msg out">lol fixing it</div>
+          </div>
+        </div>
+        <div class="cb-arrow" aria-hidden="true">→</div>
+        <div class="cb-col">
+          <span class="label">Now · same question</span>
+          <div class="phone-now">
+            <span class="qtag">Q · What should I eat while drinking with friends tonight?</span>
+            <article class="answer"><span class="says" style="--mode:#ff9dca">Bestie says</span><span class="big">SPICY WINGS</span><p>Perfect with a cold drink, babe.</p></article>
+            <p class="pn-note">The AI reads the question first, so all six candidates are things you'd eat with drinks. The dice still picks one.</p>
+          </div>
+        </div>
+      </div>
+      <p class="recreated">Chat recreated and translated from the original. The "now" answer is an example.</p>
+
+
+      <article class="find card">
+        <span class="k">Finding 3</span>
+        <div><h3>Savage went too far.</h3><p>Some savage-mode lines landed as mean, not funny. Each round I patched the banned list, and each round something new slipped through. That's what led to rewriting savage mode as a character instead of a rulebook (→ Section 07).</p></div>
+      </article>
+
+      <article class="find panel">
+        <span class="k">Finding 4</span>
+        <div>
+          <h3>People did want the other one.</h3>
+          <p>Of 52 recorded decisions, 13 ended with the user switching to the side the dice didn't pick. On yes/no questions it was 10 of 24 (42%). The dice didn't make those choices; it surfaced ones people already had.</p>
+          <div class="grids">
+            <figure><div class="pxgrid" data-n="52" data-k="13" role="img" aria-label="52 decisions, 13 switched"></div><figcaption><b>13 / 52</b> All decisions switched</figcaption></figure>
+            <figure><div class="pxgrid" data-n="24" data-k="10" role="img" aria-label="24 yes/no decisions, 10 switched"></div><figcaption><b>10 / 24</b> Yes/no switched (42%)</figcaption></figure>
+          </div>
+          <p class="legend"><i class="sw acc"></i>Accepted the dice <i class="sw swi"></i>Switched to the other one</p>
+        </div>
+      </article>
+
+      <article class="find card">
+        <span class="k">Finding 5</span>
+        <div>
+          <h3>The bug the data caught.</h3>
+          <div class="bug"><span class="zero">0 / 134</span><span class="label">AI comment requests that succeeded, Sep 28 – Oct 7</span></div>
+          <p>The busiest testing day was also the day AI quietly stopped working: the production API key was missing. Because every AI feature had a local fallback, nobody saw an error. Answers just got blander and sometimes off-topic. Some of the "wrong" answers friends reported weren't AI mistakes at all. <strong>A fallback that hides failures needs monitoring that doesn't.</strong></p>
+        </div>
+      </article>
+    </div>
+
+    <div style="display:grid;gap:16px">
+      <span class="label">Early signals · PostHog · Sep 27 – Oct 8</span>
+      <div class="stats">
+        <div class="stat card"><span class="v">68</span><span class="l">Unique visitors</span></div>
+        <div class="stat card"><span class="v">145</span><span class="l">Tosses</span></div>
+        <div class="stat card"><span class="v">28%</span><span class="l">Re-tosses · 41 of 145</span></div>
+        <div class="stat card hl"><span class="v">42%</span><span class="l">Switched on yes/no · 10 of 24</span></div>
+      </div>
+      <div class="sigwrap">
+        <table class="sig">
+          <tbody>
+            <tr><th>Visitors who tossed</th><td>17 (25%)</td></tr>
+            <tr><th>Decisions recorded</th><td>52 · 39 accepted, 13 switched</td></tr>
+            <tr><th>Switched on options</th><td>3 of 16 (19%)</td></tr>
+            <tr><th>Started from a starter question</th><td>61 of 145 (42%)</td></tr>
+            <tr><th>Results shared</th><td>11</td></tr>
+          </tbody>
+        </table>
+        <div class="mix">
+          <span class="label">Mode mix</span>
+          <div class="bar" role="img" aria-label="Savage 38%, Rational 28%, Bestie 17%, Gentle 17%">
+            <span style="flex:38;background:#a88cf7" data-tip="Savage 38%"></span><span style="flex:28;background:#74d7f2" data-tip="Rational 28%"></span><span style="flex:17;background:#ff9dca" data-tip="Bestie 17%"></span><span style="flex:17;background:#ffd463" data-tip="Gentle 17%"></span>
+          </div>
+          <div class="keys"><span><i style="background:#a88cf7"></i>Savage 38%</span><span><i style="background:#74d7f2"></i>Rational 28%</span><span><i style="background:#ff9dca"></i>Bestie 17%</span><span><i style="background:#ffd463"></i>Gentle 17%</span></div>
+        </div>
+      </div>
+      <p class="framing">Early testing, small sample. These are signals, not proof.</p>
+      <div class="foot-notes">
+        <p><b>How it was counted.</b> Internal and test users are filtered out, including my own test sessions. Most visitors were friends opening a shared link without a decision in mind, so "visitors who tossed" isn't a real conversion rate.</p>
+        <p><b>Privacy.</b> Analytics track events, never the questions people ask. The API key stays server-side.</p>
+        <p><b>Reliability.</b> Successful AI calls return in about 1.3–1.5 seconds (median). After the API key was restored, a 4.2-second limit still let some calls time out, so I raised the wait to about 6 seconds, with the dice hovering in the air. From Oct 10 to Nov 8, 8 of 9 AI calls succeeded (median 1.4 s); the one miss fell back to local answers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section class="cs acc-aqua" aria-labelledby="h9a">
+    <div class="head">
+      <div class="eyebrow"><span class="num">09</span><span class="label">Reflection</span></div>
+      <h2 id="h9a">Randomness can be a <mark>mirror.</mark></h2>
+    </div>
+    <div class="prose">
+      <p>I started with one hypothesis: randomness helps people decide. Testing added a second: randomness also helps people notice what they already prefer. Sometimes the most useful answer is the one you're disappointed by.</p>
+    </div>
+    <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Looking back</span><p class="big">I built Tossy to make decisions for people. It turned out to be better at showing them <em>what they'd already decided.</em></p></article>
+    <div class="lists">
+      <div>
+        <h3>Limitations</h3>
+        <ul>
+          <li>Small sample: 68 visitors, mostly friends and friends of friends. Signals, not proof.</li>
+          <li>The preference signal only works for yes/no and option questions.</li>
+          <li>Randomness fits low-stakes choices. Tossy isn't built for serious ones.</li>
+        </ul>
+      </div>
+      <div class="next">
+        <h3>What I'd test next</h3>
+        <ul>
+          <li>Do people who switch feel better about the final choice than people who accept?</li>
+          <li>Which kinds of decisions get the most re-tosses and switches?</li>
+          <li>Does mode change how often people accept the first result?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="built">
+      <div class="head">
+        <span class="label">How I built it</span>
+      </div>
+      <div class="split">
+        <div class="prose">
+          <p>I didn't write the code. I built Tossy with Claude and Codex, and my job was the part AI can't decide for you: <strong>the principle</strong> (the dice decides, AI only speaks), <strong>what a good answer looks like</strong>, <strong>how each mode should behave</strong>, and <strong>when a version was ready to ship</strong>.</p>
+          <p>I connected the Gemini API and PostHog myself, tested each build with friends, and turned what broke into the next round of requirements. When a fix stopped working, like adding more banned words to savage mode, I changed the brief instead of the patch: I gave the AI a character to play.</p>
+        </div>
+        <div style="display:grid;gap:28px">
+          <figure class="quote"><div class="die bob" data-face="rational"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>AI wrote the code. I decided what it should do.</blockquote></figure>
+          <ol class="loopc" aria-label="Build loop">
+            <li>Idea</li><li>Brief</li><li class="ai">AI builds</li><li>Friends test</li><li class="hot2">What broke</li><li>New brief ↺</li>
+          </ol>
+        </div>
+      </div>
+      <figure class="brief">
+        <div class="brief-bar"><i></i><i></i><i></i><span>brief · savage mode v2</span></div>
+        <div class="brief-body">
+          <p><b>Goal.</b> Savage should feel like teasing from a friend, not an attack.</p>
+          <p><b>Character.</b> The old friend who talks tough but has your back.</p>
+          <p><b>Target.</b> Roast the situation, the indecision and the dice. Never the person. The user is the hero of the joke, not the punchline.</p>
+          <p><b>How.</b> Show what good lines look like instead of listing what's banned. Keep the word filter only as a last safety net.</p>
+          <p><b>Keep.</b> The UI name stays "Savage". The answer itself stays random; tone only changes the comment.</p>
+        </div>
+        <figcaption>Excerpt of a brief I wrote for the AI, rewritten in English for this page.</figcaption>
+      </figure>
+
+    </div>
+  </section>
+
+  <section class="end band band-dots" aria-label="Try Tossy">
+    <div class="die" data-face="gentle_yes"></div>
+    <div class="ground-s" aria-hidden="true"></div>
+    <p class="label">The dice has landed</p>
+    <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Toss your own →</a>
+  </section>
+
+  <footer><a class="foot-link" href="homepage.html">← All work</a><a class="foot-link" href="glowin.html">Next: Glowin →</a></footer>
+</div>
+
+<script>
+(function(){
+  var R = function (x, y, w, h, c) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" class="' + c + '"/>'; };
+  var FACES = {
+    savage: R(52,76,28,8,"d-line") + R(96,76,28,8,"d-line") + R(60,84,12,8,"d-line") + R(104,84,12,8,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(76,112,24,8,"d-line") + R(100,104,8,8,"d-line"),
+    bestie: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,8,8,"d-line") + R(104,72,8,8,"d-line") + R(112,80,8,8,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(64,100,8,8,"d-line") + R(104,100,8,8,"d-line") + R(72,108,32,8,"d-line"),
+    rational: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(62,80,8,8,"d-line") + R(106,80,8,8,"d-line") + R(76,112,24,8,"d-line"),
+    gentle: R(60,80,8,12,"d-line") + R(108,80,8,12,"d-line") + R(60,80,4,4,"d-hi") + R(108,80,4,4,"d-hi") + R(40,100,20,8,"d-blush") + R(116,100,20,8,"d-blush") + R(76,108,4,4,"d-line") + R(96,108,4,4,"d-line") + R(80,112,16,4,"d-line"),
+    listen: R(60,76,12,16,"d-line") + R(104,76,12,16,"d-line") + R(60,76,4,4,"d-hi") + R(104,76,4,4,"d-hi") + R(44,104,12,8,"d-blush") + R(120,104,12,8,"d-blush") + R(84,108,8,8,"d-line"),
+    bestie_yes: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,8,8,"d-line") + R(104,72,8,8,"d-line") + R(112,80,8,8,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(68,100,40,4,"d-line") + R(72,104,32,8,"d-line") + R(80,112,16,4,"d-line") + R(84,108,8,4,"d-blush"),
+    bestie_other: R(56,80,8,8,"d-line") + R(64,72,8,8,"d-line") + R(72,80,8,8,"d-line") + R(96,80,24,6,"d-line") + R(40,96,16,8,"d-blush") + R(120,96,16,8,"d-blush") + R(64,100,8,8,"d-line") + R(104,100,8,8,"d-line") + R(72,108,32,6,"d-line"),
+    savage_yes: R(56,84,24,6,"d-line") + R(96,84,24,6,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(72,112,32,6,"d-line") + R(104,104,8,8,"d-line") + R(112,100,4,4,"d-line"),
+    savage_other: R(52,72,28,6,"d-line") + R(96,66,12,6,"d-line") + R(108,60,16,6,"d-line") + R(60,82,12,10,"d-line") + R(104,78,12,10,"d-line") + R(44,104,16,8,"d-blush") + R(120,104,16,8,"d-blush") + R(76,112,24,6,"d-line") + R(100,106,8,6,"d-line"),
+    rational_yes: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(62,80,8,8,"d-line") + R(106,80,8,8,"d-line") + R(68,108,8,4,"d-line") + R(76,112,24,4,"d-line") + R(100,108,8,4,"d-line"),
+    rational_other: '<rect x="54" y="72" width="24" height="24" class="d-ring"/><rect x="98" y="72" width="24" height="24" class="d-ring"/>' + R(78,80,20,4,"d-line") + R(66,80,8,8,"d-line") + R(110,80,8,8,"d-line") + R(98,62,24,4,"d-line") + R(84,112,20,4,"d-line"),
+    gentle_yes: R(56,84,4,4,"d-line") + R(60,80,8,4,"d-line") + R(68,84,4,4,"d-line") + R(104,84,4,4,"d-line") + R(108,80,8,4,"d-line") + R(116,84,4,4,"d-line") + R(40,98,20,8,"d-blush") + R(116,98,20,8,"d-blush") + R(76,108,4,4,"d-line") + R(96,108,4,4,"d-line") + R(80,112,16,4,"d-line") + R(124,44,4,4,"d-blush") + R(132,44,4,4,"d-blush") + R(120,48,20,4,"d-blush") + R(124,52,12,4,"d-blush") + R(128,56,4,4,"d-blush"),
+    gentle_other: R(60,80,8,12,"d-line") + R(108,80,8,12,"d-line") + R(60,80,4,4,"d-hi") + R(108,80,4,4,"d-hi") + R(40,100,20,8,"d-blush") + R(116,100,20,8,"d-blush") + R(72,104,4,4,"d-line") + R(100,104,4,4,"d-line") + R(76,108,24,4,"d-line"),
+    dizzy: [[56,72],[72,72],[64,80],[56,88],[72,88],[96,72],[112,72],[104,80],[96,88],[112,88]].map(function (p) { return R(p[0], p[1], 8, 8, "d-line"); }).join("") + R(68,112,8,4,"d-line") + R(76,108,8,4,"d-line") + R(84,112,8,4,"d-line") + R(92,108,8,4,"d-line") + R(100,112,8,4,"d-line")
+  };
+  
+  function die(face) {
+    return '<svg viewBox="0 0 176 176" shape-rendering="crispEdges" aria-hidden="true">' +
+      '<path class="d-drop" d="M32 24h128v8h8v128h-8v8H32v-8h-8V32h8Z"/>' +
+      '<path class="d-line" d="M24 16h128v8h8v128h-8v8H24v-8h-8V24h8Z"/>' +
+      '<path class="d-body" d="M32 24h112v8h8v112h-8v8H32v-8h-8V32h8Z"/>' +
+      R(32,136,112,8,"d-shade") + R(136,40,8,96,"d-shade") + R(32,40,8,16,"d-hi") + R(40,32,16,8,"d-hi") +
+      '<g class="face">' + (FACES[face] || FACES.bestie) + "</g></svg>";
+  }
+  document.querySelectorAll("[data-face]").forEach(function (el) { el.innerHTML = die(el.getAttribute("data-face")); });
+
+  document.querySelectorAll(".pxgrid").forEach(function (g) {
+    var n = +g.getAttribute("data-n"), k = +g.getAttribute("data-k"), h = "";
+    for (var i = 0; i < n; i++) h += '<i' + (i >= n - k ? ' class="s"' : '') + '></i>';
+    g.innerHTML = h;
+  });
+  /* skins, same values as the product */
+  var SKINS = [
+    { n:"Lavender", bg:"#f1ecff", line:"#1c1740", drop:"#b9acff", shade:"#d9d1ff", body:"#f4f0ff" },
+    { n:"Aqua", bg:"#edf9fc", line:"#292544", drop:"#a6e3f0", shade:"#cdeef6", body:"#f3fcfe" },
+    { n:"Candy", bg:"#fff1f7", line:"#3a2140", drop:"#ffc2dc", shade:"#ffd6e8", body:"#fff7fb" },
+    { n:"Lemon", bg:"#fff9e3", line:"#3b2f1a", drop:"#f5dc86", shade:"#f6e7ad", body:"#fffcf0" },
+    { n:"Mint", bg:"#effbf6", line:"#1f3a36", drop:"#b6efdd", shade:"#cdeee4", body:"#f6fdfa" },
+    { n:"Night", bg:"#1b1830", line:"#0b0a16", drop:"#74d7f2", shade:"#c9bfff", body:"#f4f0ff" }
+  ];
+  var faces6 = ["bestie","savage","rational","gentle","listen","bestie_yes"];
+  var sr = document.getElementById("skinrow"); if (sr) sr.innerHTML = SKINS.map(function (s, i) {
+    return '<div title="' + s.n + '" style="--bg:' + s.bg + ';--line:' + s.line + ';--drop:' + s.drop + ';--shade:' + s.shade + ';--body:' + s.body + '"><div class="die">' + die(faces6[i]) + '</div></div>';
+  }).join("");
+
+  /* ---------- hero demo: the real toss timeline ---------- */
+  var MODES = {
+    bestie:   { c:"#ff9dca", label:"Bestie",   yes:[["YES!","DO IT. I AM ALREADY PROUD OF YOU."],["YES YES YES","DO IT FOR THE STORY."]], no:[["NOT YET!","LET IT BREATHE. YOU DESERVE THE EFFORT."],["NOPE, BABE","THIS ONE IS NOT WORTH YOUR ENERGY."]] },
+    savage:   { c:"#a88cf7", label:"Savage",   yes:[["YES. FINALLY.","STOP OVERTHINKING AND GO."],["OBVIOUSLY YES","YOU ASKED A DICE. JUST DO IT."]], no:[["NO.","YOU ALREADY KNEW. YOU JUST WANTED A WITNESS."],["HARD PASS","EVEN THE DICE SAID NO THANKS."]] },
+    rational: { c:"#74d7f2", label:"Rational", yes:[["YES.","PURE CHANCE SAYS YES. NO NEED TO OVERTHINK IT."],["AFFIRMATIVE.","OUTCOME: YES. PROCEED."]], no:[["NO.","THE ODDS LANDED ON NO. NOTHING PERSONAL."],["NEGATIVE.","OUTCOME: NO. SAVE THE TIME."]] },
+    gentle:   { c:"#ffd463", label:"Gentle",   yes:[["GO FOR IT","BE KIND TO YOURSELF EITHER WAY."],["WHY NOT","YOU DESERVE A LITTLE YES TODAY."]], no:[["MAYBE LATER","NO RUSH. REST FIRST."],["NOT TODAY","IT IS OKAY TO SAY NO."]] }
+  };
+  var ORDER = ["bestie","savage","rational","gentle"], CYCLE = ["savage","bestie","rational","gentle","listen","dizzy"];
+  var TIMELINE = [["launch",300],["hang",800],["drop",1600],["impact",1950],["settle",2300],["reveal",2600]];
+  var mode = "bestie", busy = false, timers = [], cyc = null;
+  var $ = function (id) { return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root = document.documentElement;
+
+  var box = $("demoModes");
+  box.innerHTML = ORDER.map(function (id) {
+    return '<button class="mbtn" type="button" data-m="' + id + '" style="--c:' + MODES[id].c + '" aria-pressed="' + (id === mode) + '"><span class="die">' + die(id) + '</span>' + MODES[id].label + '</button>';
+  }).join("");
+  box.addEventListener("click", function (e) {
+    var b = e.target.closest(".mbtn"); if (!b || busy) return;
+    mode = b.getAttribute("data-m");
+    box.querySelectorAll(".mbtn").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    $("demo").style.setProperty("--mode", MODES[mode].c);
+    setFace(mode);
+  });
+  function setFace(f) { $("stageFace").innerHTML = die(f); }
+  setFace(mode);
+  $("demo").style.setProperty("--mode", MODES[mode].c);
+
+  function bump(el, c) { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function phase(p) {
+    var d = $("stageDie"), g = $("ground");
+    if (p === "launch") { d.classList.add("up"); cyc = setInterval(function () { setFace(pick(CYCLE)); }, 115); }
+    if (p === "hang") { d.classList.remove("up"); $("rolling").classList.add("on"); }
+    if (p === "drop") { $("rolling").classList.remove("on"); d.classList.add("down"); }
+    if (p === "impact") { d.classList.remove("down"); clearInterval(cyc); setFace("dizzy"); bump($("fx"), "on"); bump($("arena"), "quake"); }
+    if (p === "settle") setFace(mode);
+    if (p === "reveal") {
+      clearInterval(cyc);
+      var yes = Math.random() < .5, line = pick(MODES[mode][yes ? "yes" : "no"]);
+      setFace(mode + (yes ? "_yes" : "_other"));
+      var a = $("demoAnswer");
+      a.className = "answer";
+      a.innerHTML = '<span class="says">' + MODES[mode].label + ' says</span><h3>' + (yes ? "GET THE BOBA" : "SKIP IT TODAY") + '</h3><p>' + line[1] + '</p>';
+      bump(a, "on");
+      busy = false; $("demoToss").disabled = false; $("demoToss").textContent = "TOSS AGAIN";
+    }
+  }
+  $("demoToss").addEventListener("click", function () {
+    if (busy) return; busy = true;
+    timers.forEach(clearTimeout); timers = [];
+    $("demoToss").disabled = true;
+    var d = $("stageDie"), g = $("ground");
+    d.classList.remove("go","up","down"); g.classList.remove("go"); $("fx").classList.remove("on");
+    var a = $("demoAnswer"); a.className = "answer wait"; a.innerHTML = "<p>...</p>";
+    setFace(mode); void d.offsetWidth;
+    if (reduce) { phase("reveal"); return; }
+    d.classList.add("go"); g.classList.add("go");
+    TIMELINE.forEach(function (t) { timers.push(setTimeout(function () { phase(t[0]); }, t[1])); });
+  });
+})();
+</script>
+
+
+</body>
+</html>
