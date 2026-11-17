@@ -1882,5 +1882,15 @@ document.querySelectorAll('.wave-div').forEach(d=>{
 :root{--gut:var(--site-gut)}
 .hero,.section,.thanks,.wave-div,.proc>summary{padding-left:var(--site-gut)!important;padding-right:var(--site-gut)!important}
 </style>
+<style id="type-scale">
+:root{--t-h2:clamp(34px,3.6vw,52px);--t-sub:20px;--t-body:17px;--t-small:15px;--t-cap:13px}
+@media(max-width:600px){:root{--t-sub:18px;--t-body:16px;--t-small:14px}}
+
+.s-title{font-size:var(--t-h2)!important;line-height:1.1!important}
+.s-sub{font-size:var(--t-sub)!important;line-height:1.55!important}
+.about-quote p{font-size:var(--t-sub)!important;line-height:1.6!important}
+.dx-b,.path-d,.prob-t,.mk-note{font-size:var(--t-body)!important;line-height:1.65!important}
+.iq-a,.iq-q,.sol-text,.dec dd{font-size:var(--t-small)!important;line-height:1.55!important}
+</style>
 </body>
 </html>
