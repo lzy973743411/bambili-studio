@@ -168,7 +168,9 @@ a.t-row:hover .c-go{transform:translateX(6px)}
 .facts{grid-column:1 / -1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:var(--gap);border-top:1.5px solid var(--ink)}
 .facts div{padding-top:14px}
 .facts dt{color:var(--muted);margin-bottom:8px}
-.facts dd{font-size:15px;line-height:1.45}
+.facts dd{font-size:15px;line-height:1.45;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink)}
+.facts dd a{text-decoration:underline;text-underline-offset:3px}
+.about-b p{text-wrap:pretty}
 
 /* ── Footer ── */
 footer{padding:clamp(60px,8vw,110px) var(--pad) 28px}
@@ -392,7 +394,30 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   </div>
 </section>
 
-
+<section class="sec" id="about" style="padding-top:0">
+  <div class="sec-head grid reveal">
+    <h2 style="grid-column:1 / span 8">About</h2>
+    <span class="aside label">Zhiyi (Bambi) Li · New York</span>
+  </div>
+  <div class="about grid reveal">
+    <div class="about-t">
+      <h3>From drawing, to operations, to AI.</h3>
+      <p>I'm a product designer who likes the rules underneath the screen as much as the screen itself.</p>
+    </div>
+    <div class="about-b">
+      <p>I trained in illustration and animation at the Fashion Institute of Technology. After graduating, I worked in mortgage lending operations, where a big part of my day was explaining each underwriting condition to borrowers in plain language. That job taught me that most confusion comes from rules nobody has made visible.</p>
+      <p>Since then I've designed booking, POS and an AI phone line for Glowin, a B2B platform for salons and restaurants, and built Tossy on my own with AI coding tools, from first sketch to a live product.</p>
+      <p>What connects all of it is how people decide: what to choose, what to do next, who to talk to. That is what I want to keep studying and designing for.</p>
+    </div>
+    <dl class="facts label">
+      <div><dt>Education</dt><dd>BFA, Animation &amp; Interactive Media · Fashion Institute of Technology, 2022 · cum laude</dd></div>
+      <div><dt>Design</dt><dd>Glowin platform, 2025–26 · Tossy, 2026</dd></div>
+      <div><dt>Operations</dt><dd>Mortgage lending operations, Eazzy Consulting Group</dd></div>
+      <div><dt>Certificate</dt><dd>Google AI Professional Certificate, 2026</dd></div>
+      <div><dt>Contact</dt><dd><a href="mailto:bambizhiyili@gmail.com">bambizhiyili@gmail.com</a><br><a href="https://www.linkedin.com/in/bambili/" target="_blank" rel="noopener">LinkedIn ↗</a></dd></div>
+    </dl>
+  </div>
+</section>
 
 <!-- ═════════ FOOTER ═════════ -->
 <footer id="contact">
@@ -523,6 +548,9 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
 /* one content column for all four pages: same left/right margin as the header and footer */
 :root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
 :root{--pad:var(--site-gut)}
+</style>
+<style id="anchor-offset">
+#work,#about{scroll-margin-top:90px}
 </style>
 </body>
 </html>

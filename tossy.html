@@ -1688,7 +1688,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       </div>
     </div>
 
-    <details class="more">
+    <details class="more" id="riskMore" open>
       <summary><span>Risks I designed for, and where it could go</span><small>Retention, big decisions, privacy · free toss, personality packs, party mode</small></summary>
       <div class="details" style="display:grid;gap:24px">
     <div class="risks">
@@ -2020,6 +2020,12 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
 /* one content column for all four pages: same left/right margin as the header and footer */
 :root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
 .wrap{max-width:none!important;padding-inline:var(--site-gut)!important}
+</style>
+<style id="risk-wide">
+#riskMore .lists{grid-template-columns:minmax(0,1fr)!important}
+@media(min-width:761px){#riskMore .details{grid-template-columns:minmax(0,7fr) minmax(0,5fr)!important;column-gap:48px!important}}
+@media(max-width:760px){#riskMore .details{grid-template-columns:minmax(0,1fr)!important}#riskMore .risk-rows>div{grid-template-columns:minmax(0,1fr)!important;display:grid;gap:6px}}
+#riskMore .lists .next,#riskMore .lists ul{max-width:none}
 </style>
 </body>
 </html>
