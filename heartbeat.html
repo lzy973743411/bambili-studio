@@ -920,6 +920,36 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
 .nx-in{font-size:10px;color:rgba(240,235,227,.5);border:1px solid rgba(240,235,227,.18);border-radius:999px;padding:8px 12px}
 @media(max-width:560px){.nx-pair{flex-direction:column;align-items:flex-start}.nx-to{transform:rotate(90deg);margin-left:100px}}
 </style>
+<style id="site-gutter">
+/* one content column for all four pages: same left/right margin as the header and footer */
+:root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
+:root{--gut:var(--site-gut)}
+.hero,.section,.thanks,.wave-div,.proc>summary{padding-left:var(--site-gut)!important;padding-right:var(--site-gut)!important}
+</style>
+<style id="type-scale">
+@media(max-width:760px){.sc-jump{display:none!important}}
+@media(max-width:760px){
+.dx-ba{align-items:center!important;width:100%}
+.dx-ba figure{align-items:center;width:100%}
+.dx-ba .dx-cap{align-self:center;text-align:center}
+.dx-ba .dx-arrow{align-self:center!important;margin-left:0!important}
+.dx-ba img{width:min(100%,300px)!important;height:auto!important;aspect-ratio:222/405;object-fit:cover}
+.dx-ba .nx{width:min(100%,300px)!important;height:auto!important;aspect-ratio:222/405}
+.nx-pair{flex-direction:column;align-items:center!important;width:100%}
+.nx-to{transform:rotate(90deg);margin-left:0!important}
+.dx-ba .nx-chat{aspect-ratio:auto!important}
+.nx-chat .nx-sp{flex:0 0 12px}
+}
+:root{--t-h2:clamp(30px,3.1vw,44px);--t-sub:18px;--t-body:16px;--t-small:14px;--t-cap:13px}
+@media(max-width:600px){:root{--t-h2:28px;--t-sub:16px;--t-body:15px;--t-small:13px;--t-cap:12px}}
+
+.s-title{font-size:var(--t-h2)!important;line-height:1.1!important}
+.s-sub{font-size:var(--t-sub)!important;line-height:1.55!important}
+.about-quote p{font-size:var(--t-sub)!important;line-height:1.6!important}
+.dx-b,.path-d,.prob-t,.mk-note{font-size:var(--t-body)!important;line-height:1.65!important}
+.iq-a,.iq-q,.sol-text,.dec dd{font-size:var(--t-small)!important;line-height:1.55!important}
+</style>
+<style id="text-adjust">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
 </head>
 <body id="top">
 
@@ -1876,34 +1906,7 @@ document.querySelectorAll('.wave-div').forEach(d=>{
   document.querySelectorAll('.path-step,.dx-ph,.dx-card').forEach(function(el){io.observe(el);});
 })();
 </script>
-<style id="site-gutter">
-/* one content column for all four pages: same left/right margin as the header and footer */
-:root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
-:root{--gut:var(--site-gut)}
-.hero,.section,.thanks,.wave-div,.proc>summary{padding-left:var(--site-gut)!important;padding-right:var(--site-gut)!important}
-</style>
-<style id="type-scale">
-@media(max-width:760px){.sc-jump{display:none!important}}
-@media(max-width:760px){
-.dx-ba{align-items:center!important;width:100%}
-.dx-ba figure{align-items:center;width:100%}
-.dx-ba .dx-cap{align-self:center;text-align:center}
-.dx-ba .dx-arrow{align-self:center!important;margin-left:0!important}
-.dx-ba img{width:min(100%,300px)!important;height:auto!important;aspect-ratio:222/405;object-fit:cover}
-.dx-ba .nx{width:min(100%,300px)!important;height:auto!important;aspect-ratio:222/405}
-.nx-pair{flex-direction:column;align-items:center!important;width:100%}
-.nx-to{transform:rotate(90deg);margin-left:0!important}
-.dx-ba .nx-chat{aspect-ratio:auto!important}
-.nx-chat .nx-sp{flex:0 0 12px}
-}
-:root{--t-h2:clamp(30px,3.1vw,44px);--t-sub:18px;--t-body:16px;--t-small:14px;--t-cap:13px}
-@media(max-width:600px){:root{--t-h2:28px;--t-sub:16px;--t-body:15px;--t-small:13px;--t-cap:12px}}
 
-.s-title{font-size:var(--t-h2)!important;line-height:1.1!important}
-.s-sub{font-size:var(--t-sub)!important;line-height:1.55!important}
-.about-quote p{font-size:var(--t-sub)!important;line-height:1.6!important}
-.dx-b,.path-d,.prob-t,.mk-note{font-size:var(--t-body)!important;line-height:1.65!important}
-.iq-a,.iq-q,.sol-text,.dec dd{font-size:var(--t-small)!important;line-height:1.55!important}
-</style>
+
 </body>
 </html>

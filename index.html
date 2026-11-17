@@ -258,6 +258,34 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
 .call-body .one{text-wrap:pretty}
 @media(max-width:760px){.hero-art{opacity:.55}.call .exhibit{min-height:clamp(300px,84vw,380px)!important}}
 </style>
+<style id="site-gutter">
+/* one content column for all four pages: same left/right margin as the header and footer */
+:root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
+:root{--pad:var(--site-gut)}
+</style>
+<style id="anchor-offset">
+#work,#about{scroll-margin-top:90px}
+</style>
+<style id="type-scale">
+@media(max-width:760px){
+.calls .hb,.hb{padding:20cqw 7cqw 9cqw!important}
+.hb-phone{max-width:48%!important;border-radius:5cqw}
+.calls .hb-card,.hb-card{width:50%!important;margin:0 0 0 -9%!important;align-self:center!important;margin-top:22cqw!important}
+.hb-card figcaption{display:none}
+.call .exhibit.ex-heart{aspect-ratio:1/1;min-height:0!important}
+}
+@media(max-width:760px){.call{grid-template-columns:minmax(0,1fr)!important}.call>.exhibit,.call>.call-body{grid-column:1 / -1!important;min-width:0!important;width:100%}}
+.call>.exhibit,.call>.call-body{min-width:0}
+:root{--t-h2:clamp(30px,3.1vw,44px);--t-sub:18px;--t-body:16px;--t-small:14px;--t-cap:13px}
+@media(max-width:600px){:root{--t-h2:28px;--t-sub:16px;--t-body:15px;--t-small:13px;--t-cap:12px}}
+
+#work .sec-head h2,#about .sec-head h2{font-size:var(--t-h2)!important;line-height:1.02!important}
+.hero .lede,.about-t p{font-size:var(--t-sub)!important;line-height:1.55!important}
+.about-b p{font-size:var(--t-body)!important;line-height:1.65!important}
+.call-body .one{font-size:var(--t-body)!important;line-height:1.55!important}
+.call-body .cmeta,.facts dd{font-size:var(--t-small)!important;line-height:1.55!important}
+</style>
+<style id="text-adjust">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
 </head>
 <body>
 
@@ -407,7 +435,7 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
       <p>What connects all of it is the layer under the screen: the rules that decide what people see, what they can do next, and who gets to choose. That is what I want to keep studying and designing for.</p>
     </div>
     <dl class="facts label">
-      <div><dt>Education</dt><dd><span class="fi">BFA, Animation, Interactive Media &amp; Game Design, 2022</span><span class="fi">AAS, Illustration, 2020</span><span class="fi">Fashion Institute of Technology</span></dd></div>
+      <div><dt>Education</dt><dd><span class="fi"><b>Fashion Institute of Technology</b></span><span class="fi">BFA, Animation, Interactive Media &amp; Game Design, 2022</span><span class="fi">AAS, Illustration, 2020</span></dd></div>
       <div><dt>Design</dt><dd><span class="fi">Glowin platform, 2025–26</span><span class="fi">Tossy, 2026–now</span></dd></div>
       <div><dt>Experience</dt><dd><span class="fi">Eazzy Consulting, 2023–now</span><span class="fi">Lemon Media Group, 2023</span><span class="fi">Tarro (formerly Wonders), 2022–23</span></dd></div>
       <div><dt>Certificates</dt><dd><span class="fi"><a href="https://coursera.org/verify/professional-cert/HHVRWQMLR6NO" target="_blank" rel="noopener">Google AI Professional Certificate</a>, 2026</span><span class="fi"><a href="https://coursera.org/verify/professional-cert/6BVM3Z4VU5AK" target="_blank" rel="noopener">Google UX Design Professional Certificate</a>, 2024</span><span class="fi"><a href="https://ude.my/UC-36ac2d67-e2bb-4db2-b2a0-273fa7137f07" target="_blank" rel="noopener">Complete Web &amp; Mobile Designer</a>, Udemy, 2021</span></dd></div>
@@ -541,32 +569,8 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   (function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
 })();
 </script>
-<style id="site-gutter">
-/* one content column for all four pages: same left/right margin as the header and footer */
-:root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
-:root{--pad:var(--site-gut)}
-</style>
-<style id="anchor-offset">
-#work,#about{scroll-margin-top:90px}
-</style>
-<style id="type-scale">
-@media(max-width:760px){
-.calls .hb,.hb{padding:20cqw 7cqw 9cqw!important}
-.hb-phone{max-width:48%!important;border-radius:5cqw}
-.calls .hb-card,.hb-card{width:50%!important;margin:0 0 0 -9%!important;align-self:center!important;margin-top:22cqw!important}
-.hb-card figcaption{display:none}
-.call .exhibit.ex-heart{aspect-ratio:1/1;min-height:0!important}
-}
-@media(max-width:760px){.call{grid-template-columns:minmax(0,1fr)!important}.call>.exhibit,.call>.call-body{grid-column:1 / -1!important;min-width:0!important;width:100%}}
-.call>.exhibit,.call>.call-body{min-width:0}
-:root{--t-h2:clamp(30px,3.1vw,44px);--t-sub:18px;--t-body:16px;--t-small:14px;--t-cap:13px}
-@media(max-width:600px){:root{--t-h2:28px;--t-sub:16px;--t-body:15px;--t-small:13px;--t-cap:12px}}
 
-#work .sec-head h2,#about .sec-head h2{font-size:var(--t-h2)!important;line-height:1.02!important}
-.hero .lede,.about-t p{font-size:var(--t-sub)!important;line-height:1.55!important}
-.about-b p{font-size:var(--t-body)!important;line-height:1.65!important}
-.call-body .one{font-size:var(--t-body)!important;line-height:1.55!important}
-.call-body .cmeta,.facts dd{font-size:var(--t-small)!important;line-height:1.55!important}
-</style>
+
+
 </body>
 </html>
