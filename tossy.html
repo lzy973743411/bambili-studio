@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tossy.me Case Study · Zhiyi Li</title>
+<title>Tossy · Bambi Li</title>
 <meta name="description" content="How I designed and shipped Tossy, a playful decision tool where AI shapes the options and the dice picks.">
 <meta property="og:title" content="Tossy.me Case Study">
 <meta property="og:description" content="A playful AI decision tool. The dice picks; you can take the other side.">
@@ -15,11 +15,65 @@
 <meta name="twitter:image" content="tossy/og-tossy.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' shape-rendering='crispEdges'%3E%3Crect width='28' height='28' fill='%23292544'/%3E%3Crect x='4' y='4' width='20' height='20' fill='%2374d7f2'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23292544'/%3E%3Crect x='16' y='16' width='4' height='4' fill='%23292544'/%3E%3C/svg%3E">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+
+<style id="site-chrome">
+:root{--sc-pad:clamp(20px,5.5vw,80px);--sc-page:#f7f9fb;--sc-bar:rgba(247,249,251,.94);--sc-ink:#292544;--sc-muted:#5d5a78;--sc-hair:#e2e1ea;--sc-fill:#4CC9EC;--sc-soft:#DDF4FB;--sc-line:#292544}
+/* ── Site chrome: the same header + footer on every page; colours come from the project ── */
+.sc-nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:18px var(--sc-pad);border-bottom:1px solid transparent;transition:background .35s,border-color .35s;font-family:'Inter Tight',system-ui,sans-serif;color:var(--sc-ink);-webkit-font-smoothing:antialiased}
+.sc-nav.scrolled{background:var(--sc-bar);border-bottom-color:var(--sc-hair);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.sc-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.sc-nav .sc-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;line-height:1;letter-spacing:-.01em;color:var(--sc-ink);text-decoration:none}
+.sc-brand svg{width:15px;height:21px;flex:none}
+.sc-label{font-family:'Inter Tight',system-ui,sans-serif;font-size:12px;line-height:1.3;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.sc-meta{display:flex;align-items:center;gap:6px;color:var(--sc-muted)}
+.sc-meta .sc-no{color:var(--sc-ink);margin-right:6px}
+.sc-meta a{color:var(--sc-ink);text-decoration:none;padding:7px 12px;border-radius:999px;transition:background .25s}
+.sc-meta a:hover,.sc-meta a:focus-visible{background:var(--sc-soft)}
+.sc-prog{position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none}
+.sc-fill{height:100%;width:100%;background:var(--sc-fill);transform:scaleX(0);transform-origin:0 50%;will-change:transform}
+.sc-rider{position:absolute;top:50%;left:-9px;margin-top:-9px;width:18px;height:18px;will-change:transform;opacity:0;transition:opacity .4s;overflow:visible}
+.sc-nav.scrolled .sc-rider{opacity:1}
+.sc-petals{transform:scale(0);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.sc-rider.bloom .sc-petals{transform:scale(1)}
+.sc-footer{padding:clamp(60px,8vw,110px) var(--sc-pad) 28px;background:var(--sc-page);font-family:'Inter Tight',system-ui,sans-serif}
+.sc-foot{padding-top:16px;border-top:1.5px solid var(--sc-line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;color:var(--sc-muted)}
+.sc-foot .sc-links{display:flex;flex-wrap:wrap;gap:10px 24px}
+.sc-foot a{color:var(--sc-muted);text-decoration:none;white-space:nowrap}
+.sc-foot a:hover{color:var(--sc-ink);background:var(--sc-soft)}
+@media (max-width:560px){.sc-meta .sc-no{display:none}.sc-meta a{padding:7px 8px}}
+@media (prefers-reduced-motion:reduce){.sc-fill,.sc-rider,.sc-petals{transition:none!important}}
+.sc-row{display:grid;grid-template-columns:1fr auto 1fr}
+.sc-row .sc-meta{justify-self:end}
+.sc-jump{display:flex;gap:4px}
+.sc-jump a{color:var(--sc-ink);text-decoration:none;padding:7px 12px;border-radius:999px;transition:background .25s,color .25s}
+.sc-jump a:hover,.sc-jump a:focus-visible,.sc-jump a.on{background:var(--sc-soft)}
+.sc-target{scroll-margin-top:96px}
+@media (max-width:860px){
+  .sc-nav{padding-bottom:8px;background:var(--sc-bar);border-bottom-color:var(--sc-hair);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .sc-row{display:flex;flex-wrap:wrap;row-gap:6px}
+  .sc-jump{order:3;flex:1 0 100%;overflow-x:auto;scrollbar-width:none;margin:0 -8px;gap:2px}
+  .sc-jump::-webkit-scrollbar{display:none}
+  .sc-jump a{padding:6px 10px;white-space:nowrap}
+  .sc-nav .sc-jump a.on{background:var(--sc-soft)}
+  .sc-target{scroll-margin-top:118px!important}
+  .sc-space{height:104px!important}
+}
+</style>
+<style id="site-cursor">
+/* ── Cursor: the same dot + trailing ring on every page; only the colour changes ── */
+:root{--sc-c:rgb(34,168,212);--sc-c-ring:rgba(34,168,212,.4);--sc-c-hov:rgba(34,168,212,.85)}
+html.sc-cur,html.sc-cur *{cursor:none!important}
+.sc-cdot,.sc-cring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+.sc-cdot{width:6px;height:6px;background:var(--sc-c);z-index:10001}
+.sc-cring{width:30px;height:30px;border:1px solid var(--sc-c-ring);z-index:10000;transition:width .28s,height .28s,border-color .28s,opacity .3s}
+.sc-cring.hov{width:50px;height:50px;border-color:var(--sc-c-hov)}
+.sc-cur-on .sc-cdot,.sc-cur-on .sc-cring{opacity:1}
+</style>
 </head>
-<body>
+<body id="top">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Inter+Tight:wght@400;500;600;700;800&display=swap">
 <style>
 /* Tossy.me design tokens, Aqua skin (the site default) */
 :root{
@@ -72,7 +126,9 @@ h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
 .hero .sub{margin-top:22px;font-size:clamp(18px,2vw,21px);line-height:1.5;color:var(--sub);max-width:32ch}
 .hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:32px}
 
-.demo{padding:18px;display:grid;gap:14px}
+.demo{padding:18px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr);min-width:0}
+.demo>*{min-width:0}
+@media (max-width:400px){.demo{padding:12px;gap:12px}.demo-modes{gap:6px}.mbtn{font-size:7px;letter-spacing:0}.qbar span{font-size:13px;white-space:normal;line-height:1.35}}
 .demo-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .mbtn{height:52px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:3px solid var(--line);background:var(--card);box-shadow:3px 3px 0 var(--hard);font:8px/1 var(--px);text-transform:uppercase;transition:transform .1s steps(2)}
 .mbtn .die{width:22px;height:22px}
@@ -324,7 +380,7 @@ footer{padding-block:26px 40px;border-top:2px solid var(--line);display:flex;jus
 
 /* ---------- responsive ---------- */
 @media (max-width:900px){
-  .hero,.split{grid-template-columns:1fr}
+  .hero,.split{grid-template-columns:minmax(0,1fr)}
   .snapshot{grid-template-columns:1fr 1fr}
   .snapshot > div:nth-child(1){grid-column:1 / -1;border-right:0}
   .snapshot > div:nth-child(3),.snapshot > div:nth-child(5){border-right:0}
@@ -725,7 +781,9 @@ section.cs + section.cs{border-top:1px solid var(--rule)}
 .ba .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-right:5px}
 .answer .hope{font:700 11px/1.3 var(--ui);text-transform:uppercase;text-decoration:underline;text-underline-offset:3px}
 .ba-note{font-size:14px;color:var(--muted)}
-.gif.narrow{max-width:720px}
+.gif.narrow{grid-template-columns:minmax(0,720px) minmax(0,1fr);column-gap:32px;align-items:end}
+.gif.narrow figcaption{max-width:30ch;padding-bottom:6px}
+@media (max-width:860px){.gif.narrow{grid-template-columns:minmax(0,1fr)}.gif.narrow figcaption{max-width:none;padding-bottom:0}}
 .vs{grid-template-columns:1fr 1fr;gap:16px}
 .vs-col{border:1px solid var(--rule);border-radius:14px;padding:18px;display:grid;gap:10px;align-content:start;background:var(--page)}
 .vs-col.after{background:#fff;border-color:#cdbff8}
@@ -867,7 +925,7 @@ footer .foot-link{font-size:15px}
 /* ================= v20: insight-first demo, readability, version timeline ================= */
 :root{--muted:#55526f}
 .prose{color:#45425f}
-.demo-wrap{display:grid;gap:14px}
+.demo-wrap{display:grid;gap:14px;min-width:0}
 .demo-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .demo-steps li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--rule);border-radius:10px;background:#fff;font:600 13px/1.2 var(--read);color:var(--muted);transition:background .2s,border-color .2s,color .2s}
 .demo-steps li b{display:grid;place-items:center;min-width:20px;height:20px;border-radius:50%;background:var(--page);font:700 11px/1 var(--read);color:var(--muted)}
@@ -998,26 +1056,148 @@ footer .foot-link{font-size:15px}
 @keyframes blink{50%{opacity:.25}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
+
+/* ================= CACTUS DIRECTION · shared frame =================
+   Product exhibits keep Tossy's own colors and pixel type.
+   Page, headings, captions and decision blocks follow the portfolio system. */
+:root{--paper:#f7f9fb;--paper-2:#eef3f6;--ink:#292544;--ink-2:#45425f;--ink-3:#6f6c88;--hair:#e2e1ea;--accent:#166a80;--cactus:#2C6B4F;--bloom:#E65A1E;
+  --page:#f7f9fb;--rule:var(--hair);--muted:#5d5a78;
+  --read:'Inter Tight',system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;--disp:'Inter Tight',system-ui,sans-serif;
+  --e-grow:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.34,1.45,.64,1);--ease-ui:cubic-bezier(.2,.8,.2,1)}
+body{background:var(--paper);background-image:none;color:var(--ink);font-family:var(--read)}
+.recreated,.brief figcaption{font-style:normal}
+a{text-underline-offset:3px}
+
+/* type: one family, three weights */
+.hero h1{font:800 clamp(52px,8.4vw,112px)/.88 var(--disp);letter-spacing:-.062em;color:var(--ink)}
+h2{font:800 clamp(30px,3.9vw,48px)/.96 var(--disp);letter-spacing:-.05em;max-width:20ch;color:var(--ink)}
+h2 mark{background:none;color:inherit;padding:0}
+.find h3,.spot-head h3,.role h3,.det h3,.dec h3{font-family:var(--disp);letter-spacing:-.03em}
+.kicker,.label,.snapshot dt,.lists h3{font:500 11px/1.3 var(--read);letter-spacing:.02em;text-transform:uppercase;color:var(--ink-2)}
+.hero .kicker{color:var(--ink)}
+.bigq .big{font-weight:800;letter-spacing:-.05em}
+
+
+/* the Tossy room: hero keeps the product's dotted floor */
+.hero.band{margin-top:0;padding-top:clamp(36px,5vw,64px)}
+
+/* section head: 1px ink rule + number + title + aside */
+.cs .head{gap:22px}
+.sh{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:16px;padding-top:12px;font:500 11px/1.3 var(--read);letter-spacing:.02em;text-transform:uppercase}
+.sh::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform 1s var(--e-grow)}
+.sh.in::before{transform:scaleX(1)}
+.sh .n{color:var(--accent)}
+.sh .tt{color:var(--ink)}
+.sh .aside{color:var(--ink-2);text-align:right}
+section.cs{border-top:0}
+
+/* decision block (same parts as the homepage “calls”) */
+.dec{position:relative;display:grid;grid-template-columns:1fr;gap:18px;padding-top:14px}
+.dec::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--ink)}
+.dec .dk{display:flex;gap:10px;align-items:baseline;font:500 11px/1.3 var(--read);letter-spacing:.02em;text-transform:uppercase;color:var(--ink-2)}
+.dec .dk b{font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums}
+.dec h3{margin-top:16px;font:800 clamp(28px,3vw,42px)/.95 var(--disp);letter-spacing:-.05em;max-width:13ch;color:var(--ink)}
+.dec dl{margin:0}
+.dec dl div{display:grid;grid-template-columns:72px 1fr;gap:10px;border-top:1px solid var(--hair);padding:10px 0;font-size:15px;line-height:1.5}
+.dec dt{font:500 11px/1.3 var(--read);letter-spacing:.02em;text-transform:uppercase;color:var(--ink-2);padding-top:3px}
+.dec dd{margin:0;color:var(--ink-2)}
+.dec dd s{text-decoration:line-through;text-decoration-color:rgba(29,25,21,.45);text-decoration-thickness:1px;color:var(--ink-2)}
+.dec dt.kept{color:var(--accent)}
+.dec dd.kept{color:var(--ink)}
+.dec .ev{display:flex;align-items:baseline;gap:12px;border-top:1px solid var(--ink);padding-top:12px;margin-top:4px}
+.dec .ev b{font:800 clamp(32px,3.4vw,48px)/1 var(--disp);letter-spacing:-.05em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.dec .ev span{font-size:13px;color:var(--ink-2);line-height:1.4}
+@media (min-width:760px){.dec{grid-template-columns:5fr 7fr;column-gap:clamp(24px,4vw,56px)}}
+
+/* captions: Fig. N.M — */
+figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.gif figcaption,.brief figcaption{font:400 13px/1.45 var(--read);color:var(--ink-2)}
+
+/* end: the one bloom on the page */
+.end2{display:grid;gap:40px;padding-block:clamp(72px,9vw,112px) clamp(48px,6vw,72px)}
+.end-body{display:grid;grid-template-columns:1fr;gap:32px;align-items:end}
+@media (min-width:760px){.end-body{grid-template-columns:3fr 5fr 4fr}}
+.end-art{width:clamp(84px,10vw,128px)}
+.end-art .pxc{width:100%;height:auto;display:block;overflow:visible}
+.pxc .pet{fill:var(--ink-3);transition:fill .5s var(--ease-ui)}
+.pxc .ctr{fill:var(--ink-3);transition:fill .5s .1s var(--ease-ui)}
+.pxc .pet,.pxc .ctr{transform-box:view-box;transform-origin:12px 5px;transform:scale(.6);transition:transform .7s var(--spring),fill .5s var(--ease-ui)}
+.bloomed .pxc .pet{fill:var(--bloom);transform:none}
+.bloomed .pxc .ctr{fill:#FFD463;transform:none}
+.end-lead{font:800 clamp(34px,4.4vw,60px)/.92 var(--disp);letter-spacing:-.055em;color:var(--ink)}
+.end-sub{margin-top:12px;color:var(--ink-2)}
+.end-copy .btn-e{margin-top:22px}
+.nextcase{display:grid;gap:6px;padding-top:12px;border-top:1px solid var(--ink);color:var(--ink);text-decoration:none}
+.nextcase .nl{font:500 11px/1.3 var(--read);letter-spacing:.02em;text-transform:uppercase;color:var(--ink-2)}
+.nextcase .nn{font:800 clamp(32px,3.6vw,48px)/1 var(--disp);letter-spacing:-.05em;transition:color .3s}
+.nextcase .nn i{font-style:normal;font-weight:500;display:inline-block;transition:transform .45s var(--ease-ui)}
+.nextcase .nd{font-size:14px;color:var(--ink-2)}
+.nextcase:hover .nn{color:var(--cactus)}
+.nextcase:hover .nn i{transform:translateX(.18em)}
+@media (prefers-reduced-motion:reduce){.sh::before{transform:none;transition:none}}
+/* market context · principles · risks */
+.sh.sh-end{grid-template-columns:1fr auto}
+.mkt-line{max-width:72ch;color:var(--ink-2);font-size:16px;line-height:1.6;padding-top:12px;border-top:1px solid var(--hair)}
+.mkt-line .label{display:block;margin-bottom:6px}
+.mkt-line .src{display:block;margin-top:6px;font-size:12px}
+.mkt-line .src a{color:var(--ink)}
+.lists{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mkt,.pos,.risks{display:grid;gap:16px}
+.mkt-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--ink)}
+.mkt-stats div{display:grid;gap:6px;padding:14px 16px 14px 0;border-right:1px solid var(--hair)}
+.mkt-stats div+div{padding-left:16px}
+.mkt-stats div:last-child{border-right:0}
+.mkt-stats b{font:800 clamp(30px,3.4vw,44px)/1 var(--disp);letter-spacing:-.05em;color:var(--ink);font-variant-numeric:tabular-nums}
+.mkt-stats span{font-size:14px;line-height:1.45;color:var(--ink-2)}
+.mkt-stats sup{font-size:10px;color:var(--accent)}
+.mkt > p{max-width:68ch;color:var(--ink-2)}
+.mkt .src{font-size:12px;line-height:1.5;color:var(--ink-2)}
+.mkt .src a{color:var(--ink)}
+.pos-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink)}
+.pos-list li{display:grid;align-content:start;gap:6px;padding:14px 16px 6px 0;border-right:1px solid var(--hair)}
+.pos-list li+li{padding-left:16px}
+.pos-list li:last-child{border-right:0}
+.pos-list i{font:500 11px/1 var(--read);font-style:normal;color:var(--accent);font-variant-numeric:tabular-nums}
+.pos-list b{font:800 22px/1.05 var(--disp);letter-spacing:-.035em;color:var(--ink)}
+.pos-list span{font-size:14px;line-height:1.5;color:var(--ink-2)}
+.risk-rows{border-top:1px solid var(--ink)}
+.risk-rows div{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--hair)}
+.risk-rows b{font:700 16px/1.35 var(--disp);letter-spacing:-.01em;color:var(--ink)}
+.risk-rows p{margin:0;font-size:15px;line-height:1.55;color:var(--ink-2);max-width:62ch}
+.risk-rows q{color:var(--ink)}
+@media (max-width:860px){.pos-list{grid-template-columns:1fr 1fr}.pos-list li:nth-child(2){border-right:0}.pos-list li:nth-child(3){padding-left:0;border-top:1px solid var(--hair)}.pos-list li:nth-child(4){border-top:1px solid var(--hair)}.lists{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){.mkt-stats,.pos-list,.lists{grid-template-columns:1fr}.mkt-stats div,.pos-list li{border-right:0!important;padding-left:0!important;border-top:1px solid var(--hair)}.mkt-stats div:first-child,.pos-list li:first-child{border-top:0}.risk-rows div{grid-template-columns:1fr;gap:6px}}
+
+/* frame text: warm grays instead of the product's purple ink */
+.hero .sub,.prose,.ph p,.caption,.br .t,.role li span,.det p,.find p,.lists li,.iters p,.guard p,.foot-notes,.ver-note,.more .more-intro,.method p,.tldr p,.ba-note,.scene .b,.snapshot dd,.sig td,.note,.framing,.recreated{color:var(--ink-2)}
+.prose strong,.prose b,.find h3,.role li b,.iters b,.guard b,.det h3,.tldr .label{color:var(--ink)}
+.iters li::after,.loopc li:not(:last-child)::after,.cb-arrow{color:var(--ink-3)!important}
+
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;animation-delay:0s !important;transition:none !important}}
 </style>
 
+<header class="sc-nav" id="scNav">
+  <div class="sc-row">
+    <a href="index.html" class="sc-brand" aria-label="Bambi Li, all work" data-pf>
+      <svg viewBox="0 0 16 22" aria-hidden="true"><g fill="none" stroke="#3BB6E0" stroke-linecap="round"><path d="M8 21V7" stroke-width="5"/><path d="M8 14H4.5V10" stroke-width="3"/><path d="M8 11h3.5V7.5" stroke-width="3"/></g><circle cx="8" cy="3.2" r="2.6" fill="#FF9DCA"/></svg>
+      Bambi Li
+    </a>
+    <div class="sc-jump sc-label" aria-label="Sections"><a href="#problem">Problem</a><a href="#decision">Decision</a><a href="#evidence">Evidence</a></div>
+    <div class="sc-meta sc-label"><span class="sc-no">01 · Tossy</span><a href="index.html#work" data-pf>All work</a><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></div>
+  </div>
+  <div class="sc-prog" aria-hidden="true">
+    <div class="sc-fill" id="scFill"></div>
+    <svg class="sc-rider" id="scRider" viewBox="-10 -10 20 20"><g class="sc-petals"><ellipse cx="0" cy="-5" rx="3" ry="5" fill="#FF9DCA"/><ellipse cx="0" cy="-5" rx="3" ry="5" fill="#FF9DCA" transform="rotate(72)"/><ellipse cx="0" cy="-5" rx="3" ry="5" fill="#FF9DCA" transform="rotate(144)"/><ellipse cx="0" cy="-5" rx="3" ry="5" fill="#FF9DCA" transform="rotate(216)"/><ellipse cx="0" cy="-5" rx="3" ry="5" fill="#FF9DCA" transform="rotate(288)"/></g><circle r="3.4" fill="#FF9DCA"/><circle r="1.6" fill="#FFD463"/></svg>
+  </div>
+</header>
+<div class="sc-space" aria-hidden="true" style="height:66px"></div>
 <div class="wrap">
-  <header class="top band band-dots">
-    <div class="top-left"><a class="back-link" href="index.html">← Back</a>
-    <a class="brand" href="https://tossy.me" target="_blank" rel="noopener" aria-label="Tossy.me">
-      <svg width="32" height="32" viewBox="0 0 28 28" shape-rendering="crispEdges" aria-hidden="true"><rect width="28" height="28" class="d-line"/><rect x="4" y="4" width="20" height="20" style="fill:var(--btn)"/><rect x="8" y="8" width="4" height="4" class="d-line"/><rect x="16" y="16" width="4" height="4" class="d-line"/></svg>
-      <span>TOSSY</span>
-    </a></div>
-    <div class="top-right">
-      <span class="cs-label">Case study</span>
-      <a class="btn-e small" href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a>
-    </div>
-  </header>
 
   <!-- 01 HERO -->
-  <section class="hero band band-dots" aria-labelledby="h-hero">
+  <section class="hero band band-dots" aria-labelledby="h-hero" data-sec="01">
     <div>
-      <span class="kicker">Case study · Product design · 0 → 1</span>
+      <span class="kicker">01 · Case study · AI · Web · 2026</span>
       <h1 id="h-hero">Let the dice pick.</h1>
       <p class="sub">A playful decision tool for small choices. The dice picks, and if you catch yourself hoping it had landed the other way, Tossy lets you take that side.</p>
       <div class="hero-actions">
@@ -1050,21 +1230,21 @@ footer .foot-link{font-size:15px}
 
   <dl class="snapshot panel">
     <div><dt>Role</dt><dd>Solo: product strategy, UX, interaction &amp; motion, AI behavior design. Built end-to-end with AI coding tools.</dd></div>
-    <div><dt>Timeline</dt><dd>Sep – Oct 2026</dd></div>
+    <div><dt>Timeline</dt><dd>Sep – Nov 2026</dd></div>
     <div><dt>Built with</dt><dd>Claude, Codex (AI-assisted coding)</dd></div>
-    <div><dt>Stack</dt><dd>Gemini API, Cloudflare Workers, PostHog, GitHub</dd></div>
+    <div><dt>Stack</dt><dd>Gemini API, Cloudflare Workers, PostHog, GitHub · PWA</dd></div>
     <div><dt>Live</dt><dd><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></dd></div>
   </dl>
   <div class="tldr">
     <div><span class="label">What I did</span><p>Took a live AI product from idea to launch on my own, in about six weeks, using AI coding tools to build it.</p></div>
     <div><span class="label">Key decision</span><p>AI prepares the options and the voice; the dice picks the outcome. Then I designed what happens when people push back.</p></div>
-    <div><span class="label">What testing showed</span><p>People used "take the other side" (13 of 52 decisions, mostly while AI was down), and analytics caught a silent API outage the fallback had hidden.</p></div>
+    <div><span class="label">What testing showed</span><p>People used "take the other side" (12 of 51 decisions), and analytics caught a silent API outage the fallback had hidden.</p></div>
   </div>
 
   <!-- 02 -->
-  <section class="cs acc-aqua" aria-labelledby="h2a">
+  <section class="cs acc-aqua sc-target" id="problem" aria-labelledby="h2a" data-sec="02">
     <div class="head">
-      <div class="eyebrow"><span class="num">02</span><span class="label">The question</span></div>
+      <div class="sh"><span class="n">02</span><span class="tt">The question</span><span class="aside">Problem &amp; scope</span></div>
       <h2 id="h2a">Why are small decisions so hard?</h2>
     </div>
     <div class="split">
@@ -1080,14 +1260,14 @@ footer .foot-link{font-size:15px}
       <div class="scene card"><span class="label">8:02 AM · Closet</span><div class="b">Two near-identical shirts. Late for the train.</div></div>
       <div class="scene card"><span class="label">Unread · 1</span><div class="b">Reply now, or later? The draft just sits there.</div></div>
     </div>
+    <p class="mkt-line"><span class="label">Context</span>AI companions are a fast-growing category, estimated at $24–50B in 2026 and growing about 31% a year. Tossy sits at its lightest end: a few seconds, no long conversation, just a nudge to move. <span class="src">Estimates: <a href="https://www.fortunebusinessinsights.com/ai-companion-market-113258" target="_blank" rel="noopener">Fortune Business Insights</a>, <a href="https://www.researchandmarkets.com/reports/6226343/ai-companion-market-report" target="_blank" rel="noopener">Research and Markets</a>.</span></p>
     <div class="split">
       <div class="prose">
         <p>For small choices, a good-enough answer now beats a perfect one later. That meant saying no to the obvious features:</p>
         <ul class="nos">
           <li><span class="x">NO</span><span><b>Pros/cons analysis</b>Structure invites more deliberation.</span></li>
-          <li><span class="x">NO</span><span><b>AI recommendation by default</b>A "smart" answer asks to be trusted, and questioned.</span></li>
           <li><span class="x">NO</span><span><b>Required options list</b>Don't make users structure their indecision before helping them escape it.</span></li>
-          <li><span class="x">NO</span><span><b>Productivity-tool baggage</b>No login, no dashboard, no history to manage.</span></li>
+          <li><span class="x">NO</span><span><b>Productivity-tool baggage</b>No login, no dashboard. History stays quietly on the device.</span></li>
         </ul>
       </div>
       <div style="display:grid;gap:32px">
@@ -1104,9 +1284,28 @@ footer .foot-link{font-size:15px}
         </div>
       </div>
     </div>
+    <article class="dec">
+      <div class="dl-l"><span class="dk"><b>2.1</b>Decision</span><h3>Cut everything before the toss.</h3></div>
+      <div class="dl-r">
+        <dl>
+          <div><dt class="cut">Cut</dt><dd><s>An anxiety “furnace”, an indecision slider, a follow-through rate.</s></dd></div>
+          <div><dt class="kept">Kept</dt><dd class="kept">One line: “The dice has settled 8 decisions for you.”</dd></div>
+          <div><dt>Why</dt><dd>Every step before the toss broke “type and toss.” Testers then pushed it further and skipped the question too.</dd></div>
+        </dl>
+        <div class="ev"><b>59/145</b><span>tosses had no question typed at all</span></div>
+      </div>
+    </article>
+    <div class="pos">
+      <span class="label">Four principles behind every screen</span>
+      <ol class="pos-list">
+        <li><i>01</i><b>Light</b><span>No sign-up, one screen, mobile first. Type a question, or don't, and toss.</span></li>
+        <li><i>02</i><b>A buddy, not an engine</b><span>A pixel dice with four voices. A friend, not an analyst.</span></li>
+        <li><i>03</i><b>Takes the edge off</b><span>The dice hangs in the air before it lands. That short pause is part of the relief.</span></li>
+        <li><i>04</i><b>Gets you moving</b><span>"Let's do it" is the main action after every answer. Re-tossing is there, but quieter.</span></li>
+      </ol>
+    </div>
     <details class="more">
-      <summary><span>More on scope and visual direction</span><small>What else I cut, and how the look moved from oracle to pixel</small></summary>
-      <p class="more-intro"><b>Pre-toss rituals.</b> An earlier prototype had an anxiety "furnace," an indecision slider and a follow-through rate. I kept one idea, a running count of decisions the dice has made, and cut the rest, because every step before the toss breaks "type and toss."</p>
+      <summary><span>More on visual direction</span><small>How the look moved from oracle to pixel</small></summary>
       <div class="more-evo">
     <div class="evo">
       <figure><div class="frame f1"><i></i><b>THE ORACLE</b></div><figcaption><b>Mystical</b><span class="tag" style="--mode:#e9d9a6">V1</span></figcaption></figure>
@@ -1119,15 +1318,15 @@ footer .foot-link{font-size:15px}
   </section>
 
   <!-- 03 -->
-  <section class="cs acc-aqua" aria-labelledby="h5a">
+  <section class="cs acc-aqua sc-target" id="decision" aria-labelledby="h5a" data-sec="03">
     <div class="head">
-      <div class="eyebrow"><span class="num">03</span><span class="label">The turning point</span></div>
+      <div class="sh"><span class="n">03</span><span class="tt">The turning point</span><span class="aside">Key decision</span></div>
       <h2 id="h5a">The answer isn't the <mark>interesting</mark> part.</h2>
     </div>
     <div class="split">
       <div class="prose">
         <p>The first version had one button after the reveal: Toss Again. The fork below started as my own design hypothesis, not a test finding: if someone immediately wishes the dice had landed the other way, that reaction might be worth capturing instead of ignoring.</p>
-        <p>So the reveal became a fork: <strong>Let's do it</strong>, <strong>Secretly hoping for [the other side]?</strong>, <strong>Toss again</strong> and <strong>New question</strong>. A random result gives people something to push against, and pushing back can be a signal of what they wanted. On the third toss, the character calls it out.</p>
+        <p>So the reveal became a fork: <strong>Let's do it</strong>, <strong>Secretly hoping for [the other side]?</strong>, <strong>Toss again</strong> and <strong>New question</strong>. On the third toss, the character calls it out.</p>
       </div>
       <figure class="quote"><div class="die bob" data-face="savage_other"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The interesting moment was when someone wanted the other answer.</blockquote></figure>
     </div>
@@ -1151,9 +1350,21 @@ footer .foot-link{font-size:15px}
       </div>
     </div>
     <p class="recreated">Screens recreated for this page.</p>
+    <article class="dec">
+      <div class="dl-l"><span class="dk"><b>3.1</b>Decision</span><h3>Turn doubt into a way out.</h3></div>
+      <div class="dl-r">
+        <dl>
+          <div><dt class="cut">Cut</dt><dd><s>A single “Toss again” after every answer.</s></dd></div>
+          <div><dt class="kept">Kept</dt><dd class="kept">“Secretly hoping for [the other side]?” on yes/no and option questions.</dd></div>
+          <div><dt>Why</dt><dd>Wishing the dice had landed the other way may point to a preference people already had.</dd></div>
+        </dl>
+        <div class="ev"><b>12/51</b><span>decisions ended with a switch</span></div>
+      </div>
+    </article>
 
-    <div style="display:grid;gap:18px">
-      <span class="label">Every reaction after the reveal is a signal</span>
+    <details class="more">
+      <summary><span>What each action after the reveal does</span><small>Let's do it, the other side, toss again, new question</small></summary>
+      <div class="details" style="display:grid;gap:24px">
       <div class="fork">
         <article class="answer root" style="--mode:var(--pink)"><span class="says">Answer revealed</span><span class="big">SKIP IT</span><p>Should I get the boba?</p></article>
         <div class="rail" aria-hidden="true"></div>
@@ -1164,23 +1375,26 @@ footer .foot-link{font-size:15px}
           <div class="br"><span class="act small" aria-hidden="true">NEW QUESTION</span><p class="t"><b>Starts a different decision.</b></p></div>
         </div>
       </div>
-    </div>
-    <figure class="gif narrow"><video class="vid" src="tossy/third.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="On the third toss, savage mode says Third time? You just don't like the answer, and the other-side link is highlighted"></video><figcaption>Toss #3: the character calls it out and "Secretly hoping for…?" steps forward.</figcaption></figure>
+
+      </div>
+    </details>
+    <figure class="gif narrow"><video class="vid" src="tossy/third.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="On the third toss, savage mode says Third time? You just don't like the answer, and the other-side link is highlighted"></video><figcaption><span class="fn">Fig. 3.1</span> · Toss #3: the character calls it out and "Secretly hoping for…?" steps forward.</figcaption></figure>
 
   </section>
 
   <!-- 04 -->
-  <section class="cs acc-aqua" id="toss" aria-labelledby="h4a">
+  <section class="cs acc-aqua" id="toss" aria-labelledby="h4a" data-sec="04">
     <div class="head">
-      <div class="eyebrow"><span class="num">04</span><span class="label">Interaction</span></div>
+      <div class="sh"><span class="n">04</span><span class="tt">Interaction</span><span class="aside">Interaction</span></div>
       <h2 id="h4a">Designing the toss</h2>
     </div>
-    <figure class="gif"><video class="vid" src="tossy/toss.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="A full toss: the dice rises, hangs in the air, lands with ripples, and the answer card pops in"></video><figcaption>A full toss, in real time. Broken down beat by beat below.</figcaption></figure>
+    <figure class="gif"><video class="vid" src="tossy/toss.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="A full toss: the dice rises, hangs in the air, lands with ripples, and the answer card pops in"></video><figcaption><span class="fn">Fig. 4.1</span> · A full toss, in real time. Broken down beat by beat below.</figcaption></figure>
     <div class="split">
       <div class="prose">
         <p>If the answer is random, the moment has to feel like something. The loop is <strong>Question → Toss → Reveal</strong>, it lives in about three seconds, and the toss gets the most care.</p>
         <p>Yes/no answers use the question's own words ("Get the boba" / "Skip it today"). Open questions get one concrete answer. Options are optional, and tapping an "X or Y" starter splits it into two, which quietly teaches that options exist.</p>
         <p><strong>Waiting is part of the toss.</strong> The AI usually takes 1–2 seconds, so instead of a spinner the dice hangs in the air for up to about 6 seconds.</p>
+        <p><strong>It also lives on the home screen.</strong> Tossy is a PWA: added to a phone's home screen, it opens full screen like an app, which suits a tool meant to be opened for a few seconds at a time.</p>
       </div>
       <div style="display:grid;gap:28px">
         <figure class="quote"><div class="die bob" data-face="gentle"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Anticipation turns a random result into a moment.</blockquote></figure>
@@ -1203,8 +1417,8 @@ footer .foot-link{font-size:15px}
       <summary><span>More small details</span><small>Modes, skins, 8-bit sound, haptics, pull-to-refresh, decision count, fresh lines, Chinese version, easter eggs</small></summary>
       <p class="more-intro">I used personality to make the interaction feel light and distinctive. Every detail follows the same rule: keep a low-stakes moment light.</p>
     <div class="split more-gifs" style="gap:18px">
-      <figure class="gif"><video class="vid" src="tossy/listen.mp4#t=0.1" width="780" height="430" muted loop playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video><figcaption>The dice "listens" while you type.</figcaption></figure>
-      <figure class="gif"><video class="vid" src="tossy/split.mp4#t=0.1" width="800" height="270" muted loop playsinline preload="metadata" aria-label="Tapping the Coffee or tea starter question fills two option fields"></video><figcaption>An "X or Y" starter splits into two options.</figcaption></figure>
+      <figure class="gif"><video class="vid" src="tossy/listen.mp4#t=0.1" width="780" height="430" muted loop playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video><figcaption><span class="fn">Fig. 4.2</span> · The dice "listens" while you type.</figcaption></figure>
+      <figure class="gif"><video class="vid" src="tossy/split.mp4#t=0.1" width="800" height="270" muted loop playsinline preload="metadata" aria-label="Tapping the Coffee or tea starter question fills two option fields"></video><figcaption><span class="fn">Fig. 4.3</span> · An "X or Y" starter splits into two options.</figcaption></figure>
     </div>
     <div class="details">
       <div class="det"><div class="show rec"><video class="vid" src="tossy/modes.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Switching between the four modes changes the dice face and its greeting"></video></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
@@ -1212,7 +1426,7 @@ footer .foot-link{font-size:15px}
       <div class="det"><div class="show"><div class="speaker"><svg width="64" height="64" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" class="d-line"/><rect x="6" y="5" width="2" height="10" class="d-line"/><rect x="8" y="3" width="2" height="14" class="d-line"/><rect x="12" y="7" width="2" height="6" style="fill:var(--btn)"/><rect x="15" y="4" width="2" height="12" style="fill:var(--btn)"/></svg><span class="notes">♪ BLIP<br>♪ BOOP</span></div></div><h3>8-bit sound</h3><p>A tiny sound for a tiny decision. Can be muted.</p></div>
       <div class="det"><div class="show"><div class="phone"><div class="die" data-face="bestie_yes"></div></div></div><h3>Haptics</h3><p>On phones, you feel the dice land.</p></div>
       <div class="det"><div class="show rec tall"><video class="vid" src="tossy/pull-refresh.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="On a phone, pulling down shows a small spinning dice and Release to refresh"></video></div><h3>Dice pull-to-refresh</h3><p>Pull down and the dice spins. Built because Safari's bounce area broke the polka-dot background.</p></div>
-      <div class="det"><div class="show"><div class="count"><span class="ctr"><svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>RECENT <i>12</i></span><p>THE DICE HAS DECIDED 12 THINGS FOR YOU.</p></div></div><h3>Decision count</h3><p>"The dice has decided N things for you."</p></div>
+      <div class="det"><div class="show"><div class="count"><span class="ctr"><svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>RECENT <i>8</i></span><p>THE DICE HAS SETTLED 8 DECISIONS FOR YOU.</p></div></div><h3>Decision count</h3><p>"The dice has settled 8 decisions for you."</p></div>
       <div class="det"><div class="show"><div class="fresh"><p class="say">DON'T ARGUE WITH THE DICE.</p><span>≠</span><p class="say">STOP STARING. GO.</p></div></div><h3>Fresh lines</h3><p>The same comment never shows up twice in a row.</p></div>
       <div class="det"><div class="show"><div class="zh"><div class="row"><span style="--c:#ff9dca">闺蜜</span><span style="--c:#a88cf7">毒舌</span><span style="--c:#74d7f2">理性</span><span style="--c:#ffd463">温柔</span></div><p class="say">宝，第三次了。你其实想要另一个吧。</p></div></div><h3>Chinese version</h3><p>Pixel font and copy for Chinese-speaking users.</p></div>
       <div class="det"><div class="show"><ul class="eggs"><li>Poke the dice → "Hehe, that tickles!"</li><li>Its eyes follow your cursor</li><li>Hold TOSS to charge a super toss</li></ul></div><h3>Easter eggs</h3><p>Small rewards for people who poke around.</p></div>
@@ -1221,15 +1435,22 @@ footer .foot-link{font-size:15px}
   </section>
 
   <!-- 05 -->
-  <section class="cs acc-aqua" aria-labelledby="h6a">
+  <section class="cs acc-aqua" aria-labelledby="h6a" data-sec="05">
     <div class="head">
-      <div class="eyebrow"><span class="num">05</span><span class="label">AI &amp; character</span></div>
+      <div class="sh"><span class="n">05</span><span class="tt">AI &amp; character</span><span class="aside">AI behavior</span></div>
       <h2 id="h6a">AI shapes the options, the dice picks.</h2>
     </div>
-    <div class="prose">
-      <p>Letting AI pick the answer would have made Tossy sound smart, and smart answers invite second-guessing. So AI prepares the choice and randomness makes it.</p>
-      <p>The line isn't perfectly clean. Whoever writes the candidates sets the range of what can come up, and wording can tilt how a side feels. The guardrails below are intended to limit that influence.</p>
-    </div>
+    <article class="dec">
+      <div class="dl-l"><span class="dk"><b>5.1</b>Decision</span><h3>AI writes the voice, never the verdict.</h3></div>
+      <div class="dl-r">
+        <dl>
+          <div><dt class="cut">Cut</dt><dd><s>An AI recommendation as the answer.</s></dd></div>
+          <div><dt class="kept">Kept</dt><dd class="kept">AI drafts the options and the lines; the dice picks at random.</dd></div>
+          <div><dt>Why</dt><dd>A “smart” answer asks to be trusted, and second-guessed. A random one just gets pushed against.</dd></div>
+        </dl>
+        <div class="ev"><b>5</b><span>guardrails on every AI line</span></div>
+      </div>
+    </article>
     <div class="roles">
       <div class="role panel">
         <h3><span class="tag" style="--mode:var(--lav)">AI · Gemini</span>Shapes the options</h3>
@@ -1252,6 +1473,10 @@ footer .foot-link{font-size:15px}
       </div>
     </div>
 
+    <details class="more">
+      <summary><span>How the AI got there, and its 5 guardrails</span><small>4 iterations · concrete answers · comment matches answer · non-decisions · a tone, not an expert · fallback</small></summary>
+      <p class="more-intro">The line isn't perfectly clean. Whoever writes the candidates sets the range of what can come up, and wording can tilt how a side feels. The guardrails are meant to limit that influence.</p>
+      <div class="details" style="display:grid;gap:24px">
     <div style="display:grid;gap:16px">
       <span class="label">How it got there · 4 iterations</span>
       <ol class="iters">
@@ -1272,8 +1497,10 @@ footer .foot-link{font-size:15px}
         <div class="guard card"><b>A fallback keeps it available</b><p>Every AI feature has a local fallback, so a timeout doesn't leave the user stuck.</p><div class="ex"><span class="bad">TIMEOUT</span><span class="ok">LOCAL FALLBACK</span></div></div>
       </div>
     </div>
+      </div>
+    </details>
 
-    <figure class="gif"><video class="vid" src="tossy/wildcard.mp4#t=0.1" width="720" height="445" muted loop playsinline preload="metadata" aria-label="One option, Pizza, is added; Tossy's own pick joins automatically; the dice lands on Tossy's pick, Pho"></video><figcaption>Wildcard: give one option and Tossy's own pick joins the pool. Here the dice chose Tossy's pick.</figcaption></figure>
+    <figure class="gif"><video class="vid" src="tossy/wildcard.mp4#t=0.1" width="720" height="445" muted loop playsinline preload="metadata" aria-label="One option, Pizza, is added; Tossy's own pick joins automatically; the dice lands on Tossy's pick, Pho"></video><figcaption><span class="fn">Fig. 5.1</span> · Wildcard: give one option and Tossy's own pick joins the pool. Here the dice chose Tossy's pick.</figcaption></figure>
     <div class="spot panel">
       <div class="spot-head"><span class="tag" style="--mode:var(--lav)">Spotlight · Savage mode</span><h3>From rules to a character</h3></div>
       <div class="spot-body">
@@ -1312,9 +1539,9 @@ footer .foot-link{font-size:15px}
   </section>
 
   <!-- 06 -->
-  <section class="cs acc-aqua" aria-labelledby="h8a">
+  <section class="cs acc-aqua sc-target" id="evidence" aria-labelledby="h8a" data-sec="06">
     <div class="head">
-      <div class="eyebrow"><span class="num">06</span><span class="label">Testing &amp; evidence</span></div>
+      <div class="sh"><span class="n">06</span><span class="tt">Testing &amp; evidence</span><span class="aside">Evidence</span></div>
       <h2 id="h8a">What testing showed, and what it didn't</h2>
       <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. A few patterns shaped the product most.</p></div>
     </div>
@@ -1327,7 +1554,7 @@ footer .foot-link{font-size:15px}
           <div class="steps">
             <div><i>Users did</i>Tapped TOSS IT! with an empty box.</div>
             <div><i>I changed</i>An empty toss now picks a question for you.<br><span class="say-in">NOTHING TO ASK? I PICKED ONE.</span></div>
-            <div><i>What it suggested</i>Some testers expected to try Tossy without entering a question. Empty tosses accounted for 43 of 145 tosses, showing that the no-input path was used, though not why people chose it.</div>
+            <div><i>What it showed</i>59 of 145 tosses had no question. The path gets used; why, I don't know yet.</div>
           </div>
         </div>
       </article>
@@ -1355,10 +1582,10 @@ footer .foot-link{font-size:15px}
         <span class="k">Finding 4</span>
         <div>
           <h3>Some people took the other side.</h3>
-          <p>Of 52 recorded decisions, 13 ended with a switch to the side the dice didn't pick; on yes/no questions, 10 of 24. That shows the switch gets used. It doesn't yet show that people understood themselves better or liked the result more, and some may just have been playing. 47 of these 52 decisions happened while every AI request was failing (Finding 5), so this mostly describes the fallback version, where answers were random local picks with built-in lines.</p>
+          <p>Of 51 recorded decisions, 12 ended with a switch to the side the dice didn't pick; on yes/no questions, 8 of 24. That shows the switch gets used. It doesn't yet show that people understood themselves better or liked the result more, and some may just have been playing. Switching lives in the dice flow, not in the AI, so it worked the same way whether or not the AI was responding.</p>
           <div class="grids">
-            <figure><div class="pxgrid" data-n="52" data-k="13" role="img" aria-label="52 decisions, 13 switched"></div><figcaption><b>13 / 52</b> All decisions switched</figcaption></figure>
-            <figure><div class="pxgrid" data-n="24" data-k="10" role="img" aria-label="24 yes/no decisions, 10 switched"></div><figcaption><b>10 / 24</b> Yes/no switched (42%)</figcaption></figure>
+            <figure><div class="pxgrid" data-n="51" data-k="12" role="img" aria-label="51 decisions, 12 switched"></div><figcaption><b>12 / 51</b> All decisions switched</figcaption></figure>
+            <figure><div class="pxgrid" data-n="24" data-k="8" role="img" aria-label="24 yes/no decisions, 8 switched"></div><figcaption><b>8 / 24</b> Yes/no switched (33%)</figcaption></figure>
           </div>
           <p class="legend"><i class="sw acc"></i>Accepted the dice <i class="sw swi"></i>Switched to the other one</p>
         </div>
@@ -1368,82 +1595,84 @@ footer .foot-link{font-size:15px}
         <span class="k">Finding 5</span>
         <div>
           <h3>The bug the data caught.</h3>
-          <div class="bug"><span class="zero">0 / 128</span><span class="label">Tester AI requests that succeeded, Sep 27 19:37 – Oct 8 05:56 UTC</span></div>
+          <div class="bug"><span class="zero">0 / 111</span><span class="label">Tester AI requests that succeeded, Sep 27 19:37 – Oct 8 05:56 UTC</span></div>
           <p>The busiest testing day was also the day AI quietly stopped working: the production API key was missing. Because every AI feature had a local fallback, nobody saw an error. Answers just got blander and sometimes off-topic. Some of the "wrong" answers friends reported weren't AI mistakes at all. <strong>A fallback that hides failures needs monitoring that doesn't.</strong></p>
         </div>
       </article>
     </div>
 
+    <p class="framing">Early testing, small sample. These are signals, not proof. Most recorded decisions happened during the fallback period, so these results describe use of the interaction, not the effect of AI-generated responses.</p>
+    <details class="more">
+      <summary><span>The numbers behind the findings</span><small>Version split against the outage · early signals from PostHog · mode mix · how it was counted</small></summary>
+      <div class="details" style="display:grid;gap:24px">
     <div class="ver">
       <span class="label">Which version was tested · split by timestamp against the outage</span>
       <div class="ver-wrap">
         <table class="ver-t">
           <thead><tr><th>Period (UTC)</th><th>AI status</th><th>AI requests OK</th><th>Tosses</th><th>Decisions</th><th>Switched</th></tr></thead>
           <tbody>
-            <tr><td>Sep 27 16:08 – 19:37</td><td><i class="ok"></i>AI enabled</td><td>12 of 15</td><td>15</td><td>5</td><td>3</td></tr>
-            <tr class="hl"><td>Sep 27 19:37 – Oct 8 05:56</td><td><i class="down"></i>API outage · local fallback</td><td>0 of 128</td><td>129</td><td>47</td><td>10 · yes/no 7 of 20</td></tr>
-            <tr><td>Oct 8 06:00 – 23:59</td><td><i class="ok"></i>AI enabled</td><td>1 of 1</td><td>1</td><td>0</td><td>0</td></tr>
-            <tr class="sum"><td>Main window · Sep 27 – Oct 8</td><td></td><td>13 of 144</td><td>145</td><td>52</td><td>13</td></tr>
-            <tr class="later"><td>Oct 9 – Nov 8 · after the main window</td><td><i class="ok"></i>AI enabled</td><td>7 of 8</td><td>8</td><td>1</td><td>0</td></tr>
+            <tr><td>Sep 27 16:08 – 19:37</td><td><i class="ok"></i>AI enabled</td><td>2 of 3</td><td>3</td><td>2</td><td>1</td></tr>
+            <tr class="hl"><td>Sep 27 19:37 – Oct 8 05:56</td><td><i class="down"></i>API outage · local fallback</td><td>0 of 111</td><td>112</td><td>42</td><td>9 · yes/no 7 of 20</td></tr>
+            <tr><td>Oct 8 06:00 – Nov 15</td><td><i class="ok"></i>AI enabled</td><td>26 of 29</td><td>30</td><td>7</td><td>2</td></tr>
+            <tr class="sum"><td>Whole test · Sep 27 – Nov 15</td><td></td><td>28 of 143</td><td>145</td><td>51</td><td>12</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="ver-note">The first three rows add up to the main-window figures used throughout this section. The last row comes after that window and is used only for reliability. AI requests are logged separately from tosses: depending on the question, one toss can trigger zero, one or two requests (a comment line and answer candidates), so the two counts don't match one-to-one.</p>
-      <p class="ver-note">89% of main-window tosses (129 of 145) happened during the outage, so the behavior numbers below mostly describe the fallback version. The AI-enabled slices are too small to compare (5 decisions before the outage, none after it within the window). My own sessions are excluded throughout.</p>
+      <p class="ver-note">The rows add up to the figures used throughout this section. AI requests are logged separately from tosses: depending on the question, one toss can trigger zero, one or two requests (a comment line and answer candidates), so the two counts don't match one-to-one.</p>
+      <p class="ver-note">Most testing happened in the first two weeks, while I was still iterating with friends before launch, which overlapped with the outage. My own sessions are excluded throughout, including the other devices I tested on.</p>
     </div>
 
     <div style="display:grid;gap:16px">
-      <span class="label">Early signals · PostHog · Sep 27 – Oct 8 · 89% during the outage</span>
+      <span class="label">Early signals · PostHog · Sep 27 – Nov 15</span>
       <div class="stats">
-        <div class="stat card"><span class="v">68</span><span class="l">Unique visitors</span></div>
+        <div class="stat card"><span class="v">118</span><span class="l">Unique visitors</span></div>
         <div class="stat card"><span class="v">145</span><span class="l">Tosses</span></div>
-        <div class="stat card"><span class="v">28%</span><span class="l">Re-tosses · 41 of 145</span></div>
-        <div class="stat card hl"><span class="v">42%</span><span class="l">Switched on yes/no · 10 of 24</span></div>
+        <div class="stat card"><span class="v">29%</span><span class="l">Re-tosses · 42 of 145</span></div>
+        <div class="stat card hl"><span class="v">33%</span><span class="l">Switched on yes/no · 8 of 24</span></div>
       </div>
       <div class="sigwrap">
         <table class="sig">
           <tbody>
-            <tr><th>Decisions recorded</th><td>52 · 39 accepted, 13 switched</td></tr>
-            <tr><th>Switched on options</th><td>3 of 16 (19%)</td></tr>
-            <tr><th>Empty toss, Tossy picked the question</th><td>43 of 145 (30%)</td></tr>
-            <tr><th>Tapped a starter question</th><td>18 of 145 (12%)</td></tr>
-            <tr><th>Results shared</th><td>11</td></tr>
+            <tr><th>Decisions recorded</th><td>51 · 39 accepted, 12 switched</td></tr>
+            <tr><th>Switched on options</th><td>4 of 17 (24%)</td></tr>
+            <tr><th>Empty toss, Tossy picked the question</th><td>59 of 145 (41%)</td></tr>
+            <tr><th>Tapped a starter question</th><td>12 of 145 (8%)</td></tr>
+            <tr><th>Results shared</th><td>6</td></tr>
           </tbody>
         </table>
         <div class="mix">
           <span class="label">Mode mix</span>
-          <div class="bar" role="img" aria-label="Savage 38%, Rational 28%, Bestie 17%, Gentle 17%">
-            <span style="flex:38;background:#a88cf7" data-tip="Savage 38%"></span><span style="flex:28;background:#74d7f2" data-tip="Rational 28%"></span><span style="flex:17;background:#ff9dca" data-tip="Bestie 17%"></span><span style="flex:17;background:#ffd463" data-tip="Gentle 17%"></span>
+          <div class="bar" role="img" aria-label="Savage 43%, Rational 27%, Bestie 17%, Gentle 13%">
+            <span style="flex:43;background:#a88cf7" data-tip="Savage 43%"></span><span style="flex:27;background:#74d7f2" data-tip="Rational 27%"></span><span style="flex:17;background:#ff9dca" data-tip="Bestie 17%"></span><span style="flex:13;background:#ffd463" data-tip="Gentle 13%"></span>
           </div>
-          <div class="keys"><span><i style="background:#a88cf7"></i>Savage 38%</span><span><i style="background:#74d7f2"></i>Rational 28%</span><span><i style="background:#ff9dca"></i>Bestie 17%</span><span><i style="background:#ffd463"></i>Gentle 17%</span></div>
+          <div class="keys"><span><i style="background:#a88cf7"></i>Savage 43%</span><span><i style="background:#74d7f2"></i>Rational 27%</span><span><i style="background:#ff9dca"></i>Bestie 17%</span><span><i style="background:#ffd463"></i>Gentle 13%</span></div>
         </div>
       </div>
-      <p class="framing">Early testing, small sample. These are signals, not proof.</p>
       <div class="foot-notes">
-        <p><b>How it was counted.</b> My own test sessions are excluded throughout. Most visitors were friends opening a shared link without a decision in mind.</p>
+        <p><b>How it was counted.</b> My own test sessions are excluded throughout, including other devices I tested on. Most visitors were friends opening a shared link without a decision in mind.</p>
         <p><b>Privacy.</b> Analytics track events, never the questions people ask. The API key stays server-side.</p>
-        <p><b>Reliability.</b> After the API key was restored, a 4.2-second limit still let some calls time out, so I raised the wait to about 6 seconds, with the dice hovering in the air. From Oct 8 to Nov 8, 8 of 9 AI requests succeeded, with a median of 1.5 s across the successful ones; the failed request fell back to local answers.</p>
+        <p><b>Reliability.</b> After the API key was restored, a 4.2-second limit still let some calls time out, so I raised the wait to about 6 seconds, with the dice hovering in the air. From Oct 8 to Nov 15, 26 of 29 AI requests succeeded, with a median of 1.4 s across the successful ones; the failed requests fell back to local answers.</p>
       </div>
     </div>
+      </div>
+    </details>
   </section>
 
   <!-- 07 -->
-  <section class="cs acc-aqua" aria-labelledby="h9a">
+  <section class="cs acc-aqua" aria-labelledby="h9a" data-sec="07">
     <div class="head">
-      <div class="eyebrow"><span class="num">07</span><span class="label">Reflection</span></div>
+      <div class="sh"><span class="n">07</span><span class="tt">Reflection</span><span class="aside">What’s next</span></div>
       <h2 id="h9a">What I'm taking forward</h2>
     </div>
     <div class="prose">
       <p>The project changed how I approached three problems: generating relevant answers, defining a supportive character, and detecting failures hidden by fallbacks. I revised the candidate-generation process and replaced a growing banned-phrase list with a character brief. These changes still need more systematic evaluation.</p>
-      <p>The preference idea is still a hypothesis. A random answer gives people something to react to, and the reaction may show what they already leaned toward.</p>
     </div>
     <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Looking back</span><p class="big">I set out to make decisions for people. The more interesting part was <em>watching them disagree with the dice.</em></p></article>
     <div class="lists">
       <div>
         <h3>Limitations</h3>
         <ul>
-          <li>Small sample: 68 visitors, mostly friends and friends of friends. Signals, not proof.</li>
-          <li>89% of main-window tosses happened during the API outage, so the behavior data mostly describes the fallback version. The AI-on samples are too small to compare.</li>
+          <li>Small sample: 118 visitors, mostly friends and friends of friends. Signals, not proof.</li>
           <li>The preference signal only works for yes/no and option questions.</li>
           <li>Randomness fits low-stakes choices. Tossy isn't built for serious ones.</li>
         </ul>
@@ -1454,9 +1683,34 @@ footer .foot-link{font-size:15px}
           <li>Do people who switch feel better about the final choice than people who accept?</li>
           <li>Which kinds of decisions get the most re-tosses and switches?</li>
           <li>Does mode change how often people accept the first result?</li>
+          <li>With AI on for a full round, does the comment line change how often people switch?</li>
         </ul>
       </div>
     </div>
+
+    <details class="more">
+      <summary><span>Risks I designed for, and where it could go</span><small>Retention, big decisions, privacy · free toss, personality packs, party mode</small></summary>
+      <div class="details" style="display:grid;gap:24px">
+    <div class="risks">
+      <span class="label">Three risks I designed for</span>
+      <div class="risk-rows">
+        <div><b>People use it once, then leave</b><p>Small decisions come often but pass fast. So results can be shared with friends, the dice keeps count ("The dice has settled 8 decisions for you"), history stays on the device, and as a PWA Tossy can live on the home screen.</p></div>
+        <div><b>Someone brings a big decision</b><p>The footer says it plainly: <q>Tossy answers at random. It is a playful nudge, not advice. For big decisions, ask a real person.</q></p></div>
+        <div><b>Privacy</b><p>No account. History is saved on the device only, with a Clear all. The question goes to the AI only to write the options and the line, and analytics never see it.</p></div>
+      </div>
+    </div>
+    <div class="lists">
+      <div class="next">
+        <h3>Where it could go</h3>
+        <ul>
+          <li>The toss itself stays free, with no sign-up.</li>
+          <li>Extras that build on the buddy: seasonal skins and new personality packs.</li>
+          <li>A party mode: phones on the table, Tossy decides who pays tonight.</li>
+        </ul>
+      </div>
+    </div>
+      </div>
+    </details>
 
     <div class="method">
       <span class="label">How I'd study it next</span>
@@ -1469,7 +1723,7 @@ footer .foot-link{font-size:15px}
       </div>
       <div class="split">
         <div class="prose">
-          <p>I built Tossy with Claude and Codex. I was responsible for <strong>the product behavior</strong> (AI shapes the options, the dice picks), <strong>the interaction and visual design</strong>, <strong>the AI's character and rules</strong>, <strong>connecting Gemini and PostHog</strong>, and <strong>testing and iterating</strong> with friends.</p>
+          <p>I built Tossy with Claude and Codex. I was responsible for <strong>the product behavior</strong>, <strong>the interaction and visual design</strong>, <strong>the AI's character and rules</strong>, <strong>connecting Gemini and PostHog</strong>, and <strong>testing and iterating</strong> with friends.</p>
           <p>Each round, what broke became the next brief. When a fix stopped working, like adding more banned words to savage mode, I changed the brief instead of the patch: I gave the AI a character to play.</p>
         </div>
         <div style="display:grid;gap:28px">
@@ -1487,20 +1741,34 @@ footer .foot-link{font-size:15px}
           <p><b>How.</b> Show what good lines look like instead of listing what's banned. Keep the word filter only as a last safety net.</p>
           <p><b>Keep.</b> The UI name stays "Savage". The answer itself stays random; tone only changes the comment.</p>
         </div>
-        <figcaption>Excerpt of a brief I wrote for the AI, rewritten in English for this page.</figcaption>
+        <figcaption><span class="fn">Fig. 7.1</span> · Excerpt of a brief I wrote for the AI, rewritten in English for this page.</figcaption>
       </figure>
 
     </div>
   </section>
 
-  <section class="end band band-dots" aria-label="Try Tossy">
-    <div class="die" data-face="gentle_yes"></div>
-    <div class="ground-s" aria-hidden="true"></div>
-    <p class="label">The dice has landed</p>
-    <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Toss your own →</a>
+  <section class="end2" aria-label="End of case study" data-sec="08">
+    <div class="sh sh-end"><span class="tt">End of case</span><span class="aside">Thanks for reading</span></div>
+    <div class="end-body">
+      <div class="end-art" id="endArt"><svg class="pxc" viewBox="0 0 24 34" shape-rendering="crispEdges" aria-hidden="true"><g fill="#1D1915"><rect x="9" y="7" width="6" height="27"/><rect x="2" y="15" width="6" height="8"/><rect x="16" y="11" width="6" height="8"/><rect x="7" y="20" width="3" height="3"/><rect x="14" y="15" width="3" height="3"/></g><g fill="#2C6B4F"><rect x="10" y="8" width="4" height="25"/><rect x="3" y="16" width="4" height="6"/><rect x="17" y="12" width="4" height="6"/><rect x="7" y="21" width="3" height="1"/><rect x="14" y="16" width="3" height="1"/></g><g fill="#7FC29B"><rect x="10" y="9" width="1" height="22"/><rect x="3" y="17" width="1" height="4"/><rect x="17" y="13" width="1" height="4"/></g><g class="pet"><rect x="11" y="2" width="2" height="2"/><rect x="9" y="4" width="2" height="2"/><rect x="13" y="4" width="2" height="2"/></g><rect class="ctr" x="11" y="4" width="2" height="2"/></svg></div>
+      <div class="end-copy">
+        <p class="end-lead">The dice has landed.</p>
+        <p class="end-sub">Tossy is live. Ask it something small.</p>
+        <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Toss your own ↗</a>
+      </div>
+      <a class="nextcase" href="glowin.html" data-pf><span class="nl">Next case · 02</span><span class="nn">Glowin <i>→</i></span><span class="nd">One platform, three entry points.</span></a>
+    </div>
   </section>
-
-  <footer><a class="foot-link" href="index.html">← All work</a><a class="foot-link" href="glowin.html">Next: Glowin →</a></footer>
+</div>
+<div class="sc-footer" role="contentinfo">
+  <div class="sc-foot sc-label">
+    <span>© 2026 Bambi Li</span>
+    <span class="sc-links">
+      <a href="mailto:bambizhiyili@gmail.com" style="text-transform:none;letter-spacing:.02em">bambizhiyili@gmail.com</a>
+      <a href="https://www.linkedin.com/in/bambili/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="#top">Back to top ↑</a>
+    </span>
+  </div>
 </div>
 
 <script>
@@ -1583,6 +1851,10 @@ footer .foot-link{font-size:15px}
     box.querySelectorAll(".mbtn").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
     $("demo").style.setProperty("--mode", MODES[mode].c);
     setFace(mode);
+    stopAuto();
+    var a = $("demoAnswer"); a.className = "answer wait"; a.innerHTML = "<p>" + MODES[mode].label.toUpperCase() + " IS READY. TOSS IT.</p>";
+    last = null; $("demoToss").textContent = "TOSS IT!";
+    setStep(1, MODES[mode].label + " mode on. The next toss uses this voice.");
   });
   function setFace(f) { $("stageFace").innerHTML = die(f); }
   setFace(mode);
@@ -1665,5 +1937,89 @@ footer .foot-link{font-size:15px}
   vids.forEach(function (v) { io.observe(v); });
 })();
 </script>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var heads = [].slice.call(document.querySelectorAll(".sh"));
+  var endArt = document.getElementById("endArt");
+  if (reduce || !("IntersectionObserver" in window)) { heads.forEach(function (h) { h.classList.add("in"); }); }
+  else {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -10% 0px" });
+    heads.forEach(function (h) { io.observe(h); });
+  }
+  if (endArt) {
+    if (reduce || !("IntersectionObserver" in window)) endArt.classList.add("bloomed");
+    else { var eo = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { setTimeout(function () { endArt.classList.add("bloomed"); }, 500); eo.disconnect(); } }, { threshold: .6 }); eo.observe(endArt); }
+  }
+})();
+</script>
+<script>
+(function(){
+  var nav=document.getElementById('scNav'),fill=document.getElementById('scFill'),rider=document.getElementById('scRider');
+  function on(){var y=scrollY,max=document.documentElement.scrollHeight-innerHeight,p=max>0?Math.min(1,Math.max(0,y/max)):0;
+    nav.classList.toggle('scrolled',y>30);fill.style.transform='scaleX('+p+')';
+    var W=nav.clientWidth;rider.style.transform='translate3d('+Math.max(9,Math.min(W-9,p*W))+'px,0,0)';
+    rider.classList.toggle('bloom',p>.985);}
+  addEventListener('scroll',on,{passive:true});addEventListener('resize',on);on();
+})();
+</script>
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.sc-jump a'));
+  var t=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
+  function spy(){var y=innerHeight*.35,k=-1;t.forEach(function(el,i){if(el&&el.getBoundingClientRect().top<y)k=i;});
+    links.forEach(function(a,i){a.classList.toggle('on',i===k);});}
+  addEventListener('scroll',spy,{passive:true});spy();
+})();
+</script>
+<div class="sc-cdot" id="scDot" aria-hidden="true"></div><div class="sc-cring" id="scRing" aria-hidden="true"></div>
+<script>
+(function(){
+  if(!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  var html=document.documentElement,dot=document.getElementById('scDot'),ring=document.getElementById('scRing');
+  html.classList.add('sc-cur');
+  var mx=-100,my=-100,rx=-100,ry=-100,HOV='a,button,summary,label,input,select,textarea,video,[role="button"],[onclick],.hv,.sol-card,.prob-item,.screen-ph,.wf-cell,.q-row,.cal-ev,.d-issue,.cf-si,.cf-ts,.il-node,.sim-node';
+  addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';html.classList.add('sc-cur-on');},{passive:true});
+  document.addEventListener('mouseleave',function(){html.classList.remove('sc-cur-on');});
+  document.addEventListener('mouseover',function(e){ring.classList.toggle('hov',!!(e.target.closest&&e.target.closest(HOV)));});
+  (function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+})();
+</script>
+<style id="legibility">@media (min-width:401px){.demo .mbtn{font-size:9px}}</style>
+<style id="sc-zoom">
+.sc-zoomable{cursor:zoom-in}
+.sc-zoomable:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.sc-lb{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;padding:4vh 4vw;background:rgba(10,8,14,.86);opacity:0;pointer-events:none;transition:opacity .25s;cursor:zoom-out}
+.sc-lb.on{opacity:1;pointer-events:auto}
+.sc-lb img{max-width:92vw;max-height:88vh;width:auto;height:auto;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5);background:#fff}
+.sc-lb p{position:absolute;left:0;right:0;bottom:2.5vh;text-align:center;font:500 13px/1.4 'Inter Tight',system-ui,sans-serif;color:rgba(255,255,255,.8);padding:0 6vw}
+.sc-lb button{position:absolute;top:2.5vh;right:3vw;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:20px;cursor:pointer}
+</style>
+<script>
+(function(){
+  var imgs=[].slice.call(document.querySelectorAll('figure img, .shot img')).filter(function(i){return !i.closest('.sc-nav,.sc-footer')});
+  if(!imgs.length) return;
+  var lb=document.createElement('div'); lb.className='sc-lb'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true'); lb.setAttribute('aria-label','Enlarged image');
+  lb.innerHTML='<img alt=""><p></p><button type="button" aria-label="Close">×</button>'; document.body.appendChild(lb);
+  var big=lb.querySelector('img'),cap=lb.querySelector('p'),last=null;
+  function open(i){ last=i; big.src=i.currentSrc||i.src; big.alt=i.alt||''; cap.textContent=i.alt||''; lb.classList.add('on'); lb.querySelector('button').focus(); }
+  function close(){ lb.classList.remove('on'); if(last) last.focus(); }
+  imgs.forEach(function(i){
+    if((i.getAttribute('width')|0)&&(i.getAttribute('width')|0)<80) return;
+    i.classList.add('sc-zoomable'); i.setAttribute('tabindex','0'); i.setAttribute('role','button');
+    if(!i.getAttribute('aria-label')) i.setAttribute('aria-label','Enlarge image'+(i.alt?': '+i.alt:''));
+    i.addEventListener('click',function(){open(i)});
+    i.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();open(i);} });
+  });
+  lb.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&lb.classList.contains('on')) close(); });
+})();
+</script>
+<style id="site-gutter">
+/* one content column for all four pages: same left/right margin as the header and footer */
+:root{--site-gut:max(clamp(20px,5.5vw,80px),calc((100vw - 1280px) / 2));--sc-pad:var(--site-gut)}
+.wrap{max-width:none!important;padding-inline:var(--site-gut)!important}
+</style>
 </body>
 </html>
