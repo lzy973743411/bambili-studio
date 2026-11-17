@@ -69,6 +69,17 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
 .sc-cring.hov{width:50px;height:50px;border-color:var(--sc-c-hov)}
 .sc-cur-on .sc-cdot,.sc-cur-on .sc-cring{opacity:1}
 </style>
+<style id="v-tight">
+.chain{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:2px solid var(--ink)}
+.chain li{display:grid;gap:6px;align-content:start;padding:16px 18px 18px;position:relative}
+.chain li+li{border-left:1px dashed var(--line,#c9c4e0)}
+.chain li:first-child{background:#fff4f2}
+.chain .ck{font:10px/1.5 var(--px);text-transform:uppercase;color:var(--sub)}
+.chain b{font-size:16px;line-height:1.35;color:var(--text,#1d1a33)}
+.chain p{font-size:15px;line-height:1.5;color:#45425f}
+.chain-note{font:700 12px/1.5 var(--ui);color:var(--sub);text-transform:uppercase;max-width:80ch}
+@media(max-width:760px){.chain{grid-template-columns:minmax(0,1fr)}.chain li+li{border-left:0;border-top:1px dashed var(--line,#c9c4e0)}}
+</style>
 </head>
 <body id="top">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1197,9 +1208,9 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
   <!-- 01 HERO -->
   <section class="hero band band-dots" aria-labelledby="h-hero" data-sec="01">
     <div>
-      <span class="kicker">01 · Case study · AI · Web · 2026</span>
+      <span class="kicker">01 · Case study · Solo · Live · 2026</span>
       <h1 id="h-hero">Let the dice pick.</h1>
-      <p class="sub">A playful decision tool for small choices. The dice picks, and if you catch yourself hoping it had landed the other way, Tossy lets you take that side.</p>
+      <p class="sub">A playful decision tool for small choices. The question behind it: when the dice lands and you catch yourself hoping for the other side, can that reaction show you what you wanted?</p>
       <div class="hero-actions">
         <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Try it live →</a>
 
@@ -1237,39 +1248,25 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
   </dl>
   <div class="tldr">
     <div><span class="label">What I did</span><p>Took a live AI product from idea to launch on my own, in about six weeks, using AI coding tools to build it.</p></div>
-    <div><span class="label">Key decision</span><p>AI prepares the options and the voice; the dice picks the outcome. Then I designed what happens when people push back.</p></div>
-    <div><span class="label">What testing showed</span><p>People used "take the other side" (12 of 51 decisions), and analytics caught a silent API outage the fallback had hidden.</p></div>
+    <div><span class="label">Key decision</span><p>AI writes the options and the voice; the dice draws the outcome. Writing the options already shapes what can come up, so that is where I put the limits.</p></div>
+    <div><span class="label">What testing showed</span><p>People used the switch (12 of 51 decisions), but most of those came during an AI outage the fallback had hidden. It shows the interaction gets used, not yet that it helps.</p></div>
   </div>
 
   <!-- 02 -->
   <section class="cs acc-aqua sc-target" id="problem" aria-labelledby="h2a" data-sec="02">
     <div class="head">
       <div class="sh"><span class="n">02</span><span class="tt">The question</span><span class="aside">Problem &amp; scope</span></div>
-      <h2 id="h2a">Why are small decisions so hard?</h2>
+      <h2 id="h2a">Can a dice help you notice what you wanted?</h2>
     </div>
     <div class="split">
       <div class="prose">
-        <p>What to eat. Which shirt. Whether to text back now or later. None of these matter much, yet they can eat twenty minutes.</p>
-        <p>The options are usually close enough that either would be fine. <strong>The hard part isn't choosing well. It's stopping.</strong> For these moments, I wanted to test an alternative to more analysis.</p>
+        <p>What to eat, which shirt, whether to text back now. Small choices can eat twenty minutes, and the options are usually close enough that either would be fine. <strong>The hard part isn't choosing well. It's stopping.</strong></p>
+        <p>Tossy tries a different route from more analysis: the dice picks fast, and the moment I care about comes after. If you catch yourself hoping it had landed the other way, that reaction may point to a preference you already had.</p>
       </div>
-      <figure class="quote"><div class="die bob" data-face="savage"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The options were never the problem. Stopping was.</blockquote></figure>
+      
     </div>
-    <div class="scenes">
-      <div class="scene card"><span class="label">12:41 PM · Lunch</span><div class="b">Scrolling a delivery app for 20 minutes. Still nothing in the cart.</div></div>
-      <div class="scene card"><span class="label">Group chat</span><div><span class="chat">whatever works</span><span class="chat">idk, either</span><span class="chat">up to you</span></div></div>
-      <div class="scene card"><span class="label">8:02 AM · Closet</span><div class="b">Two near-identical shirts. Late for the train.</div></div>
-      <div class="scene card"><span class="label">Unread · 1</span><div class="b">Reply now, or later? The draft just sits there.</div></div>
-    </div>
-    <p class="mkt-line"><span class="label">Context</span>AI companions are a fast-growing category, estimated at $24–50B in 2026 and growing about 31% a year. Tossy sits at its lightest end: a few seconds, no long conversation, just a nudge to move. <span class="src">Estimates: <a href="https://www.fortunebusinessinsights.com/ai-companion-market-113258" target="_blank" rel="noopener">Fortune Business Insights</a>, <a href="https://www.researchandmarkets.com/reports/6226343/ai-companion-market-report" target="_blank" rel="noopener">Research and Markets</a>.</span></p>
-    <div class="split">
-      <div class="prose">
-        <p>For small choices, a good-enough answer now beats a perfect one later. That meant saying no to the obvious features:</p>
-        <ul class="nos">
-          <li><span class="x">NO</span><span><b>Pros/cons analysis</b>Structure invites more deliberation.</span></li>
-          <li><span class="x">NO</span><span><b>Required options list</b>Don't make users structure their indecision before helping them escape it.</span></li>
-          <li><span class="x">NO</span><span><b>Productivity-tool baggage</b>No login, no dashboard. History stays quietly on the device.</span></li>
-        </ul>
-      </div>
+        
+    <div>
       <div style="display:grid;gap:32px">
         <div class="isnt">
           <div class="no">
@@ -1292,10 +1289,12 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
           <div><dt class="kept">Kept</dt><dd class="kept">One line: “The dice has settled 8 decisions for you.”</dd></div>
           <div><dt>Why</dt><dd>Every step before the toss broke “type and toss.” Testers then pushed it further and skipped the question too.</dd></div>
         </dl>
-        <div class="ev"><b>59/145</b><span>tosses had no question typed at all</span></div>
       </div>
     </article>
-    <div class="pos">
+    
+    <details class="more">
+      <summary><span>Principles and visual direction</span><small>Four principles behind every screen · how the look moved from oracle to pixel</small></summary>
+      <div style="padding:18px 20px 0"><div class="pos">
       <span class="label">Four principles behind every screen</span>
       <ol class="pos-list">
         <li><i>01</i><b>Light</b><span>No sign-up, one screen, mobile first. Type a question, or don't, and toss.</span></li>
@@ -1303,9 +1302,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         <li><i>03</i><b>Takes the edge off</b><span>The dice hangs in the air before it lands. That short pause is part of the relief.</span></li>
         <li><i>04</i><b>Gets you moving</b><span>"Let's do it" is the main action after every answer. Re-tossing is there, but quieter.</span></li>
       </ol>
-    </div>
-    <details class="more">
-      <summary><span>More on visual direction</span><small>How the look moved from oracle to pixel</small></summary>
+    </div></div>
       <div class="more-evo">
     <div class="evo">
       <figure><div class="frame f1"><i></i><b>THE ORACLE</b></div><figcaption><b>Mystical</b><span class="tag" style="--mode:#e9d9a6">V1</span></figcaption></figure>
@@ -1325,10 +1322,10 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
     </div>
     <div class="split">
       <div class="prose">
-        <p>The first version had one button after the reveal: Toss Again. The fork below started as my own design hypothesis, not a test finding: if someone immediately wishes the dice had landed the other way, that reaction might be worth capturing instead of ignoring.</p>
+        <p>The first version had one button after the reveal: Toss Again. The fork below is my own design hypothesis, not a test finding.</p>
         <p>So the reveal became a fork: <strong>Let's do it</strong>, <strong>Secretly hoping for [the other side]?</strong>, <strong>Toss again</strong> and <strong>New question</strong>. On the third toss, the character calls it out.</p>
       </div>
-      <figure class="quote"><div class="die bob" data-face="savage_other"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The interesting moment was when someone wanted the other answer.</blockquote></figure>
+      
     </div>
     <div class="ba">
       <div class="ba-col">
@@ -1358,7 +1355,6 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
           <div><dt class="kept">Kept</dt><dd class="kept">“Secretly hoping for [the other side]?” on yes/no and option questions.</dd></div>
           <div><dt>Why</dt><dd>Wishing the dice had landed the other way may point to a preference people already had.</dd></div>
         </dl>
-        <div class="ev"><b>12/51</b><span>decisions ended with a switch</span></div>
       </div>
     </article>
 
@@ -1370,7 +1366,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         <div class="rail" aria-hidden="true"></div>
         <div class="branches">
           <div class="br"><span class="act primary" aria-hidden="true">LET'S DO IT</span><p class="t"><b>Accepts the result.</b> The dice did its job and the decision is over. The primary action; re-tossing is visually demoted.</p></div>
-          <div class="br hl"><span><span class="hot" aria-hidden="true">Secretly hoping for get it?</span></span><p class="t"><b>Disappointment may point to a preference the user already had.</b> Yes/no and option questions only: open questions have no "other one", so they just re-toss.</p></div>
+          <div class="br hl"><span><span class="hot" aria-hidden="true">Secretly hoping for get it?</span></span><p class="t"><b>Takes the side the dice didn't pick.</b> Yes/no and option questions only: open questions have no "other one", so they just re-toss.</p></div>
           <div class="br"><span class="act small" aria-hidden="true">TOSS AGAIN</span><p class="t"><b>Repeated re-tossing is a signal too.</b> On the 3rd toss the character reacts, and "Secretly hoping for…?" steps forward.</p></div>
           <div class="br"><span class="act small" aria-hidden="true">NEW QUESTION</span><p class="t"><b>Starts a different decision.</b></p></div>
         </div>
@@ -1392,9 +1388,8 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
     <div class="split">
       <div class="prose">
         <p>If the answer is random, the moment has to feel like something. The loop is <strong>Question → Toss → Reveal</strong>, it lives in about three seconds, and the toss gets the most care.</p>
-        <p>Yes/no answers use the question's own words ("Get the boba" / "Skip it today"). Open questions get one concrete answer. Options are optional, and tapping an "X or Y" starter splits it into two, which quietly teaches that options exist.</p>
+        <p>Yes/no answers use the question's own words ("Get the boba" / "Skip it today"). Open questions get one concrete answer.</p>
         <p><strong>Waiting is part of the toss.</strong> The AI usually takes 1–2 seconds, so instead of a spinner the dice hangs in the air for up to about 6 seconds.</p>
-        <p><strong>It also lives on the home screen.</strong> Tossy is a PWA: added to a phone's home screen, it opens full screen like an app, which suits a tool meant to be opened for a few seconds at a time.</p>
       </div>
       <div style="display:grid;gap:28px">
         <figure class="quote"><div class="die bob" data-face="gentle"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Anticipation turns a random result into a moment.</blockquote></figure>
@@ -1441,12 +1436,12 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       <h2 id="h6a">AI shapes the options, the dice picks.</h2>
     </div>
     <article class="dec">
-      <div class="dl-l"><span class="dk"><b>5.1</b>Decision</span><h3>AI writes the voice, never the verdict.</h3></div>
+      <div class="dl-l"><span class="dk"><b>5.1</b>Decision</span><h3>AI narrows the options. The dice draws one.</h3></div>
       <div class="dl-r">
         <dl>
           <div><dt class="cut">Cut</dt><dd><s>An AI recommendation as the answer.</s></dd></div>
-          <div><dt class="kept">Kept</dt><dd class="kept">AI drafts the options and the lines; the dice picks at random.</dd></div>
-          <div><dt>Why</dt><dd>A “smart” answer asks to be trusted, and second-guessed. A random one just gets pushed against.</dd></div>
+          <div><dt class="kept">Kept</dt><dd class="kept">AI drafts the options and the lines; the dice draws one at random.</dd></div>
+          <div><dt>Why</dt><dd>A “smart” answer asks to be trusted, and second-guessed. A random one just gets pushed against. But writing the six candidates already decides what can come up, so the AI still holds real influence. The guardrails below are how I limit it.</dd></div>
         </dl>
         <div class="ev"><b>5</b><span>guardrails on every AI line</span></div>
       </div>
@@ -1459,7 +1454,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
           <li><b>Writes the options</b><span>Yes/no: both sides in the question's own words. Open: six concrete candidates, each with its own line.</span></li>
           <li><b>Writes the voice</b><span>Mode changes the tone of the comment, never the answer.</span></li>
           <li><b>Expands the pool</b><span>Wildcard adds Tossy's own pick. If you give one option, Tossy's pick joins it.</span></li>
-          <li class="never"><b>Doesn't pick the winner</b><span>It shapes the pool and the wording, not which side or candidate comes up.</span></li>
+          <li class="never"><b>Doesn't draw the winner</b><span>But it sets the pool, which limits what can come up.</span></li>
         </ul>
       </div>
       <div class="divider" aria-hidden="true"></div>
@@ -1468,14 +1463,14 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         <ul>
           <li><b>Yes / no</b><span>Still a 50/50 toss between the two sides the AI wrote.</span></li>
           <li><b>Open questions</b><span>The answer is drawn at random from the six candidates.</span></li>
-          <li><b>Selects without ranking</b><span>The dice doesn't rank the candidates; it picks one at random.</span></li>
+          
         </ul>
       </div>
     </div>
 
     <details class="more">
       <summary><span>How the AI got there, and its 5 guardrails</span><small>4 iterations · concrete answers · comment matches answer · non-decisions · a tone, not an expert · fallback</small></summary>
-      <p class="more-intro">The line isn't perfectly clean. Whoever writes the candidates sets the range of what can come up, and wording can tilt how a side feels. The guardrails are meant to limit that influence.</p>
+      <p class="more-intro">Wording can also tilt how a side feels, so the guardrails cover the lines as well as the options.</p>
       <div class="details" style="display:grid;gap:24px">
     <div style="display:grid;gap:16px">
       <span class="label">How it got there · 4 iterations</span>
@@ -1505,7 +1500,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       <div class="spot-head"><span class="tag" style="--mode:var(--lav)">Spotlight · Savage mode</span><h3>From rules to a character</h3></div>
       <div class="spot-body">
         <div class="prose">
-          <p>Savage mode started as a list of things the AI must never say. In testing, friends still got lines that felt mean. So I stopped writing rules and wrote a character instead: <strong>the old friend who talks tough but has your back.</strong> It roasts the situation, the indecision and the dice. Never the person.</p>
+          <p>Savage mode started as a list of things the AI must never say. In testing, friends still got lines that felt mean, and each patch to the list let something new slip through. So I stopped writing rules and wrote a character instead: <strong>the old friend who talks tough but has your back.</strong> It roasts the situation, the indecision and the dice. Never the person.</p>
         </div>
         <figure class="quote"><div class="die bob" data-face="savage"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The user is the hero of the joke, not the punchline.</blockquote></figure>
       </div>
@@ -1543,14 +1538,20 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
     <div class="head">
       <div class="sh"><span class="n">06</span><span class="tt">Testing &amp; evidence</span><span class="aside">Evidence</span></div>
       <h2 id="h8a">What testing showed, and what it didn't</h2>
-      <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. A few patterns shaped the product most.</p></div>
+      <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. Read the numbers with one fact first:</p></div>
     </div>
+    <ol class="chain" aria-label="Outage, fix, after">
+      <li><span class="ck">Outage · Sep 27 – Oct 8</span><b>AI was down and nobody saw it.</b><p>The production API key was missing, so 0 of 111 AI requests succeeded. Every feature fell back to local answers without an error. 42 of the 51 recorded decisions happened here.</p></li>
+      <li><span class="ck">Fix</span><b>Restored the key, then raised the wait.</b><p>A 4.2-second limit still let some calls time out, so the dice now hovers for up to about 6 seconds. Lesson: a fallback that hides failures needs monitoring that doesn't.</p></li>
+      <li><span class="ck">After · Oct 8 – Nov 15</span><b>26 of 29 AI requests succeeded.</b><p>But only 7 decisions were recorded. Too few to say anything about the AI's effect.</p></li>
+    </ol>
+    <p class="chain-note">So the findings below describe how people used the interaction, mostly without AI. They don't show that it helped anyone decide.</p>
     <div class="findings">
       <article class="find card">
         <span class="k">Finding 1</span>
         <div>
           <h3>People wanted to toss before typing.</h3>
-          <p>Several testers tapped the dice without entering a question, expecting it to just answer. So I made an empty toss work. It pushed the product principle further than I had: don't even make users write the question down first.</p>
+          <p>Testers pushed the principle further than I had: don't even make people write the question down.</p>
           <div class="steps">
             <div><i>Users did</i>Tapped TOSS IT! with an empty box.</div>
             <div><i>I changed</i>An empty toss now picks a question for you.<br><span class="say-in">NOTHING TO ASK? I PICKED ONE.</span></div>
@@ -1563,7 +1564,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         <span class="k">Finding 2</span>
         <div>
           <h3>Answers that missed the question.</h3>
-          <p>A friend asked what to eat while drinking with friends tonight. Tossy said sparkling water. She tossed again: iced Americano. "Why is everything a drink?" A random answer is fine; an irrelevant one breaks trust. This pushed AI from writing comments to reading the question first (→ Section 05). Part of the problem, it turned out, was a bug (Finding 5).</p>
+          <p>A friend asked what to eat while drinking tonight. Tossy said sparkling water; she tossed again and got iced Americano. "Why is everything a drink?" An irrelevant answer breaks trust in a way a random one doesn't. This pushed the AI to read the question first (→ Section 05). Part of it was the outage above.</p>
           <div class="chatlog">
             <span class="q">Q · What should I eat while drinking with friends tonight?</span>
             <div class="row"><span class="a">SPARKLING WATER</span><span class="arrow">→ toss again →</span><span class="a">ICED AMERICANO</span></div>
@@ -1573,16 +1574,13 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       </article>
 
 
-      <article class="find card">
-        <span class="k">Finding 3</span>
-        <div><h3>Savage went too far.</h3><p>Some savage-mode lines landed as mean, not funny. Each round I patched the banned list, and each round something new slipped through. That's what led to rewriting savage mode as a character instead of a rulebook (→ Section 05).</p></div>
-      </article>
+      
 
       <article class="find panel">
-        <span class="k">Finding 4</span>
+        <span class="k">Finding 3</span>
         <div>
           <h3>Some people took the other side.</h3>
-          <p>Of 51 recorded decisions, 12 ended with a switch to the side the dice didn't pick; on yes/no questions, 8 of 24. That shows the switch gets used. It doesn't yet show that people understood themselves better or liked the result more, and some may just have been playing. Switching lives in the dice flow, not in the AI, so it worked the same way whether or not the AI was responding.</p>
+          <p>12 of 51 recorded decisions ended with a switch; on yes/no questions, 8 of 24. The switch doesn't depend on the AI, so it worked during the outage too. It shows the switch gets used, not that people understood themselves better or liked the result more. Some may just have been playing.</p>
           <div class="grids">
             <figure><div class="pxgrid" data-n="51" data-k="12" role="img" aria-label="51 decisions, 12 switched"></div><figcaption><b>12 / 51</b> All decisions switched</figcaption></figure>
             <figure><div class="pxgrid" data-n="24" data-k="8" role="img" aria-label="24 yes/no decisions, 8 switched"></div><figcaption><b>8 / 24</b> Yes/no switched (33%)</figcaption></figure>
@@ -1591,17 +1589,10 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         </div>
       </article>
 
-      <article class="find card">
-        <span class="k">Finding 5</span>
-        <div>
-          <h3>The bug the data caught.</h3>
-          <div class="bug"><span class="zero">0 / 111</span><span class="label">Tester AI requests that succeeded, Sep 27 19:37 – Oct 8 05:56 UTC</span></div>
-          <p>The busiest testing day was also the day AI quietly stopped working: the production API key was missing. Because every AI feature had a local fallback, nobody saw an error. Answers just got blander and sometimes off-topic. Some of the "wrong" answers friends reported weren't AI mistakes at all. <strong>A fallback that hides failures needs monitoring that doesn't.</strong></p>
-        </div>
-      </article>
+      
     </div>
 
-    <p class="framing">Early testing, small sample. These are signals, not proof. Most recorded decisions happened during the fallback period, so these results describe use of the interaction, not the effect of AI-generated responses.</p>
+    
     <details class="more">
       <summary><span>The numbers behind the findings</span><small>Version split against the outage · early signals from PostHog · mode mix · how it was counted</small></summary>
       <div class="details" style="display:grid;gap:24px">
@@ -1651,7 +1642,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       <div class="foot-notes">
         <p><b>How it was counted.</b> My own test sessions are excluded throughout, including other devices I tested on. Most visitors were friends opening a shared link without a decision in mind.</p>
         <p><b>Privacy.</b> Analytics track events, never the questions people ask. The API key stays server-side.</p>
-        <p><b>Reliability.</b> After the API key was restored, a 4.2-second limit still let some calls time out, so I raised the wait to about 6 seconds, with the dice hovering in the air. From Oct 8 to Nov 15, 26 of 29 AI requests succeeded, with a median of 1.4 s across the successful ones; the failed requests fell back to local answers.</p>
+        <p><b>Reliability.</b> After the fix, successful AI requests took a median of 1.4 s; the 3 failed ones fell back to local answers.</p>
       </div>
     </div>
       </div>
@@ -1664,15 +1655,12 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       <div class="sh"><span class="n">07</span><span class="tt">Reflection</span><span class="aside">What’s next</span></div>
       <h2 id="h9a">What I'm taking forward</h2>
     </div>
-    <div class="prose">
-      <p>The project changed how I approached three problems: generating relevant answers, defining a supportive character, and detecting failures hidden by fallbacks. I revised the candidate-generation process and replaced a growing banned-phrase list with a character brief. These changes still need more systematic evaluation.</p>
-    </div>
-    <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Looking back</span><p class="big">I set out to make decisions for people. The more interesting part was <em>watching them disagree with the dice.</em></p></article>
+        <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Looking back</span><p class="big">I set out to make decisions for people. The more interesting part was <em>watching them disagree with the dice.</em></p></article>
     <div class="lists">
       <div>
         <h3>Limitations</h3>
         <ul>
-          <li>Small sample: 118 visitors, mostly friends and friends of friends. Signals, not proof.</li>
+          <li>Small sample: 118 visitors, mostly friends and friends of friends, and most decisions were logged while the AI was down.</li>
           <li>The preference signal only works for yes/no and option questions.</li>
           <li>Randomness fits low-stakes choices. Tossy isn't built for serious ones.</li>
         </ul>
@@ -1681,7 +1669,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
         <h3>What I'd test next</h3>
         <ul>
           <li>Do people who switch feel better about the final choice than people who accept?</li>
-          <li>Which kinds of decisions get the most re-tosses and switches?</li>
+          <li>Watch people use it and ask why they accept, switch or re-toss, to tell a recognized preference from simply enjoying the interaction.</li>
           <li>Does mode change how often people accept the first result?</li>
           <li>With AI on for a full round, does the comment line change how often people switch?</li>
         </ul>
@@ -1712,10 +1700,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       </div>
     </details>
 
-    <div class="method">
-      <span class="label">How I'd study it next</span>
-      <p>I would next observe people making everyday choices with Tossy and ask what led them to accept, switch, or toss again. This would help distinguish a recognized preference from other explanations, such as dissatisfaction with the answer or simply enjoying the interaction.</p>
-    </div>
+    
 
     <div class="built">
       <div class="head">
@@ -1724,7 +1709,7 @@ figcaption .fn{font-weight:500;color:var(--ink);font-variant-numeric:tabular-num
       <div class="split">
         <div class="prose">
           <p>I built Tossy with Claude and Codex. I was responsible for <strong>the product behavior</strong>, <strong>the interaction and visual design</strong>, <strong>the AI's character and rules</strong>, <strong>connecting Gemini and PostHog</strong>, and <strong>testing and iterating</strong> with friends.</p>
-          <p>Each round, what broke became the next brief. When a fix stopped working, like adding more banned words to savage mode, I changed the brief instead of the patch: I gave the AI a character to play.</p>
+          <p>Each round, what broke became the next brief, like the savage-mode rewrite below.</p>
         </div>
         <div style="display:grid;gap:28px">
           <ol class="loopc" aria-label="Build loop">
