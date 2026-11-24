@@ -1498,9 +1498,9 @@ section.cs .dec .dl-l h3,.find .spot-head h3,.find .subh h3{font:700 19px/1.3 va
       <div aria-hidden="true"></div>
     </div>
     <div class="trio">
-      <div class="det"><div class="show rec"><video class="rv" src="tossy/listen.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video></div><h3>Listens</h3><p>The dice watches and reacts while you type.</p></div>
-      <div class="det"><div class="show rec"><video class="rv" src="tossy/modes.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Switching between the four modes changes the dice face and its greeting"></video></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
-      <div class="det"><div class="show rec"><video class="rv" src="tossy/skins.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Clicking through the six skins recolors the whole page"></video></div><h3>Skins</h3><p>Pick a palette before you toss.</p></div>
+      <div class="det"><div class="show rec"><video class="vid" src="tossy/listen.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video></div><h3>Listens</h3><p>The dice watches and reacts while you type.</p></div>
+      <div class="det"><div class="show rec"><video class="vid" src="tossy/modes.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Switching between the four modes changes the dice face and its greeting"></video></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
+      <div class="det"><div class="show rec"><video class="vid" src="tossy/skins.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Clicking through the six skins recolors the whole page"></video></div><h3>Skins</h3><p>Pick a palette before you toss.</p></div>
     </div>
     <details class="more">
       <summary><span>More small details</span><small>8-bit sound, haptics, pull-to-refresh, fresh lines, Chinese version, easter eggs</small></summary>
@@ -1525,9 +1525,9 @@ section.cs .dec .dl-l h3,.find .spot-head h3,.find .subh h3{font:700 19px/1.3 va
       <div class="prose"><p>Gemini writes the options and the voice; the dice picks one at random.</p></div>
     </div>
     <ol class="iters ways" aria-label="Three ways to ask">
-      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-xy.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing Coffee or bubble tea? and tossing; the dice picks Coffee"></video></div><span class="lv">01</span><b>Two options</b><span class="eg">"Coffee or bubble tea?"</span><p>Both sides become the options automatically, and the dice picks one.</p></li>
-      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-open.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing What should I eat for lunch? and tossing; the dice picks Tacos"></video></div><span class="lv">02</span><b>An open question</b><span class="eg">"What should I eat for lunch?"</span><p>AI writes six concrete answers, and the dice picks one.</p></li>
-      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-pick.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Adding Bread, Sushi and Pizza plus Tossy's pick, then tossing; the dice picks Pizza"></video></div><span class="lv">03</span><b>Your own list + Tossy's pick</b><span class="eg">Bread · sushi · pizza</span><p>Already have ideas? The dice only picks from yours. Open to something new? Keep <strong>Tossy's pick</strong> on, and Tossy's own answer joins the pool.</p></li>
+      <li class="card"><div class="exm"><video class="vid" src="tossy/ask-xy.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Typing Coffee or bubble tea? and tossing; the dice picks Coffee"></video></div><span class="lv">01</span><b>Two options</b><span class="eg">"Coffee or bubble tea?"</span><p>Both sides become the options automatically, and the dice picks one.</p></li>
+      <li class="card"><div class="exm"><video class="vid" src="tossy/ask-open.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Typing What should I eat for lunch? and tossing; the dice picks Tacos"></video></div><span class="lv">02</span><b>An open question</b><span class="eg">"What should I eat for lunch?"</span><p>AI writes six concrete answers, and the dice picks one.</p></li>
+      <li class="card"><div class="exm"><video class="vid" src="tossy/ask-pick.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Adding Bread, Sushi and Pizza plus Tossy's pick, then tossing; the dice picks Pizza"></video></div><span class="lv">03</span><b>Your own list + Tossy's pick</b><span class="eg">Bread · sushi · pizza</span><p>Already have ideas? The dice only picks from yours. Open to something new? Keep <strong>Tossy's pick</strong> on, and Tossy's own answer joins the pool.</p></li>
     </ol>
 
     <div class="subh"><span class="label">Under the hood</span><h3>AI shapes the options. The dice picks.</h3></div>
@@ -2181,27 +2181,6 @@ section.cs .dec .dl-l h3,.find .spot-head h3,.find .subh h3{font:700 19px/1.3 va
 })();
 </script>
 
-<script id="relay-js">
-(function(){
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  [].slice.call(document.querySelectorAll('.trio,.ways')).forEach(function(g){
-    var v=[].slice.call(g.querySelectorAll('video.rv')); if(!v.length) return;
-    var cur=0, vis=false;
-    function endFrame(x){ if(x.duration) x.currentTime=Math.max(0,x.duration-0.15); }
-    v.forEach(function(x,k){
-      x.muted=true; x.preload='auto';
-      x.addEventListener('loadedmetadata',function(){ if(k!==cur||reduce) endFrame(x); });
-      x.addEventListener('ended',function(){ if(k!==cur) return; endFrame(x); cur=(cur+1)%v.length; if(vis) play(); });
-    });
-    function mark(){ v.forEach(function(x,k){ x.classList.toggle('rv-on',k===cur&&!reduce); x.classList.toggle('rv-idle',k!==cur&&!reduce); }); }
-    function play(){ mark(); var x=v[cur]; v.forEach(function(y,k){ if(k!==cur) y.pause(); }); x.currentTime=0; var p=x.play(); if(p&&p.catch) p.catch(function(){}); }
-    if(reduce){ return; }
-    mark();
-    if('IntersectionObserver' in window){
-      new IntersectionObserver(function(es){ vis=es[0].isIntersecting; if(vis){ var x=v[cur]; if(x.paused){ var p=x.play(); if(p&&p.catch) p.catch(function(){}); } } else { v[cur].pause(); } },{threshold:.35}).observe(g);
-    } else { vis=true; play(); }
-  });
-})();
-</script>
+
 </body>
 </html>
