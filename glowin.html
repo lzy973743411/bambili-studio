@@ -1122,6 +1122,7 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
 @media(max-width:600px){.tl li{grid-template-columns:minmax(0,1fr)}}
 </style>
 <style id="text-adjust">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+<style id="imp5">@media(min-width:640px){.imp-grid{grid-template-columns:repeat(6,1fr)!important}.imp-grid .imp-card{grid-column:span 2}.imp-grid .imp-card:nth-child(n+4){grid-column:span 3}}</style>
 </head>
 <body id="top">
 
@@ -1131,8 +1132,8 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
       <svg viewBox="0 0 16 22" aria-hidden="true"><g fill="none" stroke="#6B45FF" stroke-linecap="round"><path d="M8 21V7" stroke-width="5"/><path d="M8 14H4.5V10" stroke-width="3"/><path d="M8 11h3.5V7.5" stroke-width="3"/></g><circle cx="8" cy="3.2" r="2.6" fill="#F5307C"/></svg>
       Bambi Li
     </a>
-    <div class="sc-jump sc-label" aria-label="Sections"><a href="#problem">Problem</a><a href="#system">System</a><a href="#decisions">Decisions</a></div>
-    <div class="sc-meta sc-label"><span class="sc-no">02 · Glowin</span><a href="index.html#work">All work</a></div>
+    <div class="sc-jump sc-label" aria-hidden="true"></div>
+    <div class="sc-meta sc-label"><a href="index.html#work">All work</a></div>
   </div>
   <div class="sc-prog" aria-hidden="true">
     <div class="sc-fill" id="scFill"></div>
@@ -1207,7 +1208,6 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
     </div>
   </div>
 
-  <div class="hero-scroll"><div class="scroll-line"></div><span class="scroll-label">Scroll</span></div>
 </section>
 
 <!-- CONTEXT -->
@@ -1218,8 +1218,6 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
     <h2 class="s-h2">When expansion becomes a <em>consistency problem</em></h2>
     <div>
       <p class="s-body">When a platform serves multiple entry points (POS, online booking and AI phone intake), the real design challenge isn't adding features. It's making sure everything <strong>behaves like one system.</strong></p>
-      <br>
-      <p class="s-body">As the product expanded, the challenge shifted from building new entry points to keeping behavior consistent across all of them.</p>
       <br>
       <p class="s-body">Two counts run through this case study. <strong>3 channels</strong> are how a booking comes in: POS / walk-in, online, and AI phone. <strong>4 surfaces</strong> are the screens people act on: the customer booking web, iPad POS, Sunmi handheld, and Boss App. The AI phone is a channel without a screen of its own; its output lands on the merchant surfaces.</p>
       <br>
@@ -1234,9 +1232,10 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   <div class="chapter sc-target" id="problem"><span class="chapter-num">02</span><span class="chapter-label">Problem Shift</span></div>
   <h2 class="s-h2">Three core challenges <em>emerged</em></h2>
   <p class="s-body" style="margin-top:.75rem"><b>Where it started.</b> The existing iPad app showed every order as the same card: a number, a name, a time, an amount and "Unpaid". It didn't show where a booking came from or what stage it was at, so staff couldn't tell an online request from a walk-in without opening it.</p>
+  <p class="s-body" style="margin-top:.75rem">For example: a customer books Hair Styling online for 2:30 PM, and it still needs review. A walk-in asks for the same slot, and staff create a POS booking on the spot. On the old screen, both show up as the same card marked "Unpaid", so no one can tell which one is confirmed, which one still needs review, or whether 2:30 is now double-booked.</p>
   <div class="prob-list">
     <div class="prob-item rv d1"><span class="prob-num">01</span><div><div class="prob-t">Intake logic</div><div class="prob-d">Different sources had different timing, validation needs, and confidence levels, so the same request could behave differently depending on where it came from.</div></div></div>
-    <div class="prob-item rv d2"><span class="prob-num">02</span><div><div class="prob-t">State consistency</div><div class="prob-d">Once inside operations, requests couldn't be treated as separate flows. Inconsistent handling meant staff had to compensate manually.</div></div></div>
+    <div class="prob-item rv d2"><span class="prob-num">02</span><div><div class="prob-t">State consistency</div><div class="prob-d">Once inside operations, requests couldn't be treated as separate flows. Inconsistent handling meant staff had to open each booking to check its source and status.</div></div></div>
     <div class="prob-item rv d3"><span class="prob-num">03</span><div><div class="prob-t">Cross-surface visibility</div><div class="prob-d">Merchants needed a clear view of source, status, and next actions. Without it, staying on top of activity meant constant context-switching.</div></div></div>
   </div>
 </div>
@@ -1246,11 +1245,11 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   <div class="sec-rule"></div>
   <div class="chapter sc-target" id="process"><span class="chapter-num">03</span><span class="chapter-label">How the Work Moved</span></div>
   <h2 class="s-h2">Flows first, then screens, <em>then rules</em></h2>
-  <p class="s-body" style="margin-top:.75rem">Selected entries from my work log, February to August 2025. The early rounds were mostly visual. From spring on, most of the work was about how the system should behave, and nearly every round started from a review with the team.</p>
+  <p class="s-body" style="margin-top:.75rem">Selected entries from my work log, February to August 2025, when the core system took shape. The early rounds were mostly visual. From spring on, most of the work was about how the system should behave, and nearly every round started from a review with the team. After August, the work was mostly iteration on the same rules.</p>
   <ol class="tl">
     <li><span class="tl-d">Feb 2025</span><div><div class="tl-t">Website and first app screens</div><p class="tl-b">The marketing site for mobile and desktop, then the main app screens. After review, the second version pushed navigation back so order categories lead, moved every page to a horizontal navigation bar, and reworked New Order to fit more products on one screen.</p></div></li>
     <li><span class="tl-d">Mar 2025</span><div><div class="tl-t">Flows before screens</div><p class="tl-b">I mapped the online booking web flow and the POS booking workflow and collected references from existing booking systems before drawing anything. The mobile booking screens were then revised after a team meeting, and the web version followed.</p></div></li>
-    <li><span class="tl-d">Mar – Apr 2025</span><div><div class="tl-t">Booking on the iPad</div><p class="tl-b">Notifications, booking details and the merchant workflow on iPad, plus staff schedules and business hours, revised over two rounds of product feedback.</p></div></li>
+    <li><span class="tl-d">Mar – Apr 2025</span><div><div class="tl-t">Booking on the iPad</div><p class="tl-b">Notifications, booking details and the merchant workflow on iPad, plus business hours, revised over two rounds of product feedback.</p></div></li>
     <li><span class="tl-d">Apr – May 2025</span><div><div class="tl-t">Rules become settings</div><p class="tl-b">Booking rules became settings each merchant controls (Decision 04). A broken booking link now leads to contact details, the shop's phone number and the home page instead of a dead end. Checkout gained tips and a signature step, then was revised after a product review.</p></div></li>
     <li><span class="tl-d">May 2025</span><div><div class="tl-t">The AI phone line</div><p class="tl-b">I mapped the AI call workflow: answer by voice, check the scheduling engine against the POS booking table, create the booking and send an SMS confirmation, handle rescheduling, and pick up the caller's basic details.</p></div></li>
     <li><span class="tl-d">Jun 2025</span><div><div class="tl-t">Payment rules</div><p class="tl-b">Tax and split payment moved into checkout as rules set once per shop (Decision 05).</p></div></li>
@@ -1268,8 +1267,8 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
       <p class="s-body" style="margin-top:.75rem">Three distinct entry points, each with its own rules at intake, converge into one operational model. The system stays flexible where channels differ, predictable where merchants need to act.</p>
     </div>
     <div class="ch-grid">
-      <div class="ch-card c-ai rv d3"><div class="ch-lbl">AI Phone</div><div class="ch-t">AI Phone Booking</div><div class="ch-d">Generated through AI‑assisted phone calls. Auto‑accepted, AI‑tagged for tracking.</div></div>
-      <div class="ch-card c-online rv d2"><div class="ch-lbl">Online</div><div class="ch-t">Online Booking</div><div class="ch-d">Submitted by customers. Requires staff review before confirmation enters the queue.</div></div>
+      <div class="ch-card c-ai rv d3"><div class="ch-lbl">AI Phone</div><div class="ch-t">AI Phone Booking</div><div class="ch-d">Generated through AI‑assisted phone calls. Auto‑accepted when confidence is high, AI‑tagged for tracking.</div></div>
+      <div class="ch-card c-online rv d2"><div class="ch-lbl">Online</div><div class="ch-t">Online Booking</div><div class="ch-d">Submitted by customers. Enters the queue as Pending and waits for staff to confirm.</div></div>
       <div class="ch-card c-pos rv d1"><div class="ch-lbl">POS</div><div class="ch-t">Merchant-Created Booking</div><div class="ch-d">Created directly by staff. Immediate confidence: auto‑confirmed, enters the queue instantly.</div></div>
     </div>
     <div class="rv">
@@ -1381,7 +1380,7 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
         </div>
       </div>
     </div>
-    <div class="ann"><div class="ann-tag">Calendar View</div><p class="ann-text">Channel identity is <strong>visually encoded</strong> with the same colours on every surface: Online (purple), AI Phone (green), POS (neutral). Staff read the source without investigating.</p></div>
+    <div class="ann"><div class="ann-tag">Calendar View</div><p class="ann-text">Channel identity is <strong>visually encoded</strong> with the same colors on every surface: Online (purple), AI Phone (green), POS (neutral). Staff read the source without investigating.</p></div>
   </div>
 
   <!-- DASHBOARD -->
@@ -1404,17 +1403,17 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
         </div>
         <div class="dp">
           <div class="dp-title">Channel Distribution</div>
-          <div class="chan-r"><div class="chan-d" style="background:var(--purple)"></div><div class="chan-n">Online</div><div class="chan-v">142</div><div class="chan-p">57.5%</div></div>
+          <div class="chan-r"><div class="chan-d" style="background:var(--purple)"></div><div class="chan-n">Online</div><div class="chan-v">179</div><div class="chan-p">57.6%</div></div>
           <div class="chan-bw"><div class="chan-bf" id="cb1" style="width:0;background:var(--purple);opacity:.7"></div></div>
-          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:var(--ink2)"></div><div class="chan-n">POS</div><div class="chan-v">78</div><div class="chan-p">31.6%</div></div>
+          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:var(--ink2)"></div><div class="chan-n">POS</div><div class="chan-v">98</div><div class="chan-p">31.5%</div></div>
           <div class="chan-bw"><div class="chan-bf" id="cb2" style="width:0;background:var(--ink2);opacity:.5"></div></div>
-          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:#16A34A"></div><div class="chan-n">AI Phone</div><div class="chan-v">27</div><div class="chan-p">10.9%</div></div>
+          <div class="chan-r" style="margin-top:6px"><div class="chan-d" style="background:#16A34A"></div><div class="chan-n">AI Phone</div><div class="chan-v">34</div><div class="chan-p">10.9%</div></div>
           <div class="chan-bw"><div class="chan-bf" id="cb3" style="width:0;background:#16A34A;opacity:.7"></div></div>
           <div class="peak"><div class="peak-l">Peak Hours</div><div class="peak-v">2:00 PM – 4:00 PM</div></div>
         </div>
       </div>
     </div>
-    <div class="ann"><div class="ann-tag">Dashboard</div><p class="ann-text">Broader view for exceptions. <strong>Click issues to dismiss.</strong> The rule model surfaced what needed attention, not everything at once.</p></div>
+    <div class="ann"><div class="ann-tag">Dashboard</div><p class="ann-text">Broader view for exceptions. <strong>Click issues to dismiss.</strong> The 2:30 double-booking from section 02 shows up here as a Time Conflict. The rule model surfaced what needed attention, not everything at once.</p></div>
   </div>
 
   <!-- AI BOOKING + CUSTOMER FLOW paired -->
@@ -1434,7 +1433,7 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
           </div>
         </div>
       </div>
-      <div class="ann"><div class="ann-tag">AI Phone Booking</div><p class="ann-text">One natural sentence → <strong>fully structured booking</strong>. Enters the queue auto-confirmed, AI-tagged. First-class, not an exception.</p></div>
+      <div class="ann"><div class="ann-tag">AI Phone Booking</div><p class="ann-text">One natural sentence → <strong>fully structured booking</strong>. Enters the queue auto-confirmed when confidence is high, AI-tagged. First-class, not an exception.</p></div>
     </div>
 
     <div class="pair-col pair-col-bottom">
@@ -2037,11 +2036,6 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
       </div>
     </div>
 
-    <!-- Tagline -->
-    <div class="sim-tagline rv">
-      <span>Channel-specific intake.</span>
-      <span class="sim-tagline-em">Shared downstream behavior.</span>
-    </div>
 
   </div>
 </div>
@@ -2053,7 +2047,7 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   <div class="chapter sc-target" id="decisions"><span class="chapter-num">07</span><span class="chapter-label">Design Decisions</span></div>
   <h2 class="s-h2">The real work was in<br><em>rules, states, and edge cases</em></h2>
   <div class="dec-list">
-    <div class="dec-card rv d1"><div class="dec-q">Decision 01 · Source labels</div><div class="dec-t">Keep channel identity, and show it everywhere</div><div class="dec-b">Rather than normalizing all channels at intake, I kept each booking's channel as a label that travels with it. Different intake rules could apply without fragmenting operations, and staff could read the source at a glance instead of investigating. That was a prerequisite for cutting the manual compensation that was already happening.</div></div>
+    <div class="dec-card rv d1"><div class="dec-q">Decision 01 · Source labels</div><div class="dec-t">Keep channel identity, and show it everywhere</div><div class="dec-b">Rather than normalizing all channels at intake, I kept each booking's channel as a label that travels with it. Different intake rules could apply without fragmenting operations, and staff could read the source at a glance instead of investigating. That was a prerequisite for ending the habit of opening each booking to check its source and status.</div></div>
     <div class="dec-card rv d2"><div class="dec-q">Decision 02 · One state model</div><div class="dec-t">One explicit set of statuses for every channel</div><div class="dec-b">Whatever the channel, a booking moves through the same statuses: Pending, Confirmed, In Progress, Completed. Merchants could trust the behavior without needing to understand the logic behind each channel.</div></div>
     <div class="dec-card rv d3"><div class="dec-q">Decision 03 · Rules as shared reference</div><div class="dec-t">The rule table as the team's reference point</div><div class="dec-b">Channel rules lived in one table, the one in section 04. New features were checked against it before they were designed, which changed how the PM, engineering and I made decisions together.</div></div>
     <div class="dec-card rv d1"><div class="dec-q">Decision 04 · Rules as settings</div><div class="dec-t">Booking rules the merchant owns</div><div class="dec-b">Every shop runs its day differently, so buffer time between appointments, the slot interval and blocked hours became settings rather than constants. The booking web reads them, so customers only see times the shop can actually take.</div></div>
@@ -2067,28 +2061,37 @@ html.sc-cur,html.sc-cur *{cursor:none!important}
   <div class="sec-rule"></div>
   <div class="chapter"><span class="chapter-num">08</span><span class="chapter-label">Intended Outcomes</span></div>
   <h2 class="s-h2">Designed so the logic would be <em>self-evident</em></h2>
-  <p class="s-body" style="margin-top:.75rem">This was a 0→1 startup build. We ran no formal usability testing and tracked no metrics for these changes, so I don't report measured results here. Each card pairs a design decision with the outcome it was built for, what we actually noticed, and how I would measure it next time.</p>
+  <p class="s-body" style="margin-top:.75rem">This was a 0→1 startup build. We ran no formal usability testing and tracked no metrics for these changes, so I don't report measured results here. Each card pairs a design decision with what we actually noticed, and how I would measure it next time.</p>
   <div class="imp-grid">
     <div class="imp-card rv d1">
       <div class="imp-tag">Decision 01 · Source labels</div>
       <div class="imp-t">Where a booking came from is visible on every surface</div>
-      <div class="imp-row"><span>Built for</span>Staff can read the source and next action without opening the booking.</div>
       <div class="imp-row obs"><span>What we noticed</span>In sales demos and early onboarding, this part needed less explaining. Informal, not measured.</div>
       <div class="imp-row"><span>How I'd measure it</span>Time to first action on a new booking; wrong confirmations in a task-based test.</div>
     </div>
     <div class="imp-card rv d2">
       <div class="imp-tag">Decision 02 · One state model</div>
       <div class="imp-t">Every channel lands in the same set of statuses</div>
-      <div class="imp-row"><span>Built for</span>Removing the manual workarounds staff used when channels behaved differently.</div>
       <div class="imp-row obs"><span>What we noticed</span>Feedback from a small group of early customers fed straight into the rule table.</div>
       <div class="imp-row"><span>How I'd measure it</span>Manual status corrections per week, before vs. after the state model.</div>
     </div>
     <div class="imp-card rv d3">
       <div class="imp-tag">Decision 03 · Rules as shared reference</div>
       <div class="imp-t">New features are checked against the rule table first</div>
-      <div class="imp-row"><span>Built for</span>A shared way for PM, engineering and design to decide how a new feature should behave.</div>
       <div class="imp-row obs"><span>What we noticed</span>Reviews started asking "does this fit the system?" more often than "what should this do?"</div>
       <div class="imp-row"><span>How I'd measure it</span>Channel-specific exceptions added per release.</div>
+    </div>
+    <div class="imp-card rv d4">
+      <div class="imp-tag">Decision 04 · Rules as settings</div>
+      <div class="imp-t">Each shop sets its own booking rules</div>
+      <div class="imp-row obs"><span>What we noticed</span>When a merchant changes buffer time or blocked hours, customers only see times the shop can actually take.</div>
+      <div class="imp-row"><span>How I'd measure it</span>Booking requests that land on a time the shop can't take, before vs. after.</div>
+    </div>
+    <div class="imp-card rv d5">
+      <div class="imp-tag">Decision 05 · Payment rules</div>
+      <div class="imp-t">Tax and split payment are set once, applied at checkout</div>
+      <div class="imp-row obs"><span>What we noticed</span>Split payment and tax are both worked out at checkout, so staff don't have to adjust them by hand.</div>
+      <div class="imp-row"><span>How I'd measure it</span>Time to settle a split bill; manual tax or split corrections per week.</div>
     </div>
   </div>
 </div>
@@ -2129,8 +2132,8 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 // dashboard bars
 const dObs=new IntersectionObserver(es=>es.forEach(e=>{
   if(e.isIntersecting){
-    setTimeout(()=>{document.getElementById('cb1').style.width='57.5%'},200);
-    setTimeout(()=>{document.getElementById('cb2').style.width='31.6%'},350);
+    setTimeout(()=>{document.getElementById('cb1').style.width='57.6%'},200);
+    setTimeout(()=>{document.getElementById('cb2').style.width='31.5%'},350);
     setTimeout(()=>{document.getElementById('cb3').style.width='10.9%'},500);
     dObs.unobserve(e.target);
   }

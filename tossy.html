@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tossy · Bambi Li</title>
-<meta name="description" content="How I designed and shipped Tossy, a playful decision tool where AI shapes the options and the dice picks.">
+<meta name="description" content="How I designed and shipped Tossy, a light AI decision buddy for small choices: AI suggests, the dice decides.">
 <meta property="og:title" content="Tossy.me Case Study">
-<meta property="og:description" content="A playful AI decision tool. The dice picks; you can take the other side.">
+<meta property="og:description" content="Overthinking? Toss it. A light AI decision buddy for small choices.">
 <meta property="og:type" content="article">
-<meta property="og:image" content="tossy/og-tossy.png">
+<meta property="og:image" content="https://bambili.studio/tossy/og-tossy-v2.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="tossy/og-tossy.png">
+<meta name="twitter:image" content="https://bambili.studio/tossy/og-tossy-v2.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' shape-rendering='crispEdges'%3E%3Crect width='28' height='28' fill='%23292544'/%3E%3Crect x='4' y='4' width='20' height='20' fill='%2374d7f2'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23292544'/%3E%3Crect x='16' y='16' width='4' height='4' fill='%23292544'/%3E%3C/svg%3E">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 
@@ -1224,6 +1224,136 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
 .gif.narrow figcaption{max-width:none!important;padding-bottom:0!important}
 </style>
 <style id="text-adjust">html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
+<style id="v2">
+.hero h1#h-hero{font-size:clamp(44px,5.6vw,80px);line-height:.92}
+@media(max-width:760px){.hero h1#h-hero{font-size:clamp(40px,12vw,56px)}}
+.think{position:relative;height:clamp(380px,34vw,440px);overflow:visible}
+.think .tb{position:absolute;transform:translate(-50%,-50%);max-width:250px;padding:9px 14px;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:3px 3px 0 var(--line);font:600 14px/1.35 var(--read);color:var(--ink);text-align:left;white-space:normal;animation:tbin .35s cubic-bezier(.2,.9,.3,1.4) backwards;transition:transform .22s cubic-bezier(.2,.9,.3,1.4),box-shadow .22s;cursor:default}
+.think .tb:hover{transform:translate(-50%,-58%) rotate(-2deg) scale(1.05);box-shadow:5px 6px 0 var(--line);z-index:5}
+.think .tb::after{content:"";position:absolute;left:18px;bottom:-9px;width:12px;height:12px;background:inherit;border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(45deg) skew(8deg,8deg)}
+.think .tb.r::after{left:auto;right:18px}
+.think .tb.out{animation:tbout .45s ease-in forwards}
+.think .tb.pop{animation:tbpop .28s ease-in forwards}
+@keyframes tbin{from{opacity:0;transform:translate(-50%,-30%) scale(.6)}}
+@keyframes tbfloat{to{margin-top:-8px}}
+@keyframes tbout{to{opacity:0;transform:translate(-50%,-90%) scale(.92)}}
+@keyframes tbpop{to{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+.think .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:12px;z-index:6;text-align:center}
+.think .core .die{width:64px;height:64px}
+.think .core button.toss{font:12px/1 var(--px);text-transform:uppercase;padding:12px 16px;background:var(--btn);color:var(--ink);border:3px solid var(--line);box-shadow:4px 4px 0 var(--line);cursor:pointer}
+.think .core button.toss:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
+.think .ans{display:none;max-width:300px;padding:14px 16px;background:#fff;border:3px solid var(--line);box-shadow:4px 4px 0 var(--aqua);font:11px/1.7 var(--px);text-transform:uppercase}
+.think .ans .q{display:block;font:600 12px/1.4 var(--read);text-transform:none;color:var(--muted);margin-bottom:6px}
+.think .ans b{display:block;font-weight:400;font-size:16px;margin-bottom:4px}
+.think.done .ans{display:block;animation:tbin .35s cubic-bezier(.2,.9,.3,1.4) both}
+.think.done .toss{display:none}
+.think .meter{position:absolute;left:14px;bottom:12px;z-index:6;font:10px/1 var(--px);text-transform:uppercase;padding:7px 9px;background:#fff;border:2px solid var(--line)}
+.think .meter i{font-style:normal;background:var(--pink,#ff9dca);padding:0 4px;margin-left:4px}
+.think-hint{margin-top:-20px;font:600 12px/1.4 var(--read);color:var(--muted);text-align:center}
+@media(max-width:760px){.think{height:480px}.think .tb{max-width:170px;font-size:12.5px;padding:7px 10px}.think .core .die{width:52px;height:52px}.think .meter{left:50%;transform:translateX(-50%);bottom:10px;z-index:7}}
+.dirrow{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,64px);align-items:start;padding-top:28px;border-top:1px solid var(--rule)}
+.dirrow > .subh{padding-top:0;border-top:0;position:sticky;top:96px}
+.dirrow .dec{grid-template-columns:1fr!important}
+.dirrow.mid{align-items:center}
+video.rv{transition:opacity .35s,filter .35s}
+video.rv.rv-idle{opacity:.5;filter:saturate(.5)}
+#problem > .dirrow,#problem > .subh{margin-top:32px;padding-top:44px}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start;padding-right:4px}
+.trio .det .show{aspect-ratio:16/9}
+.trio .det .show.rec video{object-fit:cover;object-position:center top}
+@media(max-width:760px){.trio{grid-template-columns:1fr}}
+section.cs > .more-gifs{padding:0!important;margin:0!important}
+.dirrow.mid > .subh{position:static}
+.dir-l{display:grid;gap:28px}
+.dirrow.d2{align-items:center}
+.dir-l > .subh{padding-top:0;border-top:0}
+.dirrow.d2 .dec .dl-l h3{margin-top:6px;font:700 clamp(17px,1.5vw,19px)/1.3 var(--disp);letter-spacing:-.01em;max-width:none}
+.d2 .dec .dk{gap:0}
+.d2 > .dir-ex{display:flex;justify-content:center}
+.d2 .pwa-phone{width:min(100%,220px)}
+.pwa-row{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:clamp(20px,3vw,36px);align-items:start}
+.gif.pwa-phone{margin:0}
+.gif.pwa-phone video{display:block;width:100%;height:auto;border:3px solid var(--line);border-radius:28px;box-shadow:5px 5px 0 var(--line);background:#e9f7fc}
+@media(max-width:560px){.pwa-row{grid-template-columns:1fr}.gif.pwa-phone{max-width:240px}}
+.dirrow .dec .dl-l h3{max-width:none}
+.dirrow .evo{gap:12px}
+.dirrow .dec{padding-top:14px}
+.dirrow .dec h3{font-size:clamp(24px,2.4vw,34px)}
+@media(max-width:900px){.dirrow{grid-template-columns:1fr}.dirrow > .subh,.dir-l{position:static}}
+#h3a,#h4a{max-width:none}
+.bigq.block{background:none!important;padding:0!important;border-radius:0!important;box-shadow:none!important;border:0!important;gap:8px!important}
+.bigq.block .peek{display:none}
+.bigq.block .bigq-next{font:400 16px/1.55 var(--read)!important;text-transform:none!important;letter-spacing:0!important;color:var(--ink-2)!important;margin:0}
+.bigq.block .says{color:var(--muted)!important}
+.bigq.block .big{font:700 24px/1.35 var(--disp)!important;letter-spacing:-.015em!important;color:var(--ink)!important;max-width:none}
+.bigq.block .big em{color:var(--accent,#2a9fc9)!important;background:none!important}
+.takeaways{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3vw,40px)}
+.takeaways > div{display:grid;gap:8px;align-content:start;padding-top:14px;border-top:2px solid var(--ink)}
+.takeaways p{color:var(--ink-2);font-size:16px;line-height:1.55}
+@media(max-width:760px){.takeaways{grid-template-columns:1fr}}
+.fits{display:grid;gap:18px;padding-top:44px;margin-top:20px;border-top:1px solid var(--rule)}
+.fits .subh{border-top:0;padding-top:0}
+.fits .prose{max-width:none}
+.fits-hope{font:700 clamp(19px,1.8vw,22px)/1.4 var(--disp)!important;color:var(--ink)!important;letter-spacing:-.01em}
+.fits sup{font-size:.65em;color:var(--muted)}
+.fits-src{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.fits-src a{color:var(--ink-2)}
+.fork-block,.numbers-block{display:grid;gap:24px;margin-top:20px}
+.find4 > div,.find > div{display:grid;gap:16px;min-width:0}
+.find .numbers-block .subh{border-top:0;padding-top:8px}
+.find .dec .dl-l h3{font:700 clamp(17px,1.5vw,19px)/1.3 var(--disp)!important;letter-spacing:-.01em;max-width:none;margin-top:6px}
+.find p,.find .ver-note,.find .foot-notes,.find .chain-note{max-width:none!important}
+.numbers-block > .details{padding:0!important;grid-template-columns:minmax(0,1fr)!important}
+.fork-block .br .act{height:42px;font-size:10px;padding:0 14px;box-shadow:3px 3px 0 var(--hard);background:var(--card)}
+#decision .head .prose{max-width:none}
+#evidence .head .prose{max-width:none}
+.chain li:nth-child(1){background:#ffe9e6!important}
+.chain li:nth-child(2){background:#fff6d6!important}
+.chain li:nth-child(3){background:#e6f7ec!important}
+.chain li+li{border-left:0!important}
+#h5a{max-width:none}
+.gif.narrow.third-fig{max-width:480px!important}
+#how .head .prose{max-width:none}
+section.cs{border-top:0!important;padding-bottom:clamp(24px,3.5vw,48px)}
+/* heading scale: L1 section h2 44 · L2 subsection/finding 24 · L3 decision/spotlight/nested 19 · L4 card 17-18 */
+section.cs .head h2{max-width:none!important;white-space:nowrap}
+@media(max-width:900px){section.cs .head h2{white-space:normal}}
+.subh h3,.find > div > h3{font:700 24px/1.25 var(--disp)!important;letter-spacing:-.015em!important;text-transform:none}
+section.cs .dec .dl-l h3,.find .spot-head h3,.find .subh h3{font:700 19px/1.3 var(--disp)!important;letter-spacing:-.01em!important;max-width:none!important;margin-top:6px}
+.end-lead{white-space:nowrap;font-size:clamp(34px,3.6vw,52px)!important}
+@media(max-width:560px){.end-lead{white-space:normal}}
+/* hero demo: reserve the tallest state so the page doesn't jump */
+.demo #demoAnswer{min-height:196px!important;box-sizing:border-box;justify-content:center}
+.demo-cap{min-height:48px}
+@media(max-width:760px){.demo #demoAnswer{min-height:224px!important}}
+.subh{display:grid;gap:10px;padding-top:28px;border-top:1px solid var(--rule)}
+.subh h3{font:700 clamp(20px,2.2vw,26px)/1.25 var(--disp);letter-spacing:-.01em;text-transform:none}
+.subh p{max-width:68ch;color:var(--ink-2)}
+.ways{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ways li .eg{font:700 11px/1.4 var(--ui);text-transform:uppercase;color:var(--sub)}
+.dirs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.scenes2{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.scenes2 li{font:700 clamp(17px,1.8vw,21px)/1.35 var(--disp);letter-spacing:-.01em}
+.local{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center}
+.local .show{display:grid;place-items:center;padding:28px;border-radius:18px;background:var(--page)}
+.hope-sum .prose .legend{font-size:11px;line-height:1}
+.ways li::after{display:none!important}
+.mob-only{display:none}
+@media(max-width:760px){.mob-only{display:block}}
+.ways{align-items:stretch}
+.ways .exm{aspect-ratio:8/9;margin-bottom:6px;border:2px solid var(--line);background:#edf9fc radial-gradient(circle,#cfe9f2 1.2px,transparent 1.3px) 0 0/14px 14px;overflow:hidden;display:grid;place-items:center;position:relative}
+.ways .exm video{display:block;width:100%;height:100%;object-fit:contain}
+.ways .mock{align-content:center;gap:10px;padding:12px;font:9px/1.4 var(--px);text-transform:uppercase;color:var(--ink)}
+.ways .mq{justify-self:stretch;padding:8px 10px;background:#fff;border:2px solid var(--line);box-shadow:3px 3px 0 var(--line)}
+.ways .mchips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ways .mchips span{padding:7px 4px;text-align:center;background:#fff;border:2px dashed var(--line);transition:background .08s}
+.ways .mchips span.hot{background:var(--btn);border-style:solid}
+.ways .mchips span.win{background:var(--btn);border-style:solid;box-shadow:3px 3px 0 var(--line);transform:translate(-1px,-1px)}
+.ways .mres{text-align:center;min-height:1.4em}
+.ways .mres b{font-weight:400;background:var(--btn);padding:1px 4px}
+.ways .mtag{position:absolute;right:6px;bottom:5px;font:600 9px/1 var(--read);text-transform:none;color:var(--muted)}
+@media(max-width:760px){.ways,.dirs,.local{grid-template-columns:1fr}}
+</style>
 </head>
 <body id="top">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1237,8 +1367,8 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       <svg viewBox="0 0 16 22" aria-hidden="true"><g fill="none" stroke="#3BB6E0" stroke-linecap="round"><path d="M8 21V7" stroke-width="5"/><path d="M8 14H4.5V10" stroke-width="3"/><path d="M8 11h3.5V7.5" stroke-width="3"/></g><circle cx="8" cy="3.2" r="2.6" fill="#FF9DCA"/></svg>
       Bambi Li
     </a>
-    <div class="sc-jump sc-label" aria-label="Sections"><a href="#problem">Problem</a><a href="#decision">Decision</a><a href="#evidence">Evidence</a></div>
-    <div class="sc-meta sc-label"><span class="sc-no">01 · Tossy</span><a href="index.html#work" data-pf>All work</a><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></div>
+    <div class="sc-jump sc-label" aria-hidden="true"></div>
+    <div class="sc-meta sc-label"><a href="index.html#work" data-pf>All work</a><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></div>
   </div>
   <div class="sc-prog" aria-hidden="true">
     <div class="sc-fill" id="scFill"></div>
@@ -1251,9 +1381,9 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
   <!-- 01 HERO -->
   <section class="hero band band-dots" aria-labelledby="h-hero" data-sec="01">
     <div>
-      <span class="kicker">01 · Case study · Solo · Live · 2026</span>
-      <h1 id="h-hero">Let the dice pick.</h1>
-      <p class="sub">A playful decision tool for small choices. The question behind it: when the dice lands and you catch yourself hoping for the other side, can that reaction show you what you wanted?</p>
+      <span class="kicker">Case study · Solo · Live · 2026</span>
+      <h1 id="h-hero">Overthinking? Toss it.</h1>
+      <p class="sub">A light AI decision buddy for the small choices that aren't worth the stress.</p>
       <div class="hero-actions">
         <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Try it live →</a>
 
@@ -1276,7 +1406,7 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       <article class="answer wait" id="demoAnswer" aria-live="polite"><p>PICK A MODE, THEN TOSS.</p></article>
     </div>
     <ol class="demo-steps" id="demoSteps" aria-label="The full loop">
-      <li data-s="1"><b>1</b>Ask</li><li data-s="2"><b>2</b>Toss</li><li data-s="3"><b>3</b>Doubt</li><li data-s="4"><b>4</b>Switch</li>
+      <li data-s="1"><b>1</b>Ask</li><li data-s="2"><b>2</b>Toss</li><li data-s="3"><b>3</b>Decide</li><li data-s="4"><b>4</b>Doubt</li>
     </ol>
     <p class="demo-cap" id="demoCap">Plays once on its own. Then it's yours to try.</p>
     </div>
@@ -1284,31 +1414,33 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
 
   <dl class="snapshot panel">
     <div><dt>Role</dt><dd>Solo: product strategy, UX, interaction &amp; motion, AI behavior design. Built end-to-end with AI coding tools.</dd></div>
-    <div><dt>Timeline</dt><dd>Sep – Nov 2026</dd></div>
+    <div><dt>Timeline</dt><dd>Sep 2026 – now · tested Sep 27 – Nov 15</dd></div>
     <div><dt>Built with</dt><dd>Claude, Codex (AI-assisted coding)</dd></div>
     <div><dt>Stack</dt><dd>Gemini API, Cloudflare Workers, PostHog, GitHub · PWA</dd></div>
-    <div><dt>Live</dt><dd><a href="https://tossy.me" target="_blank" rel="noopener">tossy.me ↗</a></dd></div>
   </dl>
   <div class="tldr">
-    <div><span class="label">What I did</span><p>Took a live AI product from idea to launch on my own, using AI coding tools to build it, then ran it with real users for seven weeks.</p></div>
-    <div><span class="label">Key decision</span><p>AI writes the options and the voice; the dice draws the outcome. Writing the options already shapes what can come up, so that is where I put the limits.</p></div>
-    <div><span class="label">What testing showed</span><p>People used the switch (12 of 51 decisions), but most of those came during an AI outage the fallback had hidden. It shows the interaction gets used, not yet that it helps.</p></div>
+    <div><span class="label">What I did</span><p>Designed and built a live AI product on my own, from idea to launch, using AI coding tools. Tested it with real users over seven weeks; it's still live.</p></div>
+    <div><span class="label">Key idea</span><p>AI suggests, the dice decides.</p></div>
+    <div><span class="label">Where it stands</span><p>Live at tossy.me since September 2026. 145 tosses from 118 visitors during the test.</p></div>
   </div>
 
-  <!-- 02 -->
+  <!-- 02 WHY -->
   <section class="cs acc-aqua sc-target" id="problem" aria-labelledby="h2a" data-sec="02">
     <div class="head">
-      <div class="sh"><span class="n">02</span><span class="tt">The question</span><span class="aside">Problem &amp; scope</span></div>
-      <h2 id="h2a">Can a dice help you notice what you wanted?</h2>
+      <div class="sh"><span class="n">02</span><span class="tt">Why Tossy</span><span class="aside">Problem</span></div>
+      <h2 id="h2a">Small choices, big overthinking.</h2>
     </div>
+    <div class="think" id="think" aria-hidden="true"></div>
     <div class="split">
       <div class="prose">
-        <p>What to eat, which shirt, whether to text back now. Small choices can eat twenty minutes, and the options are usually close enough that either would be fine. <strong>The hard part isn't choosing well. It's stopping.</strong></p>
-        <p>Tossy tries a different route from more analysis: the dice picks fast, and the moment I care about comes after. If you catch yourself hoping it had landed the other way, that reaction may point to a preference you already had.</p>
+        <p>Small choices can eat twenty minutes, and the options are usually close enough that either would be fine. <strong>The hard part isn't choosing well. It's stopping.</strong></p>
       </div>
-      
+      <div class="prose">
+        <p>Most AI tools answer with more: long breakdowns, tables, pros and cons. For a choice where either option is fine, that only adds to the load. Tossy goes the other way: almost nothing to read, one quick nudge, and you're moving.</p>
+      </div>
     </div>
-        
+    <div>
+      <div style="display:grid;gap:32px">
     <div>
       <div style="display:grid;gap:32px">
         <div class="isnt">
@@ -1324,8 +1456,28 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
         </div>
       </div>
     </div>
+      </div>
+    </div>
+
+    <div class="dirrow mid">
+      <div class="subh"><span class="label">Direction 01</span><h3>Minimal, not more information</h3>
+        <p>Tossy is one page, one screen, with almost no explanatory copy. A light, physical toss with micro-interactions and 8-bit sound is meant to make the first three seconds feel a little lighter. The toss itself is broken down in Section 03.</p>
+        <p class="caption" style="margin-top:6px">Tossy started as a mystical, tarot-like oracle. But fortune-telling implies the answer means something. As the product moved toward playful, low-stakes decisions, the visual language became lighter, friendlier and deliberately less authoritative.</p></div>
+      <div class="dir-ex">
+    <div class="evo">
+      <figure><div class="frame f1"><i></i><b>THE ORACLE</b></div><figcaption><b>Mystical</b><span class="tag" style="--mode:#e9d9a6">V1</span></figcaption></figure>
+      <figure><div class="frame f2"><i></i><b>Tossy</b></div><figcaption><b>Calm dark</b><span class="tag" style="--mode:#c9bfff">V4</span></figcaption></figure>
+      <figure><div class="frame f3"><div class="die" data-face="bestie"></div><b>TOSSY</b></div><figcaption><b>Playful pixel</b><span class="tag" style="--mode:var(--btn)">NOW</span></figcaption></figure>
+    </div>
+      </div>
+    </div>
+
+    <div class="dirrow d2">
+      <div class="dir-l">
+        <div class="subh"><span class="label">Direction 02</span><h3>Zero friction</h3>
+          <p>When a small choice already feels like too much, a sign-up form is where people give up. So the core feature is the homepage: type A and B, hit Toss, see the answer. Tossy is also a PWA, so on a phone it sits on the home screen and opens like an app.</p></div>
     <article class="dec">
-      <div class="dl-l"><span class="dk"><b>2.1</b>Decision</span><h3>Cut everything before the toss.</h3></div>
+      <div class="dl-l"><span class="dk">Decision</span><h3>Cut everything before the toss.</h3></div>
       <div class="dl-r">
         <dl>
           <div><dt class="cut">Cut</dt><dd><s>An anxiety “furnace”, an indecision slider, a follow-through rate.</s></dd></div>
@@ -1334,41 +1486,105 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
         </dl>
       </div>
     </article>
-    
-    <details class="more">
-      <summary><span>Principles and visual direction</span><small>Four principles behind every screen · how the look moved from oracle to pixel</small></summary>
-      <div style="padding:18px 20px 0"><div class="pos">
-      <span class="label">Four principles behind every screen</span>
-      <ol class="pos-list">
-        <li><i>01</i><b>Light</b><span>No sign-up, one screen, mobile first. Type a question, or don't, and toss.</span></li>
-        <li><i>02</i><b>A buddy, not an engine</b><span>A pixel dice with four voices. A friend, not an analyst.</span></li>
-        <li><i>03</i><b>Takes the edge off</b><span>The dice hangs in the air before it lands. That short pause is part of the relief.</span></li>
-        <li><i>04</i><b>Gets you moving</b><span>"Let's do it" is the main action after every answer. Re-tossing is there, but quieter.</span></li>
-      </ol>
-    </div></div>
-      <div class="more-evo">
-    <div class="evo">
-      <figure><div class="frame f1"><i></i><b>THE ORACLE</b></div><figcaption><b>Mystical</b><span class="tag" style="--mode:#e9d9a6">V1</span></figcaption></figure>
-      <figure><div class="frame f2"><i></i><b>Tossy</b></div><figcaption><b>Calm dark</b><span class="tag" style="--mode:#c9bfff">V4</span></figcaption></figure>
-      <figure><div class="frame f3"><div class="die" data-face="bestie"></div><b>TOSSY</b></div><figcaption><b>Playful pixel</b><span class="tag" style="--mode:var(--btn)">NOW</span></figcaption></figure>
-    </div>
-    <p class="caption">Tossy started as a mystical, tarot-like oracle. But fortune-telling implies the answer means something. As the product moved toward playful, low-stakes decisions, the visual language became lighter, friendlier and deliberately less authoritative.</p>
       </div>
+      <div class="dir-ex">
+        <figure class="gif pwa-phone"><video class="vid" src="tossy/pwa.mp4#t=0.1" width="480" height="1042" muted loop playsinline preload="metadata" aria-label="Tossy opened from the phone home screen as an app; tossing straight away with no question, Tossy picks one and answers"></video><figcaption><span class="fn">Fig. 2.1</span> · Opened from the home screen like an app, tossed right away.</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="dirrow d3">
+      <div class="subh"><span class="label">Direction 03</span><h3>More buddy than engine</h3>
+      <p>A little emotional cushion goes a long way. The dice blinks, watches you type and reacts to what happens. Four personalities and several color themes let people pick the buddy that fits their mood.</p></div>
+      <div aria-hidden="true"></div>
+    </div>
+    <div class="trio">
+      <div class="det"><div class="show rec"><video class="rv" src="tossy/listen.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video></div><h3>Listens</h3><p>The dice watches and reacts while you type.</p></div>
+      <div class="det"><div class="show rec"><video class="rv" src="tossy/modes.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Switching between the four modes changes the dice face and its greeting"></video></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
+      <div class="det"><div class="show rec"><video class="rv" src="tossy/skins.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Clicking through the six skins recolors the whole page"></video></div><h3>Skins</h3><p>Pick a palette before you toss.</p></div>
+    </div>
+    <details class="more">
+      <summary><span>More small details</span><small>8-bit sound, haptics, pull-to-refresh, fresh lines, Chinese version, easter eggs</small></summary>
+      <p class="more-intro">Every detail follows the same rule: keep a low-stakes moment light.</p>
+    <div class="details">
+      <div class="det"><div class="show"><div class="speaker"><svg width="64" height="64" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" class="d-line"/><rect x="6" y="5" width="2" height="10" class="d-line"/><rect x="8" y="3" width="2" height="14" class="d-line"/><rect x="12" y="7" width="2" height="6" style="fill:var(--btn)"/><rect x="15" y="4" width="2" height="12" style="fill:var(--btn)"/></svg><span class="notes">♪ BLIP<br>♪ BOOP</span></div></div><h3>8-bit sound</h3><p>A tiny sound for a tiny decision. Can be muted.</p></div>
+      <div class="det"><div class="show"><div class="phone"><div class="die" data-face="bestie_yes"></div></div></div><h3>Haptics</h3><p>On phones, you feel the dice land.</p></div>
+      <div class="det"><div class="show rec tall"><video class="vid" src="tossy/pull-refresh.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="On a phone, pulling down shows a small spinning dice and Release to refresh"></video></div><h3>Dice pull-to-refresh</h3><p>Pull down and the dice spins, turning a Safari bounce into a moment.</p></div>
+      <div class="det"><div class="show"><div class="fresh"><p class="say">DON'T ARGUE WITH THE DICE.</p><span>≠</span><p class="say">STOP STARING. GO.</p></div></div><h3>Fresh lines</h3><p>The same comment never shows up twice in a row.</p></div>
+      <div class="det"><div class="show"><div class="zh"><div class="row"><span style="--c:#ff9dca">闺蜜</span><span style="--c:#a88cf7">毒舌</span><span style="--c:#74d7f2">理性</span><span style="--c:#ffd463">温柔</span></div><p class="say">宝，第三次了。你其实想要另一个吧。</p></div></div><h3>Chinese version</h3><p>Pixel font and copy for Chinese-speaking users.</p></div>
+      <div class="det"><div class="show"><ul class="eggs"><li>Poke the dice → "Hehe, that tickles!"</li><li>Its eyes follow your cursor</li><li>Hold TOSS to charge a super toss</li></ul></div><h3>Easter eggs</h3><p>Small rewards for people who poke around.</p></div>
+    </div>
     </details>
   </section>
 
-  <!-- 03 -->
-  <section class="cs acc-aqua sc-target" id="decision" aria-labelledby="h5a" data-sec="03">
+
+  <!-- 03 HOW IT WORKS -->
+  <section class="cs acc-aqua sc-target" id="how" aria-labelledby="h3a" data-sec="03">
     <div class="head">
-      <div class="sh"><span class="n">03</span><span class="tt">The turning point</span><span class="aside">Key decision</span></div>
-      <h2 id="h5a">The answer isn't the <mark>interesting</mark> part.</h2>
+      <div class="sh"><span class="n">03</span><span class="tt">How it works</span><span class="aside">Features</span></div>
+      <h2 id="h3a">Ask it any way. The dice does the rest.</h2>
+      <div class="prose"><p>Gemini writes the options and the voice; the dice picks one at random.</p></div>
     </div>
+    <ol class="iters ways" aria-label="Three ways to ask">
+      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-xy.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing Coffee or bubble tea? and tossing; the dice picks Coffee"></video></div><span class="lv">01</span><b>Two options</b><span class="eg">"Coffee or bubble tea?"</span><p>Both sides become the options automatically, and the dice picks one.</p></li>
+      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-open.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Typing What should I eat for lunch? and tossing; the dice picks Tacos"></video></div><span class="lv">02</span><b>An open question</b><span class="eg">"What should I eat for lunch?"</span><p>AI writes six concrete answers, and the dice picks one.</p></li>
+      <li class="card"><div class="exm"><video class="rv" src="tossy/ask-pick.mp4#t=0.1" muted playsinline preload="metadata" aria-label="Adding Bread, Sushi and Pizza plus Tossy's pick, then tossing; the dice picks Pizza"></video></div><span class="lv">03</span><b>Your own list + Tossy's pick</b><span class="eg">Bread · sushi · pizza</span><p>Already have ideas? The dice only picks from yours. Open to something new? Keep <strong>Tossy's pick</strong> on, and Tossy's own answer joins the pool.</p></li>
+    </ol>
+
+    <div class="subh"><span class="label">Under the hood</span><h3>AI shapes the options. The dice picks.</h3></div>
+    <div class="roles">
+      <div class="role panel">
+        <h3><span class="tag" style="--mode:var(--lav)">AI · Gemini</span>Shapes the options</h3>
+        <ul>
+          <li><b>Reads the question</b><span>Is it yes/no or open?</span></li>
+          <li><b>Writes the options</b><span>Yes/no: both sides in the question's own words. Open: six concrete candidates.</span></li>
+          <li><b>Writes the voice</b><span>Mode changes the tone of the comment, never the answer.</span></li>
+        </ul>
+      </div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="role panel">
+        <h3><span class="tag" style="--mode:var(--aqua)">Dice · Random</span>Picks the outcome</h3>
+        <ul>
+          <li><b>Yes / no</b><span>A 50/50 toss between the two sides.</span></li>
+          <li><b>Open questions and lists</b><span>A random pick from the pool.</span></li>
+          <li class="never"><b>AI never picks the winner</b><span>But it writes the pool, so that's where the guardrails go (Finding 4, Section 05).</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subh"><span class="label">3.1 · The toss</span><h3>Giving a random answer its moment</h3></div>
+    <div class="mob-only"><figure class="gif"><video class="vid" src="tossy/toss.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="A full toss: the dice rises, hangs in the air, lands with ripples, and the answer card pops in"></video><figcaption><span class="fn">Fig. 3.1</span> · A full toss, in real time. Broken down beat by beat below.</figcaption></figure></div>
     <div class="split">
       <div class="prose">
-        <p>The first version had one button after the reveal: Toss Again. The fork below is my own design hypothesis, not a test finding.</p>
-        <p>So the reveal became a fork: <strong>Let's do it</strong>, <strong>Secretly hoping for [the other side]?</strong>, <strong>Toss again</strong> and <strong>New question</strong>. On the third toss, the character calls it out.</p>
+        <p>If the answer is random, the moment has to feel like something. The loop is <strong>Question → Toss → Reveal</strong>. The whole loop takes about three seconds, and the toss gets the most care.</p>
+        <p>Yes/no answers use the question's own words ("Get the boba" / "Skip it today"). Open questions get one concrete answer.</p>
+        <p><strong>Waiting is part of the toss.</strong> The AI usually takes 1–2 seconds, so instead of a spinner the dice hangs in the air for up to 6 seconds.</p>
       </div>
-      
+      <div style="display:grid;gap:28px">
+        <figure class="quote"><div class="die bob" data-face="gentle"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Anticipation turns a random result into a moment.</blockquote></figure>
+        <div class="loop"><span>QUESTION</span><em>→</em><span class="hl">TOSS</span><em>→</em><span>REVEAL</span></div>
+      </div>
+    </div>
+
+    <div class="beats-scroll" tabindex="0" aria-label="Six beats of the toss, 2.6 seconds base timing">
+      <div class="beats">
+        <div class="beat card"><div class="cell"><div class="die" data-face="bestie" style="top:22%;transform:translateX(-50%) scale(1.15,.8);transform-origin:50% 100%"></div><div class="gnd"></div><div class="tr" style="top:auto;bottom:24%;display:none"></div></div><span class="n">Beat 1</span><b>Rise</b><span class="ms">0 – 800 ms<small>Squash, then launch</small></span></div>
+        <div class="beat card"><div class="cell"><div class="die" data-face="listen" style="top:6%;transform:translateX(-50%) scale(.72)"></div><div class="tr" style="top:52%"><i></i><i></i><i></i></div><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 2</span><b>Vanish</b><span class="ms">~800 ms<small>Shrinks into the air</small></span></div>
+        <div class="beat card"><div class="cell"><div class="die" data-face="dizzy" style="top:6%;transform:translateX(-50%) scale(.72) rotate(90deg)"></div><span class="txt" style="top:62%">ROLLING...</span><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 3</span><b>Suspense</b><span class="ms">800 ms → up to ~6 s<small>Faces cycle mid-air while the AI answers</small></span></div>
+        <div class="beat card"><div class="cell"><div class="tr" style="top:10%"><i></i><i></i><i></i></div><div class="die" data-face="savage" style="top:30%;transform:translateX(-50%) rotate(20deg)"></div><div class="gnd"></div></div><span class="n">Beat 4</span><b>Fall</b><span class="ms">1600 – 1950 ms<small>Drops back down</small></span></div>
+        <div class="beat card"><div class="cell"><div class="rg"></div><div class="rg b"></div><i class="spk" style="left:20%;top:44%"></i><i class="spk" style="right:20%;top:40%"></i><div class="die" data-face="dizzy" style="top:auto;bottom:14%;transform:translateX(-50%) scale(1.12,.86);transform-origin:50% 100%;z-index:1"></div></div><span class="n">Beat 5</span><b>Bounce + ripples</b><span class="ms">1950 – 2600 ms<small>Impact, quake, sparks</small></span></div>
+        <div class="beat card"><div class="cell"><span class="ans-tag">GET IT</span><div class="die" data-face="bestie_yes" style="top:auto;bottom:14%"></div><div class="gnd"></div></div><span class="n">Beat 6</span><b>Reveal</b><span class="ms">2600 ms<small>Answer card pops in</small></span></div>
+      </div>
+    </div>
+    <p class="beats-note">Base timing shown. If the AI is still answering, the dice keeps hovering (up to 6 s) and the later beats shift back by the same amount.</p>
+  </section>
+
+
+  <!-- 04 RESULT PAGE -->
+  <section class="cs acc-aqua sc-target" id="decision" aria-labelledby="h4a" data-sec="04">
+    <div class="head">
+      <div class="sh"><span class="n">04</span><span class="tt">The result page</span><span class="aside">Key decision</span></div>
+      <h2 id="h4a">The answer isn't the <mark>interesting</mark> part.</h2>
+      <div class="prose"><p>The first version had one button after the reveal. Now there are four, and "Let's do it" leads.</p></div>
     </div>
     <div class="ba">
       <div class="ba-col">
@@ -1389,9 +1605,8 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
         <p class="ba-note">Four ways out, and each one tells Tossy something.</p>
       </div>
     </div>
-    <p class="recreated">Screens recreated for this page.</p>
     <article class="dec">
-      <div class="dl-l"><span class="dk"><b>3.1</b>Decision</span><h3>Turn doubt into a way out.</h3></div>
+      <div class="dl-l"><span class="dk"><b>4.1</b>Decision</span><h3>Turn doubt into a way out.</h3></div>
       <div class="dl-r">
         <dl>
           <div><dt class="cut">Cut</dt><dd><s>A single “Toss again” after every answer.</s></dd></div>
@@ -1401,115 +1616,166 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       </div>
     </article>
 
-    <details class="more" open>
-      <summary><span>What each action after the reveal does</span><small>Let's do it, the other side, toss again, new question</small></summary>
-      <div class="details" style="display:grid;gap:24px">
+    <div class="fork-block">
+      <div class="subh"><span class="label">After the reveal</span><h3>What each action does</h3></div>
+      <div class="fork-body">
       <div class="fork">
         <article class="answer root" style="--mode:var(--pink)"><span class="says">Answer revealed</span><span class="big">SKIP IT</span><p>Should I get the boba?</p></article>
         <div class="rail" aria-hidden="true"></div>
         <div class="branches">
-          <div class="br"><span class="act primary" aria-hidden="true">LET'S DO IT</span><p class="t"><b>Accepts the result.</b> The dice did its job and the decision is over. The primary action; re-tossing is visually demoted.</p></div>
-          <div class="br hl"><span><span class="hot" aria-hidden="true">Secretly hoping for get it?</span></span><p class="t"><b>Takes the side the dice didn't pick.</b> Yes/no and option questions only: open questions have no "other one", so they just re-toss.</p></div>
+          <div class="br"><span class="act small" aria-hidden="true">LET'S DO IT</span><p class="t"><b>Accepts the result.</b> The dice did its job and the decision is over. It's the main action; re-tossing is quieter.</p></div>
+          <div class="br"><span class="act small" aria-hidden="true">SECRETLY HOPING?</span><p class="t"><b>Takes the side the dice didn't pick.</b> Yes/no and option questions only: open questions have no "other one", so they just re-toss.</p></div>
           <div class="br"><span class="act small" aria-hidden="true">TOSS AGAIN</span><p class="t"><b>Repeated re-tossing is a signal too.</b> On the 3rd toss the character reacts, and "Secretly hoping for…?" steps forward.</p></div>
           <div class="br"><span class="act small" aria-hidden="true">NEW QUESTION</span><p class="t"><b>Starts a different decision.</b></p></div>
         </div>
       </div>
 
       </div>
-    </details>
-    <figure class="gif narrow"><video class="vid" src="tossy/third.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="On the third toss, savage mode says Third time? You just don't like the answer, and the other-side link is highlighted"></video><figcaption><span class="fn">Fig. 3.1</span> · Toss #3: the character calls it out and "Secretly hoping for…?" steps forward.</figcaption></figure>
-
-  </section>
-
-  <!-- 04 -->
-  <section class="cs acc-aqua" id="toss" aria-labelledby="h4a" data-sec="04">
-    <div class="head">
-      <div class="sh"><span class="n">04</span><span class="tt">Interaction</span><span class="aside">Interaction</span></div>
-      <h2 id="h4a">Designing the toss</h2>
     </div>
-    <figure class="gif"><video class="vid" src="tossy/toss.mp4#t=0.1" width="720" height="456" muted loop playsinline preload="metadata" aria-label="A full toss: the dice rises, hangs in the air, lands with ripples, and the answer card pops in"></video><figcaption><span class="fn">Fig. 4.1</span> · A full toss, in real time. Broken down beat by beat below.</figcaption></figure>
-    <div class="split">
+
+    <div class="subh"><span class="label">4.2 · Secretly hoping for [the other side]?</span><h3>Sometimes you already know.</h3>
+      <p>Sometimes, by the time you ask, you already have an answer in mind. If the dice lands and you catch yourself wishing it had gone the other way, that reaction is worth noticing. Tossy makes it one tap to follow it.</p></div>
+    <div class="split hope-sum">
       <div class="prose">
-        <p>If the answer is random, the moment has to feel like something. The loop is <strong>Question → Toss → Reveal</strong>, it lives in about three seconds, and the toss gets the most care.</p>
-        <p>Yes/no answers use the question's own words ("Get the boba" / "Skip it today"). Open questions get one concrete answer.</p>
-        <p><strong>Waiting is part of the toss.</strong> The AI usually takes 1–2 seconds, so instead of a spinner the dice hangs in the air for up to about 6 seconds.</p>
+        <p>In the live test, <strong>12 of 51 decisions</strong> ended with a switch to the other side (8 of 24 on yes/no questions). Most of these came while the AI was down (Section 05), so this is a signal worth testing further, not proof yet.</p>
+          <div class="grids">
+            <figure><div class="pxgrid" data-n="51" data-k="12" role="img" aria-label="51 decisions, 12 switched"></div><figcaption><b>12 / 51</b> All decisions switched</figcaption></figure>
+            <figure><div class="pxgrid" data-n="24" data-k="8" role="img" aria-label="24 yes/no decisions, 8 switched"></div><figcaption><b>8 / 24</b> Yes/no switched (33%)</figcaption></figure>
+          </div>
+          <p class="legend"><i class="sw acc"></i>Accepted the dice <i class="sw swi"></i>Switched to the other one</p>
       </div>
-      <div style="display:grid;gap:28px">
-        <figure class="quote"><div class="die bob" data-face="gentle"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>Anticipation turns a random result into a moment.</blockquote></figure>
-        <div class="loop"><span>QUESTION</span><em>→</em><span class="hl">TOSS</span><em>→</em><span>REVEAL</span></div>
-      </div>
+      <figure class="quote"><div class="die bob" data-face="bestie"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>When you're stuck, you don't need a perfect pros-and-cons table. You need a buddy to give you a nudge.</blockquote></figure>
     </div>
+    <figure class="gif narrow third-fig"><video class="vid" src="tossy/third-live.mp4#t=0.1" width="800" height="740" muted loop playsinline preload="metadata" aria-label="On the third toss, bestie mode says Babe, toss #3, you want the other one, and the other-side link is highlighted"></video><figcaption><span class="fn">Fig. 4.1</span> · Toss #3: the character calls it out and "Secretly hoping for…?" steps forward.</figcaption></figure>
 
-    <div class="beats-scroll" tabindex="0" aria-label="Six beats of the toss, 2.6 seconds base timing">
-      <div class="beats">
-        <div class="beat card"><div class="cell"><div class="die" data-face="bestie" style="top:22%;transform:translateX(-50%) scale(1.15,.8);transform-origin:50% 100%"></div><div class="gnd"></div><div class="tr" style="top:auto;bottom:24%;display:none"></div></div><span class="n">Beat 1</span><b>Rise</b><span class="ms">0 – 800 ms<small>Squash, then launch</small></span></div>
-        <div class="beat card"><div class="cell"><div class="die" data-face="listen" style="top:6%;transform:translateX(-50%) scale(.72)"></div><div class="tr" style="top:52%"><i></i><i></i><i></i></div><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 2</span><b>Vanish</b><span class="ms">~800 ms<small>Shrinks into the air</small></span></div>
-        <div class="beat card"><div class="cell"><div class="die" data-face="dizzy" style="top:6%;transform:translateX(-50%) scale(.72) rotate(90deg)"></div><span class="txt" style="top:62%">ROLLING...</span><div class="gnd" style="left:42%;right:42%;opacity:.4"></div></div><span class="n">Beat 3</span><b>Suspense</b><span class="ms">800 ms → up to ~6 s<small>Faces cycle mid-air while the AI answers</small></span></div>
-        <div class="beat card"><div class="cell"><div class="tr" style="top:10%"><i></i><i></i><i></i></div><div class="die" data-face="savage" style="top:30%;transform:translateX(-50%) rotate(20deg)"></div><div class="gnd"></div></div><span class="n">Beat 4</span><b>Fall</b><span class="ms">1600 – 1950 ms<small>Drops back down</small></span></div>
-        <div class="beat card"><div class="cell"><div class="rg"></div><div class="rg b"></div><i class="spk" style="left:20%;top:44%"></i><i class="spk" style="right:20%;top:40%"></i><div class="die" data-face="dizzy" style="top:auto;bottom:14%;transform:translateX(-50%) scale(1.12,.86);transform-origin:50% 100%;z-index:1"></div></div><span class="n">Beat 5</span><b>Bounce + ripples</b><span class="ms">1950 – 2600 ms<small>Impact, quake, sparks</small></span></div>
-        <div class="beat card"><div class="cell"><span class="ans-tag">GET IT</span><div class="die" data-face="bestie_yes" style="top:auto;bottom:14%"></div><div class="gnd"></div></div><span class="n">Beat 6</span><b>Reveal</b><span class="ms">2600 ms<small>Answer card pops in</small></span></div>
+    <div class="subh"><span class="label">4.3 · Your data stays with you</span><h3>Your history lives on your device.</h3></div>
+    <div class="local">
+      <div class="prose">
+        <p>It stays only on your device, with a Clear all. No account needed.</p>
+        <p>Analytics only count anonymous events, never what you ask. The question goes to the AI only to write the options and the line, and the API key stays server-side.</p>
       </div>
+      <div class="show"><div class="count"><span class="ctr"><svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>RECENT <i>8</i></span><p>THE DICE HAS SETTLED 8 DECISIONS FOR YOU.</p></div></div>
     </div>
-    <p class="beats-note">Base timing shown. If the AI is still answering, the dice keeps hovering (up to about 6 s) and the later beats shift back by the same amount.</p>
-    <details class="more">
-      <summary><span>More small details</span><small>Modes, skins, 8-bit sound, haptics, pull-to-refresh, decision count, fresh lines, Chinese version, easter eggs</small></summary>
-      <p class="more-intro">I used personality to make the interaction feel light and distinctive. Every detail follows the same rule: keep a low-stakes moment light.</p>
-    <div class="split more-gifs" style="gap:18px">
-      <figure class="gif"><video class="vid" src="tossy/listen.mp4#t=0.1" width="780" height="430" muted loop playsinline preload="metadata" aria-label="Typing a question while the dice listens and its speech bubble changes"></video><figcaption><span class="fn">Fig. 4.2</span> · The dice "listens" while you type.</figcaption></figure>
-      <figure class="gif"><video class="vid" src="tossy/split.mp4#t=0.1" width="800" height="270" muted loop playsinline preload="metadata" aria-label="Tapping the Coffee or tea starter question fills two option fields"></video><figcaption><span class="fn">Fig. 4.3</span> · An "X or Y" starter splits into two options.</figcaption></figure>
-    </div>
-    <div class="details">
-      <div class="det"><div class="show rec"><video class="vid" src="tossy/modes.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Switching between the four modes changes the dice face and its greeting"></video></div><h3>Modes</h3><p>Bestie, savage, rational, gentle. Same dice, different voice.</p></div>
-      <div class="det"><div class="show rec"><video class="vid" src="tossy/skins.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="Clicking through the six skins recolors the whole page"></video></div><h3>Skins</h3><p>Pick a palette before you toss.</p></div>
-      <div class="det"><div class="show"><div class="speaker"><svg width="64" height="64" viewBox="0 0 20 20" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="7" width="4" height="6" class="d-line"/><rect x="6" y="5" width="2" height="10" class="d-line"/><rect x="8" y="3" width="2" height="14" class="d-line"/><rect x="12" y="7" width="2" height="6" style="fill:var(--btn)"/><rect x="15" y="4" width="2" height="12" style="fill:var(--btn)"/></svg><span class="notes">♪ BLIP<br>♪ BOOP</span></div></div><h3>8-bit sound</h3><p>A tiny sound for a tiny decision. Can be muted.</p></div>
-      <div class="det"><div class="show"><div class="phone"><div class="die" data-face="bestie_yes"></div></div></div><h3>Haptics</h3><p>On phones, you feel the dice land.</p></div>
-      <div class="det"><div class="show rec tall"><video class="vid" src="tossy/pull-refresh.mp4#t=0.1" muted loop playsinline preload="metadata" aria-label="On a phone, pulling down shows a small spinning dice and Release to refresh"></video></div><h3>Dice pull-to-refresh</h3><p>Pull down and the dice spins. Built because Safari's bounce area broke the polka-dot background.</p></div>
-      <div class="det"><div class="show"><div class="count"><span class="ctr"><svg width="12" height="12" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" width="4" height="14" fill="#ffd463"/><rect y="5" width="14" height="4" fill="#ffd463"/><rect x="3" y="3" width="8" height="8" fill="#ffd463"/></svg>RECENT <i>8</i></span><p>THE DICE HAS SETTLED 8 DECISIONS FOR YOU.</p></div></div><h3>Decision count</h3><p>"The dice has settled 8 decisions for you."</p></div>
-      <div class="det"><div class="show"><div class="fresh"><p class="say">DON'T ARGUE WITH THE DICE.</p><span>≠</span><p class="say">STOP STARING. GO.</p></div></div><h3>Fresh lines</h3><p>The same comment never shows up twice in a row.</p></div>
-      <div class="det"><div class="show"><div class="zh"><div class="row"><span style="--c:#ff9dca">闺蜜</span><span style="--c:#a88cf7">毒舌</span><span style="--c:#74d7f2">理性</span><span style="--c:#ffd463">温柔</span></div><p class="say">宝，第三次了。你其实想要另一个吧。</p></div></div><h3>Chinese version</h3><p>Pixel font and copy for Chinese-speaking users.</p></div>
-      <div class="det"><div class="show"><ul class="eggs"><li>Poke the dice → "Hehe, that tickles!"</li><li>Its eyes follow your cursor</li><li>Hold TOSS to charge a super toss</li></ul></div><h3>Easter eggs</h3><p>Small rewards for people who poke around.</p></div>
-    </div>
-    </details>
   </section>
 
-  <!-- 05 -->
-  <section class="cs acc-aqua" aria-labelledby="h6a" data-sec="05">
+
+  <!-- 05 TESTING -->
+  <section class="cs acc-aqua sc-target" id="evidence" aria-labelledby="h5a" data-sec="05">
     <div class="head">
-      <div class="sh"><span class="n">05</span><span class="tt">AI &amp; character</span><span class="aside">AI behavior</span></div>
-      <h2 id="h6a">AI shapes the options, the dice picks.</h2>
+      <div class="sh"><span class="n">05</span><span class="tt">What testing showed</span><span class="aside">Evidence</span></div>
+      <h2 id="h5a">The fallback worked too well.</h2>
+      <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. The biggest lesson came first:</p></div>
     </div>
+    <ol class="chain" aria-label="Outage, fix, after">
+      <li><span class="ck">Outage · Sep 27 – Oct 8</span><b>AI was down and nobody saw it.</b><p>The production API key was missing, so 0 of 111 AI requests succeeded. Every feature fell back to local answers without an error. 42 of the 51 recorded decisions happened here.</p></li>
+      <li><span class="ck">Fix</span><b>Restored the key, then raised the wait.</b><p>A 4.2-second limit still let some calls time out, so the dice now hovers for up to 6 seconds. Lesson: a fallback that hides failures needs monitoring that doesn't.</p></li>
+      <li><span class="ck">After · Oct 8 – Nov 15</span><b>26 of 29 AI requests succeeded.</b><p>But only 7 decisions were recorded. Too few to say anything about the AI's effect.</p></li>
+    </ol>
+    <p class="chain-note">So Findings 1 to 3 describe how people used the interaction, mostly without AI. They don't show that it helped anyone decide.</p>
+    <div class="findings">
+      <article class="find card">
+        <span class="k">Finding 1</span>
+        <div>
+          <h3>Some people tossed before typing.</h3>
+          <p>Some testers skipped the question entirely and just hit toss.</p>
+          <div class="steps">
+            <div><i>Users did</i>Tapped TOSS IT! with an empty box.</div>
+            <div><i>I changed</i>An empty toss now picks a question for you.<br><span class="say-in">NOTHING TO ASK? I PICKED ONE.</span></div>
+            <div><i>What it showed</i>19 of 145 tosses had no question. The path gets used; why, I don't know yet.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="find panel">
+        <span class="k">Finding 2</span>
+        <div>
+          <h3>Answers that missed the question.</h3>
+          <p>A friend asked what to eat while drinking tonight. Tossy said sparkling water; she tossed again and got iced Americano. "Why is everything a drink?" An irrelevant answer breaks trust in a way a random one doesn't. This pushed the AI to read the question first (→ Finding 4). Part of it was the outage above.</p>
+          <div class="chatlog">
+            <span class="q">Q · What should I eat while drinking with friends tonight?</span>
+            <div class="row"><span class="a">SPARKLING WATER</span><span class="arrow">→ toss again →</span><span class="a">ICED AMERICANO</span></div>
+            <p class="msg">"Why is everything a drink?"</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="find panel">
+        <span class="k">Finding 3</span>
+        <div>
+          <h3>Some people took the other side.</h3>
+          <p>12 of 51 recorded decisions ended with a switch (→ Section 04). The switch doesn't depend on the AI, so it kept working during the outage. It shows the switch gets used. It doesn't yet show that people understood themselves better or liked the result more.</p>
+    <div class="numbers-block">
+      <div class="subh"><span class="label">Data</span><h3>The numbers behind the findings</h3></div>
+      <div class="details" style="display:grid;gap:24px">
+    <div class="ver">
+      <span class="label">Which version was tested · split by timestamp against the outage</span>
+      <div class="ver-wrap">
+        <table class="ver-t">
+          <thead><tr><th>Period (UTC)</th><th>AI status</th><th>AI requests OK</th><th>Tosses</th><th>Decisions</th><th>Switched</th></tr></thead>
+          <tbody>
+            <tr><td>Sep 27 16:08 – 19:37</td><td><i class="ok"></i>AI enabled</td><td>2 of 3</td><td>3</td><td>2</td><td>1</td></tr>
+            <tr class="hl"><td>Sep 27 19:37 – Oct 8 05:56</td><td><i class="down"></i>API outage · local fallback</td><td>0 of 111</td><td>112</td><td>42</td><td>9 · yes/no 7 of 20</td></tr>
+            <tr><td>Oct 8 06:00 – Nov 15</td><td><i class="ok"></i>AI enabled</td><td>26 of 29</td><td>30</td><td>7</td><td>2</td></tr>
+            <tr class="sum"><td>Whole test · Sep 27 – Nov 15</td><td></td><td>28 of 143</td><td>145</td><td>51</td><td>12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="ver-note">The rows add up to the figures used throughout this section. AI requests are logged separately from tosses: depending on the question, one toss can trigger zero, one or two requests (a comment line and answer candidates), so the two counts don't match one-to-one.</p>
+      <p class="ver-note">Most testing happened in the first two weeks, while I was still iterating with friends, which overlapped with the outage.</p>
+    </div>
+
+    <div style="display:grid;gap:16px">
+      <span class="label">Early signals · PostHog · Sep 27 – Nov 15</span>
+      <div class="stats">
+        <div class="stat card"><span class="v">118</span><span class="l">Unique visitors</span></div>
+        <div class="stat card"><span class="v">145</span><span class="l">Tosses</span></div>
+        <div class="stat card"><span class="v">29%</span><span class="l">Re-tosses · 42 of 145</span></div>
+        <div class="stat card hl"><span class="v">33%</span><span class="l">Switched on yes/no · 8 of 24</span></div>
+      </div>
+      <div class="sigwrap">
+        <table class="sig">
+          <tbody>
+            <tr><th>Decisions recorded</th><td>51 · 39 accepted, 12 switched</td></tr>
+            <tr><th>Switched on options</th><td>4 of 17 (24%)</td></tr>
+            <tr><th>Empty toss, Tossy picked the question</th><td>19 of 145 (13%)</td></tr>
+            <tr><th>Tapped a starter question</th><td>12 of 145 (8%)</td></tr>
+            <tr><th>Results shared</th><td>6</td></tr>
+          </tbody>
+        </table>
+        <div class="mix">
+          <span class="label">Mode mix</span>
+          <div class="bar" role="img" aria-label="Savage 43%, Rational 27%, Bestie 17%, Gentle 13%">
+            <span style="flex:43;background:#a88cf7" data-tip="Savage 43%"></span><span style="flex:27;background:#74d7f2" data-tip="Rational 27%"></span><span style="flex:17;background:#ff9dca" data-tip="Bestie 17%"></span><span style="flex:13;background:#ffd463" data-tip="Gentle 13%"></span>
+          </div>
+          <div class="keys"><span><i style="background:#a88cf7"></i>Savage 43%</span><span><i style="background:#74d7f2"></i>Rational 27%</span><span><i style="background:#ff9dca"></i>Bestie 17%</span><span><i style="background:#ffd463"></i>Gentle 13%</span></div>
+        </div>
+      </div>
+      <div class="foot-notes">
+        <p><b>How it was counted.</b> My own test sessions are excluded throughout, including other devices I tested on. Most visitors were friends opening a shared link without a decision in mind.</p>
+        
+        <p><b>Reliability.</b> After the fix, successful AI requests took a median of 1.4 s; the 3 failed ones fell back to local answers.</p>
+      </div>
+    </div>
+      </div>
+    </div>
+        </div>
+      </article>
+
+      <article class="find panel find4">
+        <span class="k">Finding 4</span>
+        <div>
+          <h3>The AI needed limits, and Savage needed a character.</h3>
+          <p>Testing showed where the AI and the voice needed work: how the Gemini setup evolved, the guardrails on every line, and how Savage went from a rulebook to a character.</p>
     <article class="dec">
-      <div class="dl-l"><span class="dk"><b>5.1</b>Decision</span><h3>AI narrows the options. The dice draws one.</h3></div>
+      <div class="dl-l"><span class="dk">Decision</span><h3>Don't let the AI pick the answer.</h3></div>
       <div class="dl-r">
         <dl>
           <div><dt class="cut">Cut</dt><dd><s>An AI recommendation as the answer.</s></dd></div>
-          <div><dt class="kept">Kept</dt><dd class="kept">AI drafts the options and the lines; the dice draws one at random.</dd></div>
-          <div><dt>Why</dt><dd>A “smart” answer asks to be trusted, and second-guessed. A random one just gets pushed against. But writing the six candidates already decides what can come up, so the AI still holds real influence. The guardrails below are how I limit it.</dd></div>
+          <div><dt class="kept">Kept</dt><dd class="kept">AI writes the options and the lines; the dice picks one at random.</dd></div>
+          <div><dt>Why</dt><dd>A “smart” answer asks to be trusted, and second-guessed. A random one just gets pushed against. But writing the candidates already decides what can come up, so the AI still holds real influence. The guardrails below are how I limit it.</dd></div>
         </dl>
-        <div class="ev"><b>5</b><span>guardrails on every AI line</span></div>
       </div>
     </article>
-    <div class="roles">
-      <div class="role panel">
-        <h3><span class="tag" style="--mode:var(--lav)">AI · Gemini</span>Shapes the options</h3>
-        <ul>
-          <li><b>Reads the question</b><span>Is it yes/no or open?</span></li>
-          <li><b>Writes the options</b><span>Yes/no: both sides in the question's own words. Open: six concrete candidates, each with its own line.</span></li>
-          <li><b>Writes the voice</b><span>Mode changes the tone of the comment, never the answer.</span></li>
-          <li><b>Expands the pool</b><span>Wildcard adds Tossy's own pick. If you give one option, Tossy's pick joins it.</span></li>
-          <li class="never"><b>Doesn't draw the winner</b><span>But it sets the pool, which limits what can come up.</span></li>
-        </ul>
-      </div>
-      <div class="divider" aria-hidden="true"></div>
-      <div class="role panel">
-        <h3><span class="tag" style="--mode:var(--aqua)">Dice · Random</span>Picks the outcome</h3>
-        <ul>
-          <li><b>Yes / no</b><span>Still a 50/50 toss between the two sides the AI wrote.</span></li>
-          <li><b>Open questions</b><span>The answer is drawn at random from the six candidates.</span></li>
-          
-        </ul>
-      </div>
-    </div>
 
     <details class="more">
       <summary><span>How the AI got there, and its 5 guardrails</span><small>4 iterations · concrete answers · comment matches answer · non-decisions · a tone, not an expert · fallback</small></summary>
@@ -1538,12 +1804,12 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       </div>
     </details>
 
-    <figure class="gif"><video class="vid" src="tossy/wildcard.mp4#t=0.1" width="720" height="445" muted loop playsinline preload="metadata" aria-label="One option, Pizza, is added; Tossy's own pick joins automatically; the dice lands on Tossy's pick, Pho"></video><figcaption><span class="fn">Fig. 5.1</span> · Wildcard: give one option and Tossy's own pick joins the pool. Here the dice chose Tossy's pick.</figcaption></figure>
     <div class="spot panel">
       <div class="spot-head"><span class="tag" style="--mode:var(--lav)">Spotlight · Savage mode</span><h3>From rules to a character</h3></div>
       <div class="spot-body">
         <div class="prose">
           <p>Savage mode started as a list of things the AI must never say. In testing, friends still got lines that felt mean, and each patch to the list let something new slip through. So I stopped writing rules and wrote a character instead: <strong>the old friend who talks tough but has your back.</strong> It roasts the situation, the indecision and the dice. Never the person.</p>
+          <p>It was also the most-used mode, at <strong>43% of tosses</strong>. Savage is the default, so that partly reflects the default; still, people kept it on.</p>
         </div>
         <figure class="quote"><div class="die bob" data-face="savage"></div><blockquote class="bubble" style="margin:0"><svg width="12" height="16" viewBox="0 0 12 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="8" width="4" height="16" class="d-line"/><rect x="4" y="4" width="4" height="8" class="d-line"/><rect y="6" width="4" height="4" class="d-line"/><rect x="8" y="4" width="4" height="8" style="fill:var(--card)"/><rect x="4" y="6" width="4" height="4" style="fill:var(--card)"/></svg>The user is the hero of the joke, not the punchline.</blockquote></figure>
       </div>
@@ -1574,177 +1840,18 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       <p class="recreated">Illustrative lines written for this page, not logged outputs.</p>
 
     </div>
+        </div>
+      </article>
+    </div>
   </section>
 
-  <!-- 06 -->
-  <section class="cs acc-aqua sc-target" id="evidence" aria-labelledby="h8a" data-sec="06">
+  <!-- 06 REFLECTION -->
+  <section class="cs acc-aqua" aria-labelledby="h9a" data-sec="06">
     <div class="head">
-      <div class="sh"><span class="n">06</span><span class="tt">Testing &amp; evidence</span><span class="aside">Evidence</span></div>
-      <h2 id="h8a">What testing showed, and what it didn't</h2>
-      <div class="prose"><p>I shared Tossy with friends, who passed it on to their friends. Each round, I fixed what broke. Read the numbers with one fact first:</p></div>
-    </div>
-    <ol class="chain" aria-label="Outage, fix, after">
-      <li><span class="ck">Outage · Sep 27 – Oct 8</span><b>AI was down and nobody saw it.</b><p>The production API key was missing, so 0 of 111 AI requests succeeded. Every feature fell back to local answers without an error. 42 of the 51 recorded decisions happened here.</p></li>
-      <li><span class="ck">Fix</span><b>Restored the key, then raised the wait.</b><p>A 4.2-second limit still let some calls time out, so the dice now hovers for up to about 6 seconds. Lesson: a fallback that hides failures needs monitoring that doesn't.</p></li>
-      <li><span class="ck">After · Oct 8 – Nov 15</span><b>26 of 29 AI requests succeeded.</b><p>But only 7 decisions were recorded. Too few to say anything about the AI's effect.</p></li>
-    </ol>
-    <p class="chain-note">So the findings below describe how people used the interaction, mostly without AI. They don't show that it helped anyone decide.</p>
-    <div class="findings">
-      <article class="find card">
-        <span class="k">Finding 1</span>
-        <div>
-          <h3>People wanted to toss before typing.</h3>
-          <p>Testers pushed the principle further than I had: don't even make people write the question down.</p>
-          <div class="steps">
-            <div><i>Users did</i>Tapped TOSS IT! with an empty box.</div>
-            <div><i>I changed</i>An empty toss now picks a question for you.<br><span class="say-in">NOTHING TO ASK? I PICKED ONE.</span></div>
-            <div><i>What it showed</i>59 of 145 tosses had no question. The path gets used; why, I don't know yet.</div>
-          </div>
-        </div>
-      </article>
-
-      <article class="find panel">
-        <span class="k">Finding 2</span>
-        <div>
-          <h3>Answers that missed the question.</h3>
-          <p>A friend asked what to eat while drinking tonight. Tossy said sparkling water; she tossed again and got iced Americano. "Why is everything a drink?" An irrelevant answer breaks trust in a way a random one doesn't. This pushed the AI to read the question first (→ Section 05). Part of it was the outage above.</p>
-          <div class="chatlog">
-            <span class="q">Q · What should I eat while drinking with friends tonight?</span>
-            <div class="row"><span class="a">SPARKLING WATER</span><span class="arrow">→ toss again →</span><span class="a">ICED AMERICANO</span></div>
-            <p class="msg">"Why is everything a drink?"</p>
-          </div>
-        </div>
-      </article>
-
-
-      
-
-      <article class="find panel">
-        <span class="k">Finding 3</span>
-        <div>
-          <h3>Some people took the other side.</h3>
-          <p>12 of 51 recorded decisions ended with a switch; on yes/no questions, 8 of 24. The switch doesn't depend on the AI, so it worked during the outage too. It shows the switch gets used, not that people understood themselves better or liked the result more. Some may just have been playing.</p>
-          <div class="grids">
-            <figure><div class="pxgrid" data-n="51" data-k="12" role="img" aria-label="51 decisions, 12 switched"></div><figcaption><b>12 / 51</b> All decisions switched</figcaption></figure>
-            <figure><div class="pxgrid" data-n="24" data-k="8" role="img" aria-label="24 yes/no decisions, 8 switched"></div><figcaption><b>8 / 24</b> Yes/no switched (33%)</figcaption></figure>
-          </div>
-          <p class="legend"><i class="sw acc"></i>Accepted the dice <i class="sw swi"></i>Switched to the other one</p>
-        </div>
-      </article>
-
-      
-    </div>
-
-    
-    <details class="more">
-      <summary><span>The numbers behind the findings</span><small>Version split against the outage · early signals from PostHog · mode mix · how it was counted</small></summary>
-      <div class="details" style="display:grid;gap:24px">
-    <div class="ver">
-      <span class="label">Which version was tested · split by timestamp against the outage</span>
-      <div class="ver-wrap">
-        <table class="ver-t">
-          <thead><tr><th>Period (UTC)</th><th>AI status</th><th>AI requests OK</th><th>Tosses</th><th>Decisions</th><th>Switched</th></tr></thead>
-          <tbody>
-            <tr><td>Sep 27 16:08 – 19:37</td><td><i class="ok"></i>AI enabled</td><td>2 of 3</td><td>3</td><td>2</td><td>1</td></tr>
-            <tr class="hl"><td>Sep 27 19:37 – Oct 8 05:56</td><td><i class="down"></i>API outage · local fallback</td><td>0 of 111</td><td>112</td><td>42</td><td>9 · yes/no 7 of 20</td></tr>
-            <tr><td>Oct 8 06:00 – Nov 15</td><td><i class="ok"></i>AI enabled</td><td>26 of 29</td><td>30</td><td>7</td><td>2</td></tr>
-            <tr class="sum"><td>Whole test · Sep 27 – Nov 15</td><td></td><td>28 of 143</td><td>145</td><td>51</td><td>12</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="ver-note">The rows add up to the figures used throughout this section. AI requests are logged separately from tosses: depending on the question, one toss can trigger zero, one or two requests (a comment line and answer candidates), so the two counts don't match one-to-one.</p>
-      <p class="ver-note">Most testing happened in the first two weeks, while I was still iterating with friends before launch, which overlapped with the outage. My own sessions are excluded throughout, including the other devices I tested on.</p>
-    </div>
-
-    <div style="display:grid;gap:16px">
-      <span class="label">Early signals · PostHog · Sep 27 – Nov 15</span>
-      <div class="stats">
-        <div class="stat card"><span class="v">118</span><span class="l">Unique visitors</span></div>
-        <div class="stat card"><span class="v">145</span><span class="l">Tosses</span></div>
-        <div class="stat card"><span class="v">29%</span><span class="l">Re-tosses · 42 of 145</span></div>
-        <div class="stat card hl"><span class="v">33%</span><span class="l">Switched on yes/no · 8 of 24</span></div>
-      </div>
-      <div class="sigwrap">
-        <table class="sig">
-          <tbody>
-            <tr><th>Decisions recorded</th><td>51 · 39 accepted, 12 switched</td></tr>
-            <tr><th>Switched on options</th><td>4 of 17 (24%)</td></tr>
-            <tr><th>Empty toss, Tossy picked the question</th><td>59 of 145 (41%)</td></tr>
-            <tr><th>Tapped a starter question</th><td>12 of 145 (8%)</td></tr>
-            <tr><th>Results shared</th><td>6</td></tr>
-          </tbody>
-        </table>
-        <div class="mix">
-          <span class="label">Mode mix</span>
-          <div class="bar" role="img" aria-label="Savage 43%, Rational 27%, Bestie 17%, Gentle 13%">
-            <span style="flex:43;background:#a88cf7" data-tip="Savage 43%"></span><span style="flex:27;background:#74d7f2" data-tip="Rational 27%"></span><span style="flex:17;background:#ff9dca" data-tip="Bestie 17%"></span><span style="flex:13;background:#ffd463" data-tip="Gentle 13%"></span>
-          </div>
-          <div class="keys"><span><i style="background:#a88cf7"></i>Savage 43%</span><span><i style="background:#74d7f2"></i>Rational 27%</span><span><i style="background:#ff9dca"></i>Bestie 17%</span><span><i style="background:#ffd463"></i>Gentle 13%</span></div>
-        </div>
-      </div>
-      <div class="foot-notes">
-        <p><b>How it was counted.</b> My own test sessions are excluded throughout, including other devices I tested on. Most visitors were friends opening a shared link without a decision in mind.</p>
-        <p><b>Privacy.</b> Analytics track events, never the questions people ask. The API key stays server-side.</p>
-        <p><b>Reliability.</b> After the fix, successful AI requests took a median of 1.4 s; the 3 failed ones fell back to local answers.</p>
-      </div>
-    </div>
-      </div>
-    </details>
-  </section>
-
-  <!-- 07 -->
-  <section class="cs acc-aqua" aria-labelledby="h9a" data-sec="07">
-    <div class="head">
-      <div class="sh"><span class="n">07</span><span class="tt">Reflection</span><span class="aside">What’s next</span></div>
+      <div class="sh"><span class="n">06</span><span class="tt">Reflection</span><span class="aside">What’s next</span></div>
       <h2 id="h9a">What I'm taking forward</h2>
     </div>
-        <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Looking back</span><p class="big">I set out to make decisions for people. The more interesting part was <em>watching them disagree with the dice.</em></p></article>
-    <div class="lists">
-      <div>
-        <h3>Limitations</h3>
-        <ul>
-          <li>Small sample: 118 visitors, mostly friends and friends of friends, and most decisions were logged while the AI was down.</li>
-          <li>The preference signal only works for yes/no and option questions.</li>
-          <li>Randomness fits low-stakes choices. Tossy isn't built for serious ones.</li>
-        </ul>
-      </div>
-      <div class="next">
-        <h3>What I'd test next</h3>
-        <ul>
-          <li>Do people who switch feel better about the final choice than people who accept?</li>
-          <li>Watch people use it and ask why they accept, switch or re-toss, to tell a recognized preference from simply enjoying the interaction.</li>
-          <li>Does mode change how often people accept the first result?</li>
-          <li>With AI on for a full round, does the comment line change how often people switch?</li>
-        </ul>
-      </div>
-    </div>
-
-    <details class="more" id="riskMore" open>
-      <summary><span>Risks I designed for, and where it could go</span><small>Retention, big decisions, privacy · free toss, personality packs, party mode</small></summary>
-      <div class="details" style="display:grid;gap:24px">
-    <div class="risks">
-      <span class="label">Three risks I designed for</span>
-      <div class="risk-rows">
-        <div><b>People use it once, then leave</b><p>Small decisions come often but pass fast. So results can be shared with friends, the dice keeps count ("The dice has settled 8 decisions for you"), history stays on the device, and as a PWA Tossy can live on the home screen.</p></div>
-        <div><b>Someone brings a big decision</b><p>The footer says it plainly: <q>Tossy answers at random. It is a playful nudge, not advice. For big decisions, ask a real person.</q></p></div>
-        <div><b>Privacy</b><p>No account. History is saved on the device only, with a Clear all. The question goes to the AI only to write the options and the line, and analytics never see it.</p></div>
-      </div>
-    </div>
-    <div class="lists">
-      <div class="next">
-        <h3>Where it could go</h3>
-        <ul>
-          <li>The toss itself stays free, with no sign-up.</li>
-          <li>Extras that build on the buddy: seasonal skins and new personality packs.</li>
-          <li>A party mode: phones on the table, Tossy decides who pays tonight.</li>
-        </ul>
-      </div>
-    </div>
-      </div>
-    </details>
-
-    
-
+        <article class="answer bigq block"><div class="peek die" data-face="gentle_yes"></div><span class="says">Biggest takeaway</span><p class="big">The best moment wasn't the toss. <em>It was when people pushed back on the dice.</em></p><p class="bigq-next">That's the part I want to build on.</p></article>
     <div class="built">
       <div class="head">
         <span class="label">How I built it</span>
@@ -1752,7 +1859,7 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       <div class="split">
         <div class="prose">
           <p>I built Tossy with Claude and Codex. I was responsible for <strong>the product behavior</strong>, <strong>the interaction and visual design</strong>, <strong>the AI's character and rules</strong>, <strong>connecting Gemini and PostHog</strong>, and <strong>testing and iterating</strong> with friends.</p>
-          <p>Each round, what broke became the next brief, like the savage-mode rewrite below.</p>
+          <p>Each round, what broke became the next brief for the AI. The Savage rewrite in Finding 4 is one of them.</p>
         </div>
         <div style="display:grid;gap:28px">
           <ol class="loopc" aria-label="Build loop">
@@ -1760,18 +1867,28 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
           </ol>
         </div>
       </div>
-      <figure class="brief">
-        <div class="brief-bar"><i></i><i></i><i></i><span>brief · savage mode v2</span></div>
-        <div class="brief-body">
-          <p><b>Goal.</b> Savage should feel like teasing from a friend, not an attack.</p>
-          <p><b>Character.</b> The old friend who talks tough but has your back.</p>
-          <p><b>Target.</b> Roast the situation, the indecision and the dice. Never the person. The user is the hero of the joke, not the punchline.</p>
-          <p><b>How.</b> Show what good lines look like instead of listing what's banned. Keep the word filter only as a last safety net.</p>
-          <p><b>Keep.</b> The UI name stays "Savage". The answer itself stays random; tone only changes the comment.</p>
-        </div>
-        <figcaption><span class="fn">Fig. 7.1</span> · Excerpt of a brief I wrote for the AI, rewritten in English for this page.</figcaption>
-      </figure>
 
+
+    </div>
+    <div class="takeaways">
+      <div><span class="label">What it can't prove yet</span><p>The sample is still small, mostly friends, and most decisions were logged while the AI was down. With more people, the results could look different.</p></div>
+      <div><span class="label">What I'd test next</span><p>Do people who switch feel better about the final choice? And does the mode, or the AI's comment, change how often they switch?</p></div>
+      <div><span class="label">Where it could go</span><p>First, help people see their own patterns: a private, on-device note like "You switched 4 of 5 food questions this week." Then meet them where they get stuck, with a toss inside chat apps, a home-screen widget, or a Siri shortcut.</p></div>
+    </div>
+
+    
+
+
+    <div class="fits">
+      <div class="subh"><span class="label">Where Tossy fits</span><h3>Not therapy. A friend who helps you stop overthinking.</h3></div>
+      <div class="prose">
+        <p>Emotional AI used to mean clinical tools: therapy apps and guided CBT exercises. More and more, people turn to everyday AI for support instead, and what they value is that it's always there and doesn't judge.<sup>1, 2</sup> Tossy sits in that non-clinical, low-stakes space: it won't analyze your life, it just gives you a nudge.</p>
+        <p class="fits-hope">I hope Tossy helps people spend a little less energy on small choices, and notice a little more of what they actually want.</p>
+      </div>
+      <ol class="fits-src">
+        <li>Miller, Hill &amp; Moreira, <a href="https://kar.kent.ac.uk/id/document/3506414" target="_blank" rel="noopener">"Artificial Intelligence and Unconditional Love"</a>, <i>Communication and Change</i>, 2026.</li>
+        <li>Elon University, Imagining the Digital Future Center, <a href="https://www.elon.edu/u/news/2026/09/02/imagining-the-digital-future-center-reports-on-the-rise-of-ai-companions/" target="_blank" rel="noopener">"The Rise of AI Companions"</a>, 2026.</li>
+      </ol>
     </div>
   </section>
 
@@ -1784,7 +1901,7 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
         <p class="end-sub">Tossy is live. Ask it something small.</p>
         <a class="btn-e primary" href="https://tossy.me" target="_blank" rel="noopener">Toss your own ↗</a>
       </div>
-      <a class="nextcase" href="glowin.html" data-pf><span class="nl">Next case · 02</span><span class="nn">Glowin <i>→</i></span><span class="nd">One platform, three entry points.</span></a>
+      <a class="nextcase" href="glowin.html" data-pf><span class="nl">Next case</span><span class="nn">Glowin <i>→</i></span><span class="nd">One platform, three entry points.</span></a>
     </div>
   </section>
 </div>
@@ -1908,7 +2025,7 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
       a.innerHTML = '<span class="says">' + MODES[mode].label + ' says</span><h3>' + SIDES[yes ? "yes" : "no"] + '</h3><p>' + line[1] + '</p><button class="hope-btn" type="button" id="hopeBtn">Secretly hoping for ' + other.toLowerCase() + '?</button>';
       bump(a, "on");
       busy = false; $("demoToss").disabled = false; $("demoToss").textContent = "TOSS AGAIN";
-      setStep(3, "Wish it had landed the other way? That's allowed.");
+      setStep(3, "Let's do it, or secretly hoping for the other side?");
       if (auto) {
         autoT.push(setTimeout(function () { var h = $("hopeBtn"); if (h && auto) h.classList.add("pulse"); }, 1400));
         autoT.push(setTimeout(function () { if (auto) switchSide(); }, 3000));
@@ -1921,7 +2038,7 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
     a.className = "answer";
     a.innerHTML = '<span class="stamp">SWITCHED</span><span class="says">' + MODES[last.mode].label + ' says</span><h3>' + other + '</h3><p>' + OTHER[last.mode] + '</p>';
     bump(a, "on"); setFace(last.mode + "_yes");
-    setStep(4, "The dice picked one side; the person picked the other. That switch is the signal Tossy records.");
+    setStep(4, "The dice picked one side; you picked the other. Tossy helps you notice what you wanted.");
     auto = false;
   }
   $("demoAnswer").addEventListener("click", function (e) { if (e.target.closest("#hopeBtn")) { stopAuto(); switchSide(); } });
@@ -1945,9 +2062,9 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
   if (!reduce) {
     var go = function () { if (auto) startToss(); };
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); autoT.push(setTimeout(go, 900)); } }, { threshold: .5 });
+      var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); autoT.push(setTimeout(go, 2600)); } }, { threshold: .5 });
       io.observe($("demo"));
-    } else autoT.push(setTimeout(go, 900));
+    } else autoT.push(setTimeout(go, 2600));
   } else { auto = false; }
 })();
 </script>
@@ -2040,5 +2157,51 @@ section[data-sec="07"] > .lists{grid-template-columns:repeat(2,minmax(0,1fr))!im
 
 
 <script id="mobile-open">(function(){if(matchMedia('(max-width:760px)').matches){document.querySelectorAll('details.more').forEach(function(d){d.open=true})}})();</script>
+<script id="think-js">
+(function(){
+  var st=document.getElementById('think'); if(!st) return;
+  var T=["Black or white? Black is practical… white looks better.","McDonald's or Burger King?","Should I text him back now, or wait?","Pasta or ramen. Again.","Gym tonight… or tomorrow?","Is it too late for coffee?","Window or aisle?","Cancel plans and stay in?","Keep it or return it?","Walk or grab an Uber?","Reply now or after lunch?","Netflix or sleep?","Buy it now or wait for a sale?","Bangs? No bangs?"];
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mob=matchMedia('(max-width:760px)').matches;
+  var SLOTS=mob?[[30,6],[70,16],[30,28],[70,40],[32,52],[68,64],[30,76],[70,90]]
+               :[[12,12],[38,8],[64,14],[88,10],[22,36],[50,34],[78,38],[10,60],[36,58],[62,62],[90,60],[20,86],[48,88],[76,86]];
+  var used={},i=0,timer=null,on=false,LIFE=mob?4200:6500;
+  function pick(a){return a[Math.floor(Math.random()*a.length)]}
+  function spawn(){
+    var free=SLOTS.map(function(_,k){return k}).filter(function(k){return !used[k]}); if(!free.length) return;
+    var k=pick(free),b=document.createElement('div');
+    b.className='tb'+(SLOTS[k][0]>55?' r':'');b.textContent=T[i++%T.length];
+    b.style.left=(SLOTS[k][0]+(mob?Math.random()*4-2:Math.random()*8-4))+'%';b.style.top=(SLOTS[k][1]+Math.random()*6-3)+'%';b.style.animationDelay='0s,'+(Math.random()*.8+.35).toFixed(2)+'s';
+    used[k]=b;st.appendChild(b);
+  }
+  function start(){if(on)return;on=true;spawn();timer=setInterval(function(){if(Object.keys(used).length>=SLOTS.length){clearInterval(timer);return}spawn()},mob?500:420);}
+  function stop(){on=false;clearInterval(timer);}
+  if(reduce){for(var j=0;j<SLOTS.length;j++)spawn();return;}
+  if('IntersectionObserver' in window){new IntersectionObserver(function(es){es[0].isIntersecting?start():stop();},{threshold:.2}).observe(st);}else start();
+})();
+</script>
+
+<script id="relay-js">
+(function(){
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  [].slice.call(document.querySelectorAll('.trio,.ways')).forEach(function(g){
+    var v=[].slice.call(g.querySelectorAll('video.rv')); if(!v.length) return;
+    var cur=0, vis=false;
+    function endFrame(x){ if(x.duration) x.currentTime=Math.max(0,x.duration-0.15); }
+    v.forEach(function(x,k){
+      x.muted=true; x.preload='auto';
+      x.addEventListener('loadedmetadata',function(){ if(k!==cur||reduce) endFrame(x); });
+      x.addEventListener('ended',function(){ if(k!==cur) return; endFrame(x); cur=(cur+1)%v.length; if(vis) play(); });
+    });
+    function mark(){ v.forEach(function(x,k){ x.classList.toggle('rv-on',k===cur&&!reduce); x.classList.toggle('rv-idle',k!==cur&&!reduce); }); }
+    function play(){ mark(); var x=v[cur]; v.forEach(function(y,k){ if(k!==cur) y.pause(); }); x.currentTime=0; var p=x.play(); if(p&&p.catch) p.catch(function(){}); }
+    if(reduce){ return; }
+    mark();
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(es){ vis=es[0].isIntersecting; if(vis){ var x=v[cur]; if(x.paused){ var p=x.play(); if(p&&p.catch) p.catch(function(){}); } } else { v[cur].pause(); } },{threshold:.35}).observe(g);
+    } else { vis=true; play(); }
+  });
+})();
+</script>
 </body>
 </html>
